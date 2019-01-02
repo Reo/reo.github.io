@@ -16,16 +16,13 @@
     <!-- items div -->
     <div id="menu" class="sidenav-items" style="display:block; width:100%">
       <p><a href="{{site.url}}{{site.base-url}}">TOP</a></p>
+      <!-- [> Strikethrough current page <] -->
       {% for sitePage in site.pages %}
       {% if sitePage.layout == "homepage" %}
       {% if sitePage.title %}
       {% if sitePage.title == "reo" %}
       {% else %}
-      <!-- [> Strikethrough current page <] -->
-      <p><a {% if sitePage.title == page.title %}
-		   style="text-decoration:line-through; opacity:1"
-		   {% else%} href="/{{sitePage.title | downcase}}"
-		   {% endif %}>{{sitePage.title | upcase}}</a></p>
+      <p><a {% if sitePage.title == page.title %} style="text-decoration:line-through; opacity:1" {% else%} href="/{{sitePage.title | downcase}}" {% endif %}>{{sitePage.title | upcase}}</a></p>
       {% endif %}
       {% endif %}
       {% endif %}
