@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
 
-  <title>Reo homepage</title>
+  <title>Research</title>
 
   <meta name="description" content="Reo Erizae homepage">
 
@@ -36,7 +36,7 @@
   
   <link rel="stylesheet" href="/css/style.css">
   
-  <link rel="canonical" href="http://localhost:4000/blog/">
+  <link rel="canonical" href="http://localhost:4000/blog/research/">
   <link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://localhost:4000/feed.xml">
 </head>
 
@@ -122,48 +122,33 @@
   </div>
 </div>
 
+    
+    <!-- Page content -->
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post">
 
-    <div class="wrapper">
-
-      <!-- Archive navigation -->
-      <div class="sidenav">
-	<h2>Archive</h2>
-	<p class="side-years collapsible">2019</p>
-	<div class="collap-content">
-	  <p><a href="#">January&ensp;2019</a></p>
-	</div>
-      </div>
-
-      <!-- short blog posts -->
-      <div class="main-content">
-	<div class="home">
+  <header class="post-header">
+  <!--  <h1 class="post-title">Research</h1>-->
+  </header>
 
   
+  <div class="tagline">
+  <span class="page-title">Research</span> <span class="page-tagline"><em>experiments and readings.</em></span>
+  </div>
   
 
-
-  <h2>Introductory Blog Post</h2>
-  <p>This will be used as a journal for writing down my thoughts on math and computer science topics
-  I find interesting, musical ideas, and composition pieces in Japanese. More focused series are
-  in the works and will be under respecive tags in the future. Do note that this page is still under
-  construction and will be finalized alonogside new posts.</p>
-  <!--  -->
-  
-  <!-- <ul class="post-list"> -->
-  <!--    -->
-  <!--     <li> -->
-  <!--       <span class="post-meta-main">Dec 29, 2018</span> -->
-  <!--  -->
-  <!--       <h2> -->
-  <!--         <a class="post-link-main" href="/%E6%97%A5%E6%9C%AC%E8%AA%9E/2018/12/29/%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E7%B7%B4%E7%BF%92-1.html">日本語の練習-1</a> -->
-  <!--       </h2> -->
-  <!--     </li> -->
-  <!--    -->
-  <!-- </ul> -->
+  <div class="post-content">
+    
 
 
 
-</div>
+
+
+
+  </div>
+
+</article>
 
       </div>
     </div>
@@ -213,24 +198,6 @@
 
 
     </div>
-
-    <script>
-      var coll = document.getElementsByClassName("collapsible");
-      var i;
-
-      for (i = 0; i < coll.length; i++) {
-	coll[i].addEventListener("click", function() {
-	  this.classList.toggle("collap-active");
-	  var content = this.nextElementSibling;
-	  if (content.style.maxHeight){
-	    content.style.maxHeight = null;
-	  } else {
-	    content.style.maxHeight = content.scrollHeight + "px";
-	  } 
-	});
-      }
-    </script>
-    
   </body>
 
 </html>

@@ -14,10 +14,11 @@ $base-line-height: 1.5;
 
 $spacing-unit:     30px;
 // Width of the content area
-$content-width:    800px;
+$content-width:    940px;
+$posts-width:      640px;
 
 $on-palm:          600px;
-$on-laptop:        800px;
+$on-laptop:        940px;
 
 
 
@@ -61,6 +62,8 @@ dl, dd, ol, ul, figure {
  * Basic styling
  */
 body {
+    height:100%;
+    width:100%;
     font: $base-font-weight #{$base-font-size}/#{$base-line-height} $base-font-family;
     -webkit-text-size-adjust: 100%;
     -webkit-font-feature-settings: "kern" 1;
@@ -68,6 +71,19 @@ body {
     -o-font-feature-settings: "kern" 1;
     font-feature-settings: "kern" 1;
     font-kerning: normal;
+    background-image: url("/img/linen-texture.jpg");
+}
+
+
+
+.content {
+    width: $content-width;
+    margin-left:auto;
+    margin-right:auto;
+    padding-left: 35px;
+    padding-right: 35px;
+    background-image: url("http://www.hiromiuehara.com/files/34/blog_y01/images/bg_wrapper.gif");
+    border-radius: 20px;
 }
 
 
@@ -330,7 +346,7 @@ pre {
   // Positioning context for the mobile navigation icon
   position: relative;
 }
-.site-title {
+.blog-title {
   font-size: 64px;
   font-weight: 100;
   font-family: 'PT Sans';
@@ -338,7 +354,7 @@ pre {
   font-weight: 500;
   margin-top: 1em;
 }
-.site-description {
+.blog-description {
   font-size: 14px;
   letter-spacing: 2px;
   text-indent: 6px;
@@ -480,8 +496,92 @@ pre {
     width: calc(100% - (#{$spacing-unit} / 2));
   }
 }
+
+
+
 /**
- * Page content
+ * Page content for shared layout
+ */
+.main-content {
+  width:$posts-width;
+  padding: 10px 5px 0 0;
+  float:right;
+}
+
+.main-content.entry-header h2{
+}
+
+.main-content.entry-header p{
+}
+
+.main-content.entry-body p{
+}
+
+
+
+/**
+ * Side navigation used for archive, possibly tags eventually
+ */
+.sidenav {
+   height: 100%;
+   width: calc($content-width - $posts-width);
+   text-align: left;
+   float: left;
+   overflow-x: hidden;
+}
+
+.sidenav h2 {
+   padding-top: 30px;
+   padding-left: 4px;
+   margin-bottom: 10px;
+   font-size: 18px;
+}
+.sidenav p {
+}
+
+
+/**
+ * Archive styles
+ */
+.side-years.collapsible {
+    cursor: pointer;
+    margin: 0;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 10px;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+}
+
+// .active, .collapsible:hover {
+//     color: #cccccc;
+// }
+
+.collapsible:after {
+    content: '\002B';
+    color: black;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.collap-active:after {
+    content: "\2212";
+}
+
+.collap-content {
+    padding: 0 25px;
+    color: #808080 !important;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
+
+
+/**
+ * Page content for full use layout
  */
 .page-content {
   padding: 0;

@@ -1,14 +1,41 @@
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
 
   <title>{% if page.title %}{{ page.title | escape_once }}{% else %}{{ site.title | escape_once }}{% endif %}</title>
+
   <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+  <meta name="twitter:site" content="@daniwell_aidn">
+
+  <meta property="og:locale" content="en_CA">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+  <meta property="og:title" content="Reon homepage">
+  <meta property="og:description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+
+
+  <!-- <meta property="fb:app_id" content="260132667518211"> -->
+  <!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+  <!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+  <!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+
+
   <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
 
+  <meta name="theme-color" content="#000000">
+  {% if page.layout == "homepage" %}
+  <link rel="stylesheet" href="{{ "/css/css.css" | prepend: site.baseurl }}">
+  <link rel="stylesheet" href="{{ "/css/main.css" | prepend: site.baseurl }}">
+  {% else %}
   <link rel="stylesheet" href="{{ "/css/style.css" | prepend: site.baseurl }}">
+  {% endif %}
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
   <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ "/feed.xml" | prepend: site.baseurl | prepend: site.url }}">
 </head>

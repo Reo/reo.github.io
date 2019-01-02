@@ -29,22 +29,22 @@ body.light {
    * Site footer
    */ }
   body.light a {
-    color: #aaa !important; }
+    color: #666 !important; }
     body.light a:visited {
       color: #02060b; }
     body.light a:hover {
-      color: #2b2b2b !important;
-      border-color: #848484; }
+      color: black !important;
+      border-color: #404040; }
     body.light a.page-link:hover {
       color: #111;
-      border-color: #2b2b2b; }
+      border-color: black; }
     body.light a.postLink {
-      color: #2b2b2b !important; }
+      color: black !important; }
       body.light a.postLink:visited {
         color: #DC143C !important;
         border-color: #DC143C; }
     body.light a.post-title-link {
-      color: #2b2b2b !important; }
+      color: black !important; }
       body.light a.post-title-link:visited {
         color: #DC143C !important;
         border-color: #DC143C; }
@@ -64,11 +64,11 @@ body.light {
   body.light .site-title:visited {
     color: #424242; }
   body.light .site-navigation {
-    color: #aaa; }
+    color: #666; }
   body.light .page-tagline {
-    color: #aaa; }
+    color: #666; }
   body.light .page-link {
-    color: #aaa; }
+    color: #666; }
   body.light .site-nav .page-link {
     color: #111; }
   @media screen and (max-width: 600px) {
@@ -175,13 +175,25 @@ dl, dd, ol, ul, figure {
  * Basic styling
  */
 body {
+  height: 100%;
+  width: 100%;
   font: 400 16px/1.5 "PT Sans", Helvetica, Arial, sans-serif;
   -webkit-text-size-adjust: 100%;
   -webkit-font-feature-settings: "kern" 1;
   -moz-font-feature-settings: "kern" 1;
   -o-font-feature-settings: "kern" 1;
   font-feature-settings: "kern" 1;
-  font-kerning: normal; }
+  font-kerning: normal;
+  background-image: url("/img/linen-texture.jpg"); }
+
+.content {
+  width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 35px;
+  padding-right: 35px;
+  background-image: url("http://www.hiromiuehara.com/files/34/blog_y01/images/bg_wrapper.gif");
+  border-radius: 20px; }
 
 /**
  * Set `margin-bottom` to maintain vertical rhythm
@@ -274,16 +286,16 @@ pre {
  * Wrapper
  */
 .wrapper {
-  max-width: -webkit-calc(800px - (30px * 2));
-  max-width: calc(800px - (30px * 2));
+  max-width: -webkit-calc(940px - (30px * 2));
+  max-width: calc(940px - (30px * 2));
   margin-right: auto;
   margin-left: auto;
   padding-right: 30px;
   padding-left: 30px; }
-  @media screen and (max-width: 800px) {
+  @media screen and (max-width: 940px) {
     .wrapper {
-      max-width: -webkit-calc(800px - (30px));
-      max-width: calc(800px - (30px));
+      max-width: -webkit-calc(940px - (30px));
+      max-width: calc(940px - (30px));
       padding-right: 15px;
       padding-left: 15px; } }
 
@@ -385,7 +397,7 @@ pre {
   min-height: 56px;
   position: relative; }
 
-.site-title {
+.blog-title {
   font-size: 64px;
   font-weight: 100;
   font-family: 'PT Sans';
@@ -393,7 +405,7 @@ pre {
   font-weight: 500;
   margin-top: 1em; }
 
-.site-description {
+.blog-description {
   font-size: 14px;
   letter-spacing: 2px;
   text-indent: 6px;
@@ -506,7 +518,7 @@ pre {
   width: -webkit-calc(45% - (30px / 2));
   width: calc(45% - (30px / 2)); }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 940px) {
   .footer-col-1,
   .footer-col-2 {
     width: -webkit-calc(50% - (30px / 2));
@@ -521,7 +533,61 @@ pre {
     width: -webkit-calc(100% - (30px / 2));
     width: calc(100% - (30px / 2)); } }
 /**
- * Page content
+ * Page content for shared layout
+ */
+.main-content {
+  width: 640px;
+  padding: 10px 5px 0 0;
+  float: right; }
+
+/**
+ * Side navigation used for archive, possibly tags eventually
+ */
+.sidenav {
+  height: 100%;
+  width: calc($content-width - $posts-width);
+  text-align: left;
+  float: left;
+  overflow-x: hidden; }
+
+.sidenav h2 {
+  padding-top: 30px;
+  padding-left: 4px;
+  margin-bottom: 10px;
+  font-size: 18px; }
+
+/**
+ * Archive styles
+ */
+.side-years.collapsible {
+  cursor: pointer;
+  margin: 0;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-left: 10px;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px; }
+
+.collapsible:after {
+  content: '\002B';
+  color: black;
+  font-weight: bold;
+  margin-left: 5px; }
+
+.collap-active:after {
+  content: "\2212"; }
+
+.collap-content {
+  padding: 0 25px;
+  color: #808080 !important;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out; }
+
+/**
+ * Page content for full use layout
  */
 .page-content {
   padding: 0; }
@@ -555,7 +621,7 @@ pre {
   text-align: center;
   font-family: "PT Sans";
   font-weight: 900; }
-  @media screen and (max-width: 800px) {
+  @media screen and (max-width: 940px) {
     .post-title {
       font-size: 36px; } }
 
@@ -566,17 +632,17 @@ pre {
     font-size: 1.5rem; }
   .post-content h2 {
     font-size: 32px; }
-    @media screen and (max-width: 800px) {
+    @media screen and (max-width: 940px) {
       .post-content h2 {
         font-size: 28px; } }
   .post-content h3 {
     font-size: 26px; }
-    @media screen and (max-width: 800px) {
+    @media screen and (max-width: 940px) {
       .post-content h3 {
         font-size: 22px; } }
   .post-content h4 {
     font-size: 20px; }
-    @media screen and (max-width: 800px) {
+    @media screen and (max-width: 940px) {
       .post-content h4 {
         font-size: 18px; } }
 
