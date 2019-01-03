@@ -12,7 +12,7 @@ description: "Reo Erizae homepage"
 #baseurl: "" # the subpath of your site, e.g. /blog
 #url: "http://yourdomain.com" # the base hostname & protocol for your site
 twitter_username: ReoErizae
-github_username: Leonardo-Enrique
+github_username: Reo
 #paginate: 5
 theme-dark: false #Set to true to change to dark website theme
 
