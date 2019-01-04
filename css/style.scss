@@ -347,6 +347,7 @@ pre {
   position: relative;
 }
 .blog-title {
+  color: #444;
   font-size: 64px;
   font-weight: 100;
   font-family: 'PT Sans';
@@ -503,18 +504,37 @@ pre {
  * Page content for shared layout
  */
 .main-content {
-  width:$posts-width;
-  padding: 10px 5px 0 0;
-  float:right;
+    width:$posts-width;
+    padding: 10px 5px 0 0;
+    float:right;
 }
 
-.main-content.entry-header h2{
+.shared-post-header {
+    clear: both;
+    width: 640px;
+    margin-bottom: 1px;
+    border-bottom: 1px solid #222;
+    line-height: 80%;
+}
+
+.shared-post-title {
+    font-size: 0.8em;
+    margin-top: 6px;
+}
+
+.post-date {
+    float: right;
+    margin-top: 10px;
+}
+
+.entry-header h2{
 }
 
 .main-content.entry-header p{
 }
 
-.main-content.entry-body p{
+.post-excerpt-main{
+    margin-bottom: 50px;
 }
 
 

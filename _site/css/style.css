@@ -26,10 +26,16 @@ body.light {
    * Site header
    */
   /**
+   * Site posts
+   */
+  /**
+   * Site sidenav
+   */
+  /**
    * Site footer
    */ }
   body.light a {
-    color: #666 !important; }
+    color: #666; }
     body.light a:visited {
       color: #02060b; }
     body.light a:hover {
@@ -77,6 +83,10 @@ body.light {
       border: 1px solid #e8e8e8; }
       body.light .menu-icon > svg path {
         fill: #424242; } }
+  body.light .post-title, body.light .shared-post-title {
+    color: #006699 !important; }
+  body.light .sidenav h2 {
+    color: #ff0080 !important; }
   body.light .site-footer {
     border-top-color: #e8e8e8; }
   body.light .footer-col-wrapper {
@@ -398,6 +408,7 @@ pre {
   position: relative; }
 
 .blog-title {
+  color: #444;
   font-size: 64px;
   font-weight: 100;
   font-family: 'PT Sans';
@@ -539,6 +550,24 @@ pre {
   width: 640px;
   padding: 10px 5px 0 0;
   float: right; }
+
+.shared-post-header {
+  clear: both;
+  width: 640px;
+  margin-bottom: 1px;
+  border-bottom: 1px solid #222;
+  line-height: 80%; }
+
+.shared-post-title {
+  font-size: 0.8em;
+  margin-top: 6px; }
+
+.post-date {
+  float: right;
+  margin-top: 10px; }
+
+.post-excerpt-main {
+  margin-bottom: 50px; }
 
 /**
  * Side navigation used for archive, possibly tags eventually

@@ -6,30 +6,27 @@ permalink: /blog/
 <div class="home">
 
   
-  {% for post in paginator.posts%}
-  <div class="post postContent">
-    <div  class="postDate"><time datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">{{ post.date | date: "%b %-d, %Y" }}</time>
-    </div>
-    <div class="postTag">
-      {{post.tag}}
-    </div>
-    <br>
-    <div class="postTitle">
-    <a class='postLink' href="{{site.url}}{{site.baseurl}}{{post.url}}">{{post.title}}</a>
-    </div>
-    <div class="postExt">
-   {{ post.content | strip_html | truncate:200}}
-    </div>
-  </div>
+  <!-- {% for post in paginator.posts%} -->
+  <!-- <div class="post postContent"> -->
+  <!--   <div  class="postDate"><time datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">{{ post.date | date: "%b %-d, %Y" }}</time> -->
+  <!--   </div> -->
+  <!--   <div class="postTag"> -->
+  <!--     {{post.tag}} -->
+  <!--   </div> -->
+  <!--   <br> -->
+  <!--   <div class="postTitle"> -->
+  <!--   <a class='postLink' href="{{site.url}}{{site.baseurl}}{{post.url}}">{{post.title}}</a> -->
+  <!--   </div> -->
+  <!--   <div class="postExt"> -->
+  <!--  {{ post.content | strip_html | truncate:200}} -->
+  <!--   </div> -->
+  <!-- </div> -->
+  <!--  -->
+  <!-- {% endfor %} -->
 
-  {% endfor %}
 
 
-  <h2>Introductory Blog Post</h2>
-  <p>This will be used as a journal for writing down my thoughts on math and computer science topics
-  I find interesting, musical ideas, and composition pieces in Japanese. More focused series are
-  in the works and will be under respecive tags in the future. Do note that this page is still under
-  construction and will be finalized alongside new posts.</p>
+  
   <!-- {% if paginator.total_pages > 1 %} -->
   <!--   <nav class="pagination"> -->
   <!--     {% if paginator.previous_page %} -->
@@ -51,19 +48,22 @@ permalink: /blog/
   <!--   {% endif %} -->
   <!--   </nav> -->
   <!-- {% endif %} -->
-  
-  <!-- <ul class="post-list"> -->
-  <!--   {% for post in site.posts %} -->
-  <!--     <li> -->
-  <!--       <span class="post-meta-main">{{ post.date | date: "%b %-d, %Y" }}</span> -->
-  <!--  -->
-  <!--       <h2> -->
-  <!--         <a class="post-link-main" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a> -->
-  <!--       </h2> -->
-  <!--     </li> -->
-  <!--   {% endfor %} -->
-  <!-- </ul> -->
 
+  <ul class="post-list">
+    {% for post in site.posts %}
+      <li>
+	<div class="shared-post-header">
+	<span class="post-date">{{ post.date | date: "%B %-d, %Y" }}</span>
 
+	<h2>
+	  <a class="shared-post-title" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+	</h2>
+	</div>
+	<div class="post-excerpt-main">
+	  {{ post.content }}
+	</div>
+      </li>
+    {% endfor %}
+  </ul>
 
 </div>

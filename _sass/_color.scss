@@ -7,6 +7,8 @@
 /**
  * Light color palette
  */
+$l-accent-color1:     #006699;
+$l-accent-color2:    #ff0080;
 $l-text-color:       #111;
 $l-link-color:       #666;
 $l-background-color: #fdfdfd;
@@ -45,7 +47,7 @@ body.light {
    * Links
    */
   a {
-    color: $l-link-color !important;
+    color: $l-link-color;
 
     &:visited {
         color: darken($l-brand-color, 50%);
@@ -137,6 +139,20 @@ body.light {
     .menu-icon > svg path {
       fill: $l-grey-color-dark;
     }
+  }
+
+  /**
+   * Site posts
+   */
+  .post-title, .shared-post-title{
+    color: $l-accent-color1 !important;
+  }
+
+  /**
+   * Site sidenav
+   */
+  .sidenav h2{
+    color: $l-accent-color2 !important;
   }
 
   /**
