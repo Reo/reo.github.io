@@ -23,11 +23,8 @@ Finally, the final post formally in the series will have a walk through coding a
 of the program which, if we did everything right, will fufill the conditions set out at the initial
 stage. There may also be additional commentary afterwards if I deem it necessary.
 
-Besides learning, WunderFetch is motivated by wanting to automatically fetch the assignments, notes,
-etc. for the week for each course and add a to do for eask task in my Wunderlist.
+As for this project's motivation: besides satisfying curiousity, WunderFetch is motivated by wanting
+to automate the fetching of assignments, notes, etc. for my courses. when prompted, it will download
+content from the course website and create a new task in Wunderist to attend to the newly downloaded
+content.
 
-
-
-
-
-I plan on making
