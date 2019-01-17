@@ -5,9 +5,134 @@
     <description>Reo Erizae homepage</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 05 Jan 2019 09:47:33 -0500</pubDate>
-    <lastBuildDate>Sat, 05 Jan 2019 09:47:33 -0500</lastBuildDate>
+    <pubDate>Wed, 16 Jan 2019 10:15:53 -0500</pubDate>
+    <lastBuildDate>Wed, 16 Jan 2019 10:15:53 -0500</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
+    
+      <item>
+        <title>API Authorization Technologies</title>
+        <description>&lt;p&gt;This week, I go over the techonologies involved in an implementation of the project mentioned in the
+last post. Recall we wish to make an application which, when prompted, will fetch new course content
+(eg. assignments) not already downloaded. For each item which is added, a task will be created in
+a todo list using the Wunderlist API.&lt;/p&gt;
+
+&lt;p&gt;Let’s begin with the actual fetching of the content from a given site. In other words, let’s be more
+precise about what it means to “download a1.pdf from http://www.school.math.ca/course/assignments/”.
+What is commonly reffered to as a URL (Uniform Resource Locator), is simply a string of characters
+which uniquely identifies a resource. In this case, the resource is a file over the network, this
+file is often interpreted and handled accordingly by a browser (ie. an HTML file may be formatted
+appropriatelly and shown to the user as a webpage while a format which the browser does not support
+would often be downloaded for the user to choose how to open it). Also note that a URL is simply
+a specific type of URI (Uniform Resource Identifier). The URI generic syntax has five components of
+which only two are required:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;scheme:[//authority]path[?query][#fragment]&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Further, the authority section consists of:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;[userinfo@]host[:port]&lt;/code&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;The &lt;strong&gt;scheme&lt;/strong&gt; tells the browser how to interpret everything which follows the colon.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Authority&lt;/strong&gt; is optional and though the userinfo section will not be relevant for our discussion, we 
+will be using the host and port sections which follow it.
+    &lt;ul&gt;
+      &lt;li&gt;&lt;strong&gt;host&lt;/strong&gt; consists either of a registered name or an ip address&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;port&lt;/strong&gt; is an endpoint used for communication associated with an IP address and
+a protocol. These are identified by a 16-bit unsigned integer.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;The &lt;strong&gt;path&lt;/strong&gt; is a slash-separated sequence of segments which often is the directory to the desired
+resource.&lt;/li&gt;
+  &lt;li&gt;The &lt;strong&gt;query&lt;/strong&gt; often consists of key-value pairs separated by a delimiter. This delimiter
+usually takes the form of “;” or “&amp;amp;” characters.&lt;/li&gt;
+  &lt;li&gt;For our purposes, &lt;strong&gt;fragment&lt;/strong&gt; will consist of more delimiter-separated key-value pairs&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The &lt;strong&gt;scheme&lt;/strong&gt; deserves special emphasis for this project. Possibilities include &lt;em&gt;file&lt;/em&gt; which provides
+access to locally stored files and http which will be of particular interest for this this project.
+http is a protocol which allows requests to be sent for the serve to respond accordingly. These
+requests is how the server knows what to do with the data at the specified URI and include &lt;code class=&quot;highlighter-rouge&quot;&gt;GET&lt;/code&gt;,
+&lt;code class=&quot;highlighter-rouge&quot;&gt;POST&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;PATCH&lt;/code&gt;. A file (eg. html file or “webpage”) being fetched by a browser, is an example
+of a &lt;code class=&quot;highlighter-rouge&quot;&gt;GET&lt;/code&gt; request. The server can then send a code which represents the status of what has
+occurred. Some common codes include &lt;code class=&quot;highlighter-rouge&quot;&gt;404&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;200&lt;/code&gt; which mean a resource was not found and
+a response went through well (or “OK”) respectively.&lt;/p&gt;
+
+&lt;p&gt;Communicating with a server using only codes would obviously be incredibly restrictive so the &lt;code class=&quot;highlighter-rouge&quot;&gt;GET&lt;/code&gt; and
+&lt;code class=&quot;highlighter-rouge&quot;&gt;POST&lt;/code&gt; are frequently used to send data back and forth between the client and server in
+a standardized format. There a number of these standardized formats, the one relevant to this
+project being the JSON format which Wunderlist API uses to respond to requests. JSON objects consist
+of key-value pairs like such:&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;myObj&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;    &lt;span class=&quot;s2&quot;&gt;&quot;John Smith&quot;&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;tel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;     &lt;span class=&quot;s2&quot;&gt;&quot;+1-123-123-1234&quot;&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;address&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;38 example dr.&quot;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;As one can imagine, more care must be taken when the requests involve more delicate data such as
+user information. These sorts requests are usually dealt with using some sort of authentication so
+the information is only released by the server if the authentication has been done properly. This is
+relevant to our project since the Wunderlist API uses authentication to ensure users are not able to
+perform actions they would not be able to normally. For authentication, the Wunderlist API uses the
+“authorization code” flow for oAuth 2, in order to not overwhelm the amount of concepts introduced
+here we will first have to create a web app to obtain the access token then simply paste the aquired
+access token in the application which uses a CLI.&lt;/p&gt;
+
+&lt;p&gt;More specifics with regards to the authorization process will be presented in the next post
+where we go over an implementation using the flow described in the documentation for usage of
+Wunderlist’s API and oAuth2.&lt;/p&gt;
+
+</description>
+        <pubDate>Wed, 16 Jan 2019 00:00:00 -0500</pubDate>
+        <link>http://localhost:4000/programming/2019/01/16/API-Authorization-Technologies.html</link>
+        <guid isPermaLink="true">http://localhost:4000/programming/2019/01/16/API-Authorization-Technologies.html</guid>
+        
+        <category>project</category>
+        
+        <category>web</category>
+        
+        <category>technology</category>
+        
+        
+        <category>programming</category>
+        
+      </item>
+    
+      <item>
+        <title>API-Authorization-Project</title>
+        <description>&lt;p&gt;After reading about the various capabilities of web APIs, I decided I should take advantage and write
+something which would be useful both for increasing my productivity and learning about web
+technologies which I personally have not worked much with. This spurred the beginning of a project
+which I have titled WunderFetch.&lt;/p&gt;
+
+&lt;p&gt;There will be a number of posts regarding this project, this is a format I may use for future
+projects. I begin with a “project motivation” post which shows a high level overview of the
+specifications/features I intend for the program to have. Next, is a discussion of the technologies
+involved, followed by information about specific implementations to take advantage of said
+technologies in a specific language (these usually take the form of libraries, built in functions, etc. for a particular language).
+The exciting part comes next, I walk through construction of an implementation in a scripting
+language as a prototype to get a high level overview of what we plan on doing.&lt;/p&gt;
+
+&lt;p&gt;Finally, the final post formally in the series will have a walk through coding a completed version
+of the program which, if we did everything right, will fufill the conditions set out at the initial
+stage. There may also be additional commentary afterwards if I deem it necessary.&lt;/p&gt;
+
+&lt;p&gt;As for this project’s motivation: besides satisfying curiousity, WunderFetch is motivated by wanting
+to automate the fetching of assignments, notes, etc. for my courses. when prompted, it will download
+content from the course website and create a new task in Wunderist to attend to the newly downloaded
+content.&lt;/p&gt;
+
+</description>
+        <pubDate>Wed, 09 Jan 2019 00:00:00 -0500</pubDate>
+        <link>http://localhost:4000/programming/2019/01/09/API-Authorization-Primer.html</link>
+        <guid isPermaLink="true">http://localhost:4000/programming/2019/01/09/API-Authorization-Primer.html</guid>
+        
+        
+        <category>programming</category>
+        
+      </item>
     
       <item>
         <title>Introductory Blog Post</title>

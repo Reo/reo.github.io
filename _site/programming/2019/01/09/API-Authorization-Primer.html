@@ -8,9 +8,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
 
-  <title>Research</title>
+  <title>API-Authorization-Project</title>
 
-  <meta name="description" content="Reo Erizae homepage">
+  <meta name="description" content="After reading about the various capabilities of web APIs, I decided I should take advantage and writesomething which would be useful both for increasing my p...">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
@@ -20,7 +20,7 @@
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
   <meta property="og:title" content="Reon homepage">
-  <meta property="og:description" content="Reo Erizae homepage">
+  <meta property="og:description" content="After reading about the various capabilities of web APIs, I decided I should take advantage and writesomething which would be useful both for increasing my p...">
 
 
   <!-- <meta property="fb:app_id" content="260132667518211"> -->
@@ -36,7 +36,7 @@
   
   <link rel="stylesheet" href="/css/style.css">
   
-  <link rel="canonical" href="http://localhost:4000/blog/research/">
+  <link rel="canonical" href="http://localhost:4000/programming/2019/01/09/API-Authorization-Primer.html">
   <link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://localhost:4000/feed.xml">
 </head>
 
@@ -126,43 +126,58 @@
     <!-- Page content -->
     <div class="page-content">
       <div class="wrapper">
-        <article class="post">
-
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
-  <!--  <h1 class="post-title">Research</h1>-->
+    <h1 class="post-title" itemprop="name headline"><a class="post-title-link"  href="/programming/2019/01/09/API-Authorization-Primer.html">API-Authorization-Project</a></h1>
+  <center>  <p class="post-meta"><time datetime="2019-01-09T00:00:00-05:00" itemprop="datePublished">Jan 9, 2019</time></p>
+    
+     <div class="">
+       <center><p ><strong><span class="authorKeyword">Author</span><span class="small-site-title"> <h2 style="letter-spacing: 3px !important;
+       text-transform: uppercase !important;">Reo</h2></span></strong></p></center>
+
+     </div>
+     
+   </center>
   </header>
 
-  
-  <div class="tagline">
-  <span class="page-title">Research</span> <span class="page-tagline"><em>experiments and readings.</em></span>
-  </div>
-  
+  <div class="post-content" itemprop="articleBody">
+    <p>After reading about the various capabilities of web APIs, I decided I should take advantage and write
+something which would be useful both for increasing my productivity and learning about web
+technologies which I personally have not worked much with. This spurred the beginning of a project
+which I have titled WunderFetch.</p>
 
-  <div class="post-content">
-    
+<p>There will be a number of posts regarding this project, this is a format I may use for future
+projects. I begin with a “project motivation” post which shows a high level overview of the
+specifications/features I intend for the program to have. Next, is a discussion of the technologies
+involved, followed by information about specific implementations to take advantage of said
+technologies in a specific language (these usually take the form of libraries, built in functions, etc. for a particular language).
+The exciting part comes next, I walk through construction of an implementation in a scripting
+language as a prototype to get a high level overview of what we plan on doing.</p>
 
+<p>Finally, the final post formally in the series will have a walk through coding a completed version
+of the program which, if we did everything right, will fufill the conditions set out at the initial
+stage. There may also be additional commentary afterwards if I deem it necessary.</p>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<p>As for this project’s motivation: besides satisfying curiousity, WunderFetch is motivated by wanting
+to automate the fetching of assignments, notes, etc. for my courses. when prompted, it will download
+content from the course website and create a new task in Wunderist to attend to the newly downloaded
+content.</p>
 
 
   </div>
 
+  <footer class="postNavigation">
+  
+    <a class="postPrev" href="/misc/2019/01/02/Introductory-Journal-Post.html">
+        &laquo; Introductory Blog Post
+    </a>
+  
+  
+    <a class="postNext" href="/programming/2019/01/16/API-Authorization-Technologies.html">
+        API Authorization Technologies &raquo;
+    </a>
+  
+  </footer>
 </article>
 
       </div>
