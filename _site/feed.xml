@@ -5,9 +5,242 @@
     <description>Reo Erizae homepage</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 16 Jan 2019 10:15:53 -0500</pubDate>
-    <lastBuildDate>Wed, 16 Jan 2019 10:15:53 -0500</lastBuildDate>
+    <pubDate>Mon, 21 Jan 2019 10:28:02 -0500</pubDate>
+    <lastBuildDate>Mon, 21 Jan 2019 10:28:02 -0500</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
+    
+      <item>
+        <title>API-Authorization-Implementation.md</title>
+        <description>&lt;p&gt;This week, we will go over an implementation of WunderFetcher which strikes a nice middle ground
+between clear and concise code while allowing understanding and control over specific http requests.
+In particular, we will be using the Python requests library. Last time we went over details
+regarding URL and http requests both of which will apply heavily this post, though this post also
+includes the added aspect of authentication using oAuth2.&lt;/p&gt;
+
+&lt;p&gt;The focus here is the requests so I will just briefly go over the part of the script which does not
+deal with the topic at hand.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;requests&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;requests_oauthlib&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;OAuth2Session&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;random&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;string&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;courseCode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;raw_input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;enter the course code to be fetched: &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;assign_num&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;raw_input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;enter assignment number to be fetched: &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;padded_assign_num&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;assign_num&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;assign_num&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;9&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;0&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;assign_num&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;course_site&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'MAT101'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'https://www.math.school.ca/course/Prob_Set_'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;padded_assign_num&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'.pdf'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# error checking
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;courseCode&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;course_site&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;keys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;please enter a defined course or add one, defined courses:&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;course&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;course_site&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;course&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;quit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;course_code&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;assign_num&lt;/code&gt; are simply values from the user which are used to download the
+correct assignment and used as the title of the task (eg. a task may be “MAT101 assignment 1”).
+&lt;code class=&quot;highlighter-rouge&quot;&gt;padded_assign_num&lt;/code&gt; is used for assignment URLs which pad single digit numbers with a 0.
+&lt;code class=&quot;highlighter-rouge&quot;&gt;course_site&lt;/code&gt; simply maps course codes to the respective URL to fetch the assignments. And finally,
+the if statement is error checking to make sure that the course code is in fact a key in the
+dictionary.&lt;/p&gt;
+
+&lt;p&gt;Now, a simple request to &lt;code class=&quot;highlighter-rouge&quot;&gt;GET&lt;/code&gt; a file may be written as follows using the requests library:&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# URL to which get request will be sent
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;assign_url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;course_site&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;course_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# perform the GET request to assign_URL
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;assign_request&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;assign_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;allow_redirects&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# status code error checking
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;assign_request&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;status_code&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'q'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;assign_num&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;.pdf&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'wb'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;assign_request&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;successfully downloaded!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;assignment &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;s does not exist&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;assign_num&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;quit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Note the sheme specified in the URI, http(s), defines the &lt;code class=&quot;highlighter-rouge&quot;&gt;GET&lt;/code&gt; operation as we
+have gone over. &lt;code class=&quot;highlighter-rouge&quot;&gt;assign_request&lt;/code&gt; is an object which now holds the response from the server. Recall
+a status code of &lt;code class=&quot;highlighter-rouge&quot;&gt;200&lt;/code&gt; indicates “OK” so that is the response we are looking for from this request,
+anything else indicates something went wrong (presumably &lt;code class=&quot;highlighter-rouge&quot;&gt;404&lt;/code&gt;, the assignment is not up yet). With
+the assignment downloaded, we now wish to get into the meat of the
+project, interacting with the Wunderlist API.&lt;/p&gt;
+
+&lt;p&gt;The flow which Wunderlist specificies in its documentation is the “authorization code” flow,
+typically reserved for web apps on a server (for reasons we will go into in a bit). We will be
+following &lt;a href=&quot;https://developer.wunderlist.com/documentation/concepts/authorization&quot;&gt;Wunderlist’s developer
+documentation&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The steps for using “authorization code” flow would be as follows:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;The user makes a request to log in&lt;/li&gt;
+  &lt;li&gt;The application redirects the user to the Authorization server (&lt;code class=&quot;highlighter-rouge&quot;&gt;/authorize&lt;/code&gt; endpoint)
+    &lt;ul&gt;
+      &lt;li&gt;note, the params required here may change depending on the API in question, in our case,
+Wunderlist requests we send our &lt;strong&gt;client id&lt;/strong&gt;, &lt;strong&gt;redirect uri&lt;/strong&gt;, and an “unguessable”
+    &lt;strong&gt;state&lt;/strong&gt; as parameters&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;The aformenentioned authorization server redirects the user to the login prompt&lt;/li&gt;
+  &lt;li&gt;The user authenticates using one of the configured login options&lt;/li&gt;
+  &lt;li&gt;Wunderlist’s authorization server redirects to a &lt;strong&gt;redirect uri&lt;/strong&gt; with an authorization &lt;strong&gt;code&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;The cryptographically random &lt;strong&gt;state&lt;/strong&gt; generated locally is checked against the one the server sends
+back&lt;/li&gt;
+  &lt;li&gt;The &lt;strong&gt;code&lt;/strong&gt;, &lt;strong&gt;client id&lt;/strong&gt;, and &lt;strong&gt;client secret&lt;/strong&gt; are sent to the &lt;code class=&quot;highlighter-rouge&quot;&gt;/access_token&lt;/code&gt; endpoint&lt;/li&gt;
+  &lt;li&gt;The authenticatinon server responds with an &lt;strong&gt;access token&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;The application uses said &lt;strong&gt;access token&lt;/strong&gt; to make requests “as” the user&lt;/li&gt;
+  &lt;li&gt;The API responds with the requested information&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;We begin with the &lt;strong&gt;client id&lt;/strong&gt;, &lt;strong&gt;client secret&lt;/strong&gt;, &lt;strong&gt;redirect uri&lt;/strong&gt;, and &lt;strong&gt;state&lt;/strong&gt; which are
+mentioned in the steps above. The first three are given upon &lt;a href=&quot;https://developer.wunderlist.com/apps/new&quot; title=&quot;create new app&quot;&gt;completing an
+application&lt;/a&gt;. &lt;strong&gt;redirect uri&lt;/strong&gt; is
+chosen as a server which runs locally on the machine on an unused port and &lt;strong&gt;state&lt;/strong&gt; is “&lt;em&gt;An
+unguessable random string&lt;/em&gt;” which is used to protect against cross-site request forgery attacks.
+It would be a good idea to write a function to generate such strings.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;generateRandomString&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string_length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;&quot;&quot;&quot;Return a randomly generated alphanumeric string of string_length length
+
+    :string_length: length of the string to be created
+    :returns:       randomly generated alphanumeric string of string_length length
+
+    &quot;&quot;&quot;&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# This is simply a string composed of uppercase and lowercase letters as well as digits 0-9.
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;alpha_numer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ascii_letters&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;digits&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;# concatenate string_length alphanumeric characters
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;ret&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SystemRandom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;choice&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alpha_numer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string_length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ret&lt;/span&gt;
+
+
+&lt;span class=&quot;c1&quot;&gt;# credentials
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;client_id&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'client id from application'&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;client_secret&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'client secret from application'&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;redirect_uri&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'http://localhost:8888/callback'&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;local_state&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;generateRandomString&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We may now begin with the steps highlighted above.&lt;/p&gt;
+
+&lt;h2 id=&quot;step-1&quot;&gt;Step 1:&lt;/h2&gt;
+&lt;p&gt;This is done implicitly in our case. For our purposes, the user openning up WunderFetch would imply
+they want to use the capabilities of the Wunderlist API (and hence log in).&lt;/p&gt;
+
+&lt;h2 id=&quot;step-2&quot;&gt;Step 2:&lt;/h2&gt;
+&lt;p&gt;Here, we redirect the user to Wunderlist’s authorization server,
+&lt;code class=&quot;highlighter-rouge&quot;&gt;https://www.wunderlist.com/oauth/authorize&lt;/code&gt;. Like was mentioned in the previous post, information
+may be sent as parameters in the query of a URL and as the steps above indicate, we send the &lt;strong&gt;client
+id&lt;/strong&gt;, &lt;strong&gt;redirect uri&lt;/strong&gt;, and &lt;strong&gt;state&lt;/strong&gt;. The resulting URL to which the redirect takes place then
+looks like:&lt;/p&gt;
+
+&lt;p&gt;“https://www.wunderlist.com/oauth/authorize?client_id=&lt;strong&gt;client_id&lt;/strong&gt;&amp;amp;redirect_uri=
+&lt;strong&gt;redirect_uri&lt;/strong&gt;&amp;amp;state=&lt;strong&gt;state&lt;/strong&gt;”&lt;/p&gt;
+
+&lt;p&gt;where bold indicates reference to the variables. The requests library does this in a pair of lines:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# oAuth2 session, the params are set here
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;oauth&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;OAuth2Session&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;client_id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;client_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;redirect_uri&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;redirect_uri&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;local_state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# requests takes reponsibility for forming the query string.
+# authorization_url is the newly created URL, and state is the state which was sent off to the server
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;authorization_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;state&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;oauth&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;authorization_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'https://www.wunderlist.com/oauth/authorize'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Please authorize access at: &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;s'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;authorization_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;steps-3-5&quot;&gt;Steps 3-5:&lt;/h2&gt;
+&lt;p&gt;The user pastes &lt;strong&gt;authorization_url&lt;/strong&gt; in a browser which redirects to the login prompt. The user
+authenticates at the redirected URL and gets sent back to
+“&lt;strong&gt;redirect_uri&lt;/strong&gt;?state=&lt;em&gt;state-from-server&lt;/em&gt;&amp;amp;code=&lt;em&gt;code-from-server&lt;/em&gt;”&lt;/p&gt;
+
+&lt;h2 id=&quot;step-6&quot;&gt;Step 6:&lt;/h2&gt;
+&lt;p&gt;The user pastes the values in the param of the final URL, the state sent from the server is then
+checked against the locally stored &lt;strong&gt;state&lt;/strong&gt; to ensure the authenticity of the request.&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;state&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;raw_input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Enter the state param from the callback URL'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;state&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;local_state&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;authorization error, state mismatch.&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;quit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;step-7&quot;&gt;Step 7:&lt;/h2&gt;
+&lt;p&gt;We first recieve the &lt;strong&gt;code&lt;/strong&gt; from the user (the second parameter in the URL they were redirected
+to) and then send this along with the &lt;strong&gt;client id&lt;/strong&gt; and &lt;strong&gt;client secret&lt;/strong&gt; to
+https://www.wunderlist.com/oauth/access_token. The &lt;a href=&quot;https://developer.wunderlist.com/documentation/concepts/authorization&quot;&gt;Wunderlist
+documentation&lt;/a&gt; specifies we
+send this as a &lt;code class=&quot;highlighter-rouge&quot;&gt;POST&lt;/code&gt; request with the data sent in JSON format. The server then responds with
+a JSON object which contains the &lt;strong&gt;access token&lt;/strong&gt; required to access the user’s data:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;code&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;raw_input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Enter the code param from the callback URL:'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;tok_data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'client_id'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;client_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'client_secret'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;client_secret&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'code'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;token&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'https://www.wunderlist.com/oauth/access_token'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tok_data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;step-8&quot;&gt;Step 8:&lt;/h2&gt;
+&lt;p&gt;We store the access token which the server sent, the requests library may be used to parse the JSON
+response as a Python dictionary the key may then be used to grab the access token:&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# retrieve access token from JSON
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;access_token&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;token&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'access_token'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;step-9&quot;&gt;Step 9:&lt;/h2&gt;
+&lt;p&gt;All that remains now is to make the requests using the newly aquired access token — Wunderlist’s
+API requires requests which involve user information are sent with a header with the following
+syntax:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;headers = {'X-Access-Token': access_token, 'X-Client-ID': client_id}&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;In this case, we wish to add a new task. Referring again to
+&lt;a href=&quot;https://developer.wunderlist.com/documentation/endpoints/task&quot;&gt;the documentation&lt;/a&gt;, we do a &lt;code class=&quot;highlighter-rouge&quot;&gt;POST&lt;/code&gt;
+request with the required data. A response of &lt;code class=&quot;highlighter-rouge&quot;&gt;201&lt;/code&gt; from the server then indicates everything went
+as desired:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# Wundelrlist requires this for requests which require authentication
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;headers&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'X-Access-Token'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;access_token&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'X-Client-ID'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;client_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# create a task
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;school_id&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;367927829&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# optional parameters available are:
+# assignee_id (int)
+# completed (bool)
+# recurrence_type (str): &quot;day&quot;, &quot;week&quot;, &quot;month&quot;, &quot;year&quot;
+# recurrence_count (int): &amp;gt;=1, accompanied by recurrence_type
+# due_date (str): ISO8601 format date
+# starred (bool)
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post_data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;list_id&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;school_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;title&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;course_code&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot; assignment &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;assign_num&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;post_req&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'https://a.wunderlist.com/api/v1/tasks'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;headers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;headers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post_data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post_req&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;status_code&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;201&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;successfully added task!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;problem creating task, code:&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;post_req&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;status_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This is the completed application.&lt;/p&gt;
+</description>
+        <pubDate>Mon, 21 Jan 2019 00:00:00 -0500</pubDate>
+        <link>http://localhost:4000/programming/2019/01/21/API-Authorization-Implementation.html</link>
+        <guid isPermaLink="true">http://localhost:4000/programming/2019/01/21/API-Authorization-Implementation.html</guid>
+        
+        <category>python</category>
+        
+        <category>project</category>
+        
+        <category>web</category>
+        
+        <category>code</category>
+        
+        <category>requests</category>
+        
+        
+        <category>programming</category>
+        
+      </item>
     
       <item>
         <title>API Authorization Technologies</title>
