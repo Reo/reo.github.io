@@ -9,7 +9,7 @@ author: "Reo"
 
 This week, we will go over an implementation of WunderFetcher which strikes a nice middle ground
 between clear and concise code while allowing understanding and control over specific http requests.
-In particular, we will be using the Python requests library. [Last time](/blog) we went over details
+In particular, we will be using the Python requests library. Last time we went over details
 regarding URL and http requests both of which will apply heavily this post, though this post also
 includes the added aspect of authentication using oAuth2.
 
@@ -212,8 +212,8 @@ as desired:
 headers = {'X-Access-Token': access_token, 'X-Client-ID': client_id}
 
 # create a task
-school_id = 367927829
-post_data = {"list_id": school_id, "title": course_code + " assignment " + assign_num}
+list_id = 367927829
+post_data = {"list_id": list_id, "title": course_code + " assignment " + assign_num}
 post_req = requests.post('https://a.wunderlist.com/api/v1/tasks', headers=headers, json=post_data)
 
 if (post_req.status_code == 201):
@@ -228,4 +228,4 @@ this example) this demonstration has them hard-coded. There are
 numerous ways to improve our situation here, for instance, we can have the script look in a locally
 stored file which contains the key-value pairs of the courses and their respective websites.
 
-The full source code can be found on the [GitHub repo page](https://www.github.com/Reo/thisProjectRepo).
+The full source code can be found on the [GitHub repo page](https://github.com/Reo/FetchAndTodo).
