@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "API-Authorization-Implementation.md"
+title: "API-Authorization-Implementation"
 date: 2019-01-23
 category: programming
 tags: python project web code requests
