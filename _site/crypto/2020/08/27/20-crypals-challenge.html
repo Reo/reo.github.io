@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Cryptopals Challenges 19-20</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>We complete <a href="https://cryptopals.com/">cryptopals challenge</a>
+20 in this post which involves breaking CTR mode and is a more complete
+version of challenge 19.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#observations" id="markdown-toc-observations">Observations</a></li>
+  <li><a href="#rephrasing-the-problem-as-one-weve-already-solved" id="markdown-toc-rephrasing-the-problem-as-one-weve-already-solved">Rephrasing the Problem as One We’ve Already Solved</a></li>
+  <li><a href="#scoring-key-bytes" id="markdown-toc-scoring-key-bytes">Scoring Key Bytes</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="observations">Observations</h2>
+
+<hr />
+
+<p>We are given a file with 60 lines all encrypted using AES CTR mode with the same
+nonce.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">GKEY</span><span class="o">=</span><span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">NONCE</span><span class="o">=</span><span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">ctList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="c1"># read each line into a separate list item. Decode and encrypt
+</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">'20.txt'</span><span class="p">,</span> <span class="s">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">ptFile</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">ptFile</span><span class="p">.</span><span class="n">read</span><span class="p">().</span><span class="n">splitlines</span><span class="p">():</span>
+        <span class="n">ctList</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">ctr_enc</span><span class="p">(</span><span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">line</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">,</span><span class="s">''</span><span class="p">)),</span><span class="n">GKEY</span><span class="p">,</span><span class="n">NONCE</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>Our first observation is the fact that because all of the texts have been encrypted
+using the same nonce, this can be reformulated as the repeating key xor problem
+we solved in an <a href="/crypto/2020/07/14/06-crypals-challenge.html">earlier challenge</a>.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="rephrasing-the-problem-as-one-weve-already-solved">Rephrasing the Problem as One We’ve Already Solved</h2>
+
+<hr />
+
+<p>We will use a similar approach using frequency analysis to determine the most likely
+key and hence figure out a large portion of the plaintext.
+Instead of a dictionary, we use an array this time with weights at the index which corresponds
+to the numerical value of the ascii characters.</p>
+
+<p>Frequencies were taken from <a href="http://practicalcryptography.com/cryptanalysis/letter-frequencies-various-languages/english-letter-frequencies/">practical cryptography</a>
+webpage.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># letter frequencies courtesy of practical cryptography website
+# index corresponds to ASCII value
+</span><span class="n">freqs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+         <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+         <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+         <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+         <span class="mi">0</span><span class="p">,</span> <span class="mf">8.55</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">,</span> <span class="mf">3.16</span><span class="p">,</span> <span class="mf">3.87</span><span class="p">,</span> <span class="mf">12.1</span><span class="p">,</span> <span class="mf">2.18</span><span class="p">,</span> <span class="mf">2.09</span><span class="p">,</span> <span class="mf">4.96</span><span class="p">,</span> <span class="mf">7.33</span><span class="p">,</span> <span class="mf">0.22</span><span class="p">,</span> <span class="mf">0.81</span><span class="p">,</span> <span class="mf">4.21</span><span class="p">,</span> <span class="mf">2.53</span><span class="p">,</span> <span class="mf">7.17</span><span class="p">,</span> <span class="mf">7.47</span><span class="p">,</span>
+         <span class="mf">2.07</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">6.33</span><span class="p">,</span> <span class="mf">6.73</span><span class="p">,</span> <span class="mf">8.94</span><span class="p">,</span> <span class="mf">2.68</span><span class="p">,</span> <span class="mf">1.06</span><span class="p">,</span> <span class="mf">1.83</span><span class="p">,</span> <span class="mf">0.19</span><span class="p">,</span> <span class="mf">1.72</span><span class="p">,</span> <span class="mf">0.11</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+         <span class="mi">0</span><span class="p">,</span> <span class="mf">8.55</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">,</span> <span class="mf">3.16</span><span class="p">,</span> <span class="mf">3.87</span><span class="p">,</span> <span class="mf">12.1</span><span class="p">,</span> <span class="mf">2.18</span><span class="p">,</span> <span class="mf">2.09</span><span class="p">,</span> <span class="mf">4.96</span><span class="p">,</span> <span class="mf">7.33</span><span class="p">,</span> <span class="mf">0.22</span><span class="p">,</span> <span class="mf">0.81</span><span class="p">,</span> <span class="mf">4.21</span><span class="p">,</span> <span class="mf">2.53</span><span class="p">,</span> <span class="mf">7.17</span><span class="p">,</span> <span class="mf">7.47</span><span class="p">,</span>
+         <span class="mf">2.07</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">6.33</span><span class="p">,</span> <span class="mf">6.73</span><span class="p">,</span> <span class="mf">8.94</span><span class="p">,</span> <span class="mf">2.68</span><span class="p">,</span> <span class="mf">1.06</span><span class="p">,</span> <span class="mf">1.83</span><span class="p">,</span> <span class="mf">0.19</span><span class="p">,</span> <span class="mf">1.72</span><span class="p">,</span> <span class="mf">0.11</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>In order to make the problem look even closer to repeating key xor, we trim them
+to be the same length and concatenate them back to back.
+<code class="language-plaintext highlighter-rouge">min(map(len, ctList))</code> is used here to grab the minimum length out of all of
+the ciphertexts, this will be the common length we will use.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># first trim all texts to the same length and concatenate them
+</span><span class="n">keylen</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">ctList</span><span class="p">))</span>
+<span class="n">ct</span> <span class="o">=</span> <span class="s">b''</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ctList</span><span class="p">)):</span>
+    <span class="n">ct</span> <span class="o">+=</span> <span class="n">ctList</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="n">keylen</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>Next, we figure out the byte most likely to be the correct key one byte at a time</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">keyCand</span> <span class="o">=</span> <span class="s">b''</span>
+<span class="n">keySum</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">keylen</span><span class="p">):</span> <span class="c1"># over each byte of the key
+</span>    <span class="n">chunk</span> <span class="o">=</span> <span class="s">b''</span>
+    <span class="c1"># combine bytes which are congruent mod keylen as a chunk
+</span>    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ct</span><span class="p">),</span> <span class="n">keylen</span><span class="p">):</span>
+        <span class="n">chunk</span> <span class="o">+=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">ct</span><span class="p">[</span><span class="n">k</span><span class="p">]])</span>
+    <span class="c1"># and create likely key fragments corresponding to each chunk
+</span>    <span class="n">keyFragment</span><span class="p">,</span> <span class="n">fragmentSum</span> <span class="o">=</span> <span class="n">key_byte</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+    <span class="n">keyCand</span> <span class="o">+=</span> <span class="n">keyFragment</span>
+    <span class="n">keySum</span> <span class="o">+=</span> <span class="n">fragmentSum</span>
+</code></pre></div></div>
+
+<p>keySum here is optional but can be used in a stronger attack where we create a list
+of the most likely keys and attempt those. For simplicity, we ignore its value in
+this solution and use only the most likely key.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="scoring-key-bytes">Scoring Key Bytes</h2>
+
+<hr />
+
+<p>Our strategy used in computing the most likely key bytes is implemented in <code class="language-plaintext highlighter-rouge">key_byte()</code>:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">key_byte</span><span class="p">(</span><span class="n">chunk</span><span class="p">):</span>
+    <span class="n">keyCand</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1"># the byte most likely to be the key
+</span>    <span class="n">sumCand</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1"># the total score of the most likely key
+</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">256</span><span class="p">):</span> <span class="c1"># for every possible 1-byte key
+</span>        <span class="n">currSum</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">)):</span>
+            <span class="c1"># check what the current byte decrypts to and score appropriately
+</span>            <span class="n">char</span> <span class="o">=</span> <span class="n">k</span><span class="o">^</span><span class="n">chunk</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">([</span><span class="n">char</span><span class="p">]).</span><span class="n">isascii</span><span class="p">()):</span>
+                <span class="n">currSum</span> <span class="o">+=</span> <span class="n">freqs</span><span class="p">[</span><span class="n">char</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">currSum</span> <span class="o">&gt;</span> <span class="n">sumCand</span><span class="p">):</span> <span class="c1"># update most likely candidate if necessary
+</span>            <span class="n">sumCand</span> <span class="o">=</span> <span class="n">currSum</span>
+            <span class="n">keyCand</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">k</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">keyCand</span><span class="p">,</span> <span class="n">sumCand</span>
+</code></pre></div></div>
+
+<p>We can check that our strategy works by xoring the ciphertext against our attempted keys</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ctList</span><span class="p">)):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">strxor</span><span class="p">(</span><span class="n">keyCand</span><span class="p">,</span> <span class="n">ct</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">keylen</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">keylen</span><span class="p">]))</span>
+</code></pre></div></div>
+
+<p>we get</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>b'I\'m rated "R"...this is a warning, ya better void / P'
+b'Cuz I came back to attack others in spite- / Strike l'
+b"But don't be afraid in the dark, in a park / Not a sc"
+b'Ya tremble like a alcoholic, muscles tighten up / Wha'
+b'Suddenly you feel like your in a horror flick / You g'
+b"Music's the clue, when I come your warned / Apocalyps"
+b"Haven't you ever heard of a MC-murderer? / This is th"
+b'Death wish, so come on, step to this / Hysterical ide'
+b'Friday the thirteenth, walking down Elm Street / You '
+b'This is off limits, so your visions are blurry / All '
+b"Terror in the styles, never error-files / Indeed I'm "
+b'For those that oppose to be level or next to this / I'
+b"Worse than a nightmare, you don't have to sleep a win"
+b'Flashbacks interfere, ya start to hear: / The R-A-K-I'
+b'Then the beat is hysterical / That makes Eric go get '
+b'Soon the lyrical format is superior / Faces of death '
+b"MC's decaying, cuz they never stayed / The scene of a"
+b"The fiend of a rhyme on the mic that you know / It's "
+b'Melodies-unmakable, pattern-unescapable / A horn if w'
+b'I bless the child, the earth, the gods and bomb the r'
+b'Hazardous to your health so be friendly / A matter of'
+b"Shake 'till your clear, make it disappear, make the n"
+b"If not, my soul'll release! / The scene is recreated,"
+b'Cuz your about to see a disastrous sight / A performa'
+b'Lyrics of fury! A fearified freestyle! / The "R" is i'
+b"Make sure the system's loud when I mention / Phrases "
+b'You want to hear some sounds that not only pounds but'
+b'Then nonchalantly tell you what it mean to me / Stric'
+b"And I don't care if the whole crowd's a witness! / I'"
+b'Program into the speed of the rhyme, prepare to start'
+b"Musical madness MC ever made, see it's / Now an emerg"
+b"Open your mind, you will find every word'll be / Furi"
+b"Battle's tempting...whatever suits ya! / For words th"
+b"You think you're ruffer, then suffer the consequences"
+b'I wake ya with hundreds of thousands of volts / Mic-t'
+b'Novocain ease the pain it might save him / If not, Er'
+b"Yo Rakim, what's up? / Yo, I'm doing the knowledge, E"
+b'Well, check this out, since Norby Walters is our agen'
+b'Kara Lewis is our agent, word up / Zakia and 4th and '
+b"Okay, so who we rollin' with then? We rollin' with Ru"
+b'Check this out, since we talking over / This def beat'
+b'I wanna hear some of them def rhymes, you know what I'
+b"Thinkin' of a master plan / 'Cuz ain't nuthin' but sw"
+b'So I dig into my pocket, all my money is spent / So I'
+b"So I start my mission, leave my residence / Thinkin' "
+b'I need money, I used to be a stick-up kid / So I thin'
+b"I used to roll up, this is a hold up, ain't nuthin' f"
+b"But now I learned to earn 'cuz I'm righteous / I feel"
+b'Search for a nine to five, if I strive / Then maybe I'
+b"So I walk up the street whistlin' this / Feelin' out "
+b'A pen and a paper, a stereo, a tape of / Me and Eric '
+b'Fish, which is my favorite dish / But without no mone'
+b"'Cuz I don't like to dream about gettin' paid / So I "
+b'So now to test to see if I got pull / Hit the studio,'
+b'Rakim, check this out, yo / You go to your girl house'
+b"'Cause my girl is definitely mad / 'Cause it took us "
+b"Yo, I hear what you're saying / So let's just pump th"
+b'And count our money / Yo, well check this out, yo Eli'
+b'Turn down the bass down / And let the beat just keep '
+b'And we outta here / Yo, what happened to peace? / Pea'
+</code></pre></div></div>
+
+<p>Which is exactly the deciphered text (up to length of the shortest line) as desired.</p>
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

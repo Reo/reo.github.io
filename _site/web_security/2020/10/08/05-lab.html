@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Intro to Wireshark</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>With this lab, we start experimenting with tools and exploits over a network. We
+use docker and docker-compose to simulate the different actors and networks.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#goal" id="markdown-toc-goal">Goal</a></li>
+  <li><a href="#setup" id="markdown-toc-setup">Setup</a></li>
+  <li><a href="#picking-up-traffic-as-mallory" id="markdown-toc-picking-up-traffic-as-mallory">Picking up Traffic as Mallory</a></li>
+  <li><a href="#docker-cleanup" id="markdown-toc-docker-cleanup">Docker Cleanup</a>    <ul>
+      <li><a href="#credits" id="markdown-toc-credits">Credits</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="goal">Goal</h2>
+
+<hr />
+
+<p>The goal of this lab is to get familiar with Wireshark and following a TCP stream.
+Quoting <a href="https://www.wireshark.org/">their homepage</a></p>
+
+<blockquote class="no-indent">
+  <p>Wireshark is the world’s foremost and widely-used network protocol analyzer. It lets you see what’s happening on your network at a microscopic level</p>
+</blockquote>
+
+<p>This will allow us to study closely how packets send using regular http differ from those
+using https. We will be focusing on three aspects of the TCP stream, namely:</p>
+
+<p>the 3-way initiation handshake</p>
+
+<div class="xscrollable">
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">FROM</th>
+      <th style="text-align: center">TO</th>
+      <th style="text-align: center">PROTOCOL</th>
+      <th style="text-align: center">DETAIL</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">client</td>
+      <td style="text-align: center">server</td>
+      <td style="text-align: center">TCP</td>
+      <td style="text-align: center">TCP SYN</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">server</td>
+      <td style="text-align: center">client</td>
+      <td style="text-align: center">TCP</td>
+      <td style="text-align: center">TCP SYN-ACK</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">client</td>
+      <td style="text-align: center">server</td>
+      <td style="text-align: center">TCP</td>
+      <td style="text-align: center">TCP ACK</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>Data exchange procedure</p>
+
+<div class="xscrollable">
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">FROM</th>
+      <th style="text-align: center">TO</th>
+      <th style="text-align: center">PROTOCOL</th>
+      <th style="text-align: center">DETAIL</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">client</td>
+      <td style="text-align: center">server</td>
+      <td style="text-align: center">HTTP</td>
+      <td style="text-align: center">HTTP request</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">server</td>
+      <td style="text-align: center">client</td>
+      <td style="text-align: center">TCP</td>
+      <td style="text-align: center">TCP ACK</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">server</td>
+      <td style="text-align: center">client</td>
+      <td style="text-align: center">HTTP</td>
+      <td style="text-align: center">HTTP response</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">client</td>
+      <td style="text-align: center">server</td>
+      <td style="text-align: center">TCP</td>
+      <td style="text-align: center">TCP ACK</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>And the 4-way termination handshake</p>
+
+<div class="xscrollable">
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">FROM</th>
+      <th style="text-align: center">TO</th>
+      <th style="text-align: center">PROTOCOL</th>
+      <th style="text-align: center">DETAIL</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">client</td>
+      <td style="text-align: center">server</td>
+      <td style="text-align: center">TCP</td>
+      <td style="text-align: center">TCP FIN-ACK</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">server</td>
+      <td style="text-align: center">client</td>
+      <td style="text-align: center">TCP</td>
+      <td style="text-align: center">TCP ACK</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">server</td>
+      <td style="text-align: center">client</td>
+      <td style="text-align: center">TCP</td>
+      <td style="text-align: center">TCP FIN-ACK</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">client</td>
+      <td style="text-align: center">server</td>
+      <td style="text-align: center">TCP</td>
+      <td style="text-align: center">TCP ACK</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="setup">Setup</h2>
+
+<hr />
+
+<p>If this is your first time setting up Wireshark and selected the option to allow non-root users to
+capture packets you can add the nonroot user to the wireshark group as follows:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ sudo usermod -a -G wireshark $USER
+$ newgrp wireshark
+</code></pre></div></div>
+
+<p>We can use docker-compose to simulate a user Alice sending packets over a network.
+Our docker-compose.yml (network setup) looks like</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3'</span>
+
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">alice</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">alice</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="na">channel</span><span class="pi">:</span>
+        <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.2</span>
+
+  <span class="na">mallory</span><span class="pi">:</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+      <span class="na">container_name</span><span class="pi">:</span> <span class="s">mallory</span>
+      <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+      <span class="na">network_mode</span><span class="pi">:</span> <span class="s">service:alice</span>
+
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="na">channel</span><span class="pi">:</span>
+    <span class="na">driver</span><span class="pi">:</span> <span class="s">bridge</span>
+    <span class="na">ipam</span><span class="pi">:</span>
+      <span class="na">config</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">subnet</span><span class="pi">:</span> <span class="s">10.0.0.0/28</span>
+</code></pre></div></div>
+
+<p>The first step is to to pull down the Docker images. Make sure you are in the correct directory</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>labs/05-wireshark$ docker-compose pull
+</code></pre></div></div>
+
+<p>We can now start all containers with
+the <code class="language-plaintext highlighter-rouge">-d</code> flag which detaches them from the terminal (running in the background).</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>labs/05-wireshark$ docker-compose up -d
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="picking-up-traffic-as-mallory">Picking up Traffic as Mallory</h2>
+
+<hr />
+
+<p>With Alice and Mallory running, we can use the <code class="language-plaintext highlighter-rouge">docker exec</code> command to run a command
+in a running container. Here, we will pose as Mallory and examine packets Alice is sending on
+our network.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>labs/05-wireshark$ docker exec mallory tcpdump -i eth0 -U -s 0 -w - | wireshark -k -i -
+</code></pre></div></div>
+
+<p>This is quite a bit so let’s go over what exactly this does. Before the pipe, we’re running
+<code class="language-plaintext highlighter-rouge">tcpdump</code> inside the <code class="language-plaintext highlighter-rouge">mallory</code> container.
+The options and flags we pass <code class="language-plaintext highlighter-rouge">tcpdump</code> are:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">-i</code> specifies the network interface <code class="language-plaintext highlighter-rouge">eth0</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">-U</code> which, since <code class="language-plaintext highlighter-rouge">-w</code> is also used, will write to the output file as each package is received (as opposed to when output buffer fills).</li>
+  <li><code class="language-plaintext highlighter-rouge">-s 0</code> sets the amount of bytes to copy from each packet (“snapshot-length”) to its default value.</li>
+  <li><code class="language-plaintext highlighter-rouge">-w -</code> uses the <code class="language-plaintext highlighter-rouge">-</code> character to write the raw packets to stdout</li>
+</ul>
+
+<p>this output it piped to <code class="language-plaintext highlighter-rouge">wireshark</code> with flags</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">-k</code> specifying to start capturing immediately</li>
+  <li><code class="language-plaintext highlighter-rouge">-i</code> which specifies the name of the interface</li>
+  <li><code class="language-plaintext highlighter-rouge">-</code> which tells wireshark to capture from standard input</li>
+</ul>
+
+<p>Once wireshark opens, we start seeing the packets populating the top tab while more detail is shown in the bottom tab.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><img src="/assets/images/wireshark1.png" alt="wireshark-screencap" /></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><em>Wireshark UI. Notice the raw packet data at the bottom</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The currently selected packet is DNS as seen under protocol. We want to find TCP handshakes we we look at the ones
+which fall under TCP.</p>
+
+<p>Notice that we have the 3-way handshake, HTTP requests followed by ACKS, and the 4-way handshake as we expect.
+Further, notice that simple HTTP connections send data in plain so Mallory can actually see the contents of
+the requests and responses in full.</p>
+
+<p>Next, we consider the requests sent using HTTPS (HTTP + TLS). Notice that we still see some information over the
+wire such as the destination.
+Importantly, however notice that the actual body is encrypted so cannot simply be picked off like
+communication using only HTTP.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><img src="/assets/images/wireshark4.png" alt="wireshark-screencap" /></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><em>DNS query is stil visible but TLS is used for site content</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="docker-cleanup">Docker Cleanup</h2>
+
+<hr />
+
+<p>We can now stop our containers and tidy up our docker environment:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>labs/05-wireshark$ docker-compose stop
+labs/05-wireshark$ docker-compose down
+labs/05-wireshark$ docker-compose rm
+labs/05-wireshark$ docker system prune
+</code></pre></div></div>
+
+<p>Freeing up the space for future networks and containers.</p>
+
+<hr />
+
+<h3 id="credits">Credits</h3>
+
+<hr />
+
+<p>These labs and exercises were provided as a part of a course in Security
+taught in 2019 by
+<a href="https://thierrysans.me/">Thierry Sans</a>.
+Credit for creation of these exercises and
+Docker images/containers goes to their respective creators.</p>
+
+<p>Docker images, urls, etc. are kept private
+to prevent abuse but if interested please
+contact.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

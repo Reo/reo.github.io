@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Cryptopals Challenges 31-32</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>The final challenge of this <a href="https://cryptopals.com/">cryptopals set</a>
+has us use a timing leak to attack HMAC SHA-1.
+Both challenges 31 and 32 are very similar so we go over both solutions here.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#system-setup" id="markdown-toc-system-setup">System Setup</a>    <ul>
+      <li><a href="#simple-python-web-server" id="markdown-toc-simple-python-web-server">Simple Python Web Server</a></li>
+    </ul>
+  </li>
+  <li><a href="#comparing-connection-times" id="markdown-toc-comparing-connection-times">Comparing Connection Times</a></li>
+  <li><a href="#connecting-to-the-server" id="markdown-toc-connecting-to-the-server">Connecting to the Server</a></li>
+  <li><a href="#conclusion" id="markdown-toc-conclusion">Conclusion</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="system-setup">System Setup</h2>
+
+<hr />
+
+<p>We will have a server running locally which checks whether or not an hmac is
+valid in a way which leaks information. Let’s call this <code class="language-plaintext highlighter-rouge">webapp.py</code>.
+The insecure check will do a byte-by-byte
+comparison with an artificial delay for each byte and exit early if at any point
+the byte is different from the one it expects.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">md4</span>
+
+<span class="n">GKEY</span><span class="o">=</span><span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">make_hmac</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+    <span class="n">mmd</span> <span class="o">=</span> <span class="n">md4</span><span class="p">.</span><span class="n">MD4</span><span class="p">()</span>
+    <span class="n">mmd</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">GKEY</span> <span class="o">+</span> <span class="n">message</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mmd</span><span class="p">.</span><span class="n">finish</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">verify_hmac</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">hmac</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">insecure_compare</span><span class="p">(</span><span class="n">make_hmac</span><span class="p">(</span><span class="n">message</span><span class="p">),</span> <span class="n">hmac</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">insecure_compare</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span><span class="n">b2</span><span class="p">):</span>
+    <span class="s">'''
+    insecurely compares same-length bytestrings b1 and b2 byte-by-byte
+    with a 50ms sleep in between
+    '''</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">b2</span><span class="p">)):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'wrong len!'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b1</span><span class="p">)):</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">b1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">!=</span><span class="n">b2</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">return</span> <span class="bp">True</span>
+</code></pre></div></div>
+
+<p>The artificial delay set here is 50ms, this can be tweaked and made smaller to
+test the limits of our attack.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h3 id="simple-python-web-server">Simple Python Web Server</h3>
+
+<hr />
+
+<p>Next, we have the part in charge of actually hosting the web server</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">request</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/data'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">verify</span><span class="p">():</span>
+    <span class="nb">file</span> <span class="o">=</span> <span class="n">request</span><span class="p">.</span><span class="n">args</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'file'</span><span class="p">).</span><span class="n">encode</span><span class="p">()</span>
+    <span class="n">sig</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">.</span><span class="n">fromhex</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">args</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'signature'</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">verify_hmac</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">'OK!'</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">make_hmac</span><span class="p">(</span><span class="nb">file</span><span class="p">).</span><span class="nb">hex</span><span class="p">())</span>
+        <span class="k">raise</span> <span class="nb">ValueError</span>
+
+<span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>This starts a server which expects a <code class="language-plaintext highlighter-rouge">GET</code> request at <code class="language-plaintext highlighter-rouge">localhost:5000/data</code>
+followed by a query string which has <code class="language-plaintext highlighter-rouge">file=&lt;filename&gt;&amp;signature=&lt;hmac&gt;</code> where <code class="language-plaintext highlighter-rouge">&lt;hmac&gt;</code> is
+the HMAC which corresponds to filename.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="comparing-connection-times">Comparing Connection Times</h2>
+
+<hr />
+
+<p>We now tackle the file which performs the attack. We need a library which allows us
+to connect to the server and one which will make timing operations easy.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span><span class="p">,</span> <span class="n">parse_qs</span><span class="p">,</span> <span class="n">quote</span>
+<span class="kn">import</span> <span class="nn">http.client</span>
+<span class="kn">import</span> <span class="nn">time</span>
+</code></pre></div></div>
+
+<p>Assuming we don’t know the delay the server adds, the idea here would be to set a baseline
+of how long an incorrect comparison takes for a given byte position and compare it against
+how long the comparison takes for all other byte values. The value which has the largest
+difference when compared to this baseline is very likely the correct byte. We do this over
+all 16 bytes of the signature.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">filename</span><span class="o">=</span><span class="s">'malicious'</span>
+
+<span class="c1"># assume the first byte is not \x00
+</span><span class="n">baseline</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s">'http://localhost:5000'</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="s">'0'</span><span class="o">*</span><span class="mi">32</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">currbytes</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="s">b'</span><span class="se">\x00</span><span class="s">'</span><span class="o">*</span><span class="mi">16</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">):</span>
+    <span class="n">running_max</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># 255 possible values
+</span>    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">256</span><span class="p">):</span>
+        <span class="n">currbytes</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="n">comp</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="s">'http://localhost:5000'</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">currbytes</span><span class="p">.</span><span class="nb">hex</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">comp</span> <span class="o">&gt;</span> <span class="n">running_max</span><span class="p">:</span>
+            <span class="n">running_max</span> <span class="o">=</span> <span class="n">comp</span>
+            <span class="n">running_val</span> <span class="o">=</span> <span class="n">val</span>
+    <span class="n">baseline</span> <span class="o">=</span> <span class="n">running_max</span>
+    <span class="n">currbytes</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">running_val</span>
+</code></pre></div></div>
+
+<p>Notice that we crack the signature byte-by-byte so this is significantly faster than brute
+force since there are only \(16\times 256\) attempts with this approach
+compared to the \(2^{128}\) of brute force.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="connecting-to-the-server">Connecting to the Server</h2>
+
+<hr />
+
+<p>All that remains is the code which connects us to the server and times the interaction</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="s">'file='</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s">'&amp;signature='</span> <span class="o">+</span> <span class="n">sig</span>
+    <span class="n">parsed</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">httpconn</span> <span class="o">=</span> <span class="n">http</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">HTTPConnection</span><span class="p">(</span><span class="n">parsed</span><span class="p">.</span><span class="n">hostname</span><span class="p">,</span> <span class="n">parsed</span><span class="p">.</span><span class="n">port</span><span class="p">)</span>
+
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="n">time_ns</span><span class="p">()</span>
+    <span class="n">httpconn</span><span class="p">.</span><span class="n">request</span><span class="p">(</span><span class="s">'GET'</span><span class="p">,</span> <span class="s">'/data?'</span> <span class="o">+</span> <span class="n">q</span><span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">httpconn</span><span class="p">.</span><span class="n">getresponse</span><span class="p">().</span><span class="n">status</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="n">time_ns</span><span class="p">()</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+
+    <span class="k">return</span> <span class="n">status</span><span class="p">,</span> <span class="n">diff</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="conclusion">Conclusion</h2>
+
+<hr />
+
+<p>Once the attack finishes, we can use the status to verify it worked:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">connect</span><span class="p">(</span><span class="s">'http://localhost:5000'</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">currbytes</span><span class="p">.</span><span class="nb">hex</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">200</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>If the artificial delay were large enough, we would be able to terminate early in the conparison phase once
+a large jump in computation time is found. As comparison timing gets smaller, it becomes difficult to
+distinguish amongst the noise of things such as connection times etc. This can be somewhat improved
+at the cost of running time by taking an average of various connection attempts with a given byte.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

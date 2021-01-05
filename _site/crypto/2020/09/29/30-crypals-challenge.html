@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Cryptopals Challenge 30</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>This challenge is again similar to the last one. This hash length extension is on md4.
+The md4 implementation can be found <a href="https://gist.github.com/BenWiederhake/eb6dfc2c31d3dc8c34508f4fd091cea9">at this repo</a>.</p>
+
+<p>There are no major changes and details on what’s going on can be found in the <a href="/crypto/2020/09/24/28-crypals-challenge.html">previous post</a>.
+The biggest difference is perhaps the <code class="language-plaintext highlighter-rouge">md4_pad()</code> method which is taken from the implementation itself.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">md4</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+
+<span class="n">GKEY</span><span class="o">=</span><span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">110</span><span class="p">,</span><span class="mi">220</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">md4_pad</span><span class="p">(</span><span class="n">mlength</span><span class="p">):</span>
+    <span class="c1"># suppose we're dealing with bytes
+</span>    <span class="c1"># in particular, mlength is the length of the message in bytes
+</span>    <span class="c1"># note SHA1 uses 64 byte blocks
+</span>    <span class="n">ret</span> <span class="o">=</span> <span class="s">b'</span><span class="se">\x80</span><span class="s">'</span> <span class="o">+</span> <span class="s">b'</span><span class="se">\x00</span><span class="s">'</span> <span class="o">*</span> <span class="p">((</span><span class="mi">55</span> <span class="o">-</span> <span class="n">mlength</span><span class="p">)</span> <span class="o">%</span> <span class="mi">64</span><span class="p">)</span> <span class="o">+</span> <span class="n">struct</span><span class="p">.</span><span class="n">pack</span><span class="p">(</span><span class="s">"&lt;Q"</span><span class="p">,</span> <span class="n">mlength</span> <span class="o">*</span> <span class="mi">8</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ret</span>
+
+<span class="k">def</span> <span class="nf">make_hmac</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+    <span class="n">mmd</span> <span class="o">=</span> <span class="n">md4</span><span class="p">.</span><span class="n">MD4</span><span class="p">()</span>
+    <span class="n">mmd</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">GKEY</span> <span class="o">+</span> <span class="n">message</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mmd</span><span class="p">.</span><span class="n">finish</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">verify_hmac</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">hmac</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">make_hmac</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="o">==</span> <span class="n">hmac</span>
+
+<span class="k">def</span> <span class="nf">to_int</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="s">'little'</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="s">b"comment1=cooking%20MCs;userdata=foo;comment2=%20like%20a%20pound%20of%20bacon"</span>
+<span class="n">mlen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">prefix_bytes</span> <span class="o">=</span> <span class="n">make_hmac</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+<span class="n">start_state</span> <span class="o">=</span> <span class="p">[</span><span class="n">to_int</span><span class="p">(</span><span class="n">prefix_bytes</span><span class="p">[:</span><span class="mi">4</span><span class="p">]),</span> <span class="n">to_int</span><span class="p">(</span><span class="n">prefix_bytes</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">8</span><span class="p">]),</span> <span class="n">to_int</span><span class="p">(</span><span class="n">prefix_bytes</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">12</span><span class="p">]),</span> <span class="n">to_int</span><span class="p">(</span><span class="n">prefix_bytes</span><span class="p">[</span><span class="mi">12</span><span class="p">:])]</span>
+<span class="n">md</span> <span class="o">=</span> <span class="n">md4</span><span class="p">.</span><span class="n">MD4</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">999</span><span class="p">):</span>
+    <span class="n">totallen</span> <span class="o">=</span> <span class="n">mlen</span> <span class="o">+</span> <span class="n">i</span>
+    <span class="n">md</span><span class="p">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">start_state</span><span class="p">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">md</span><span class="p">.</span><span class="n">remainder</span> <span class="o">=</span> <span class="s">b";admin=true"</span>
+    <span class="n">md</span><span class="p">.</span><span class="n">count</span> <span class="o">=</span> <span class="p">(</span><span class="n">totallen</span><span class="o">//</span><span class="mi">64</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="n">new_message</span> <span class="o">=</span> <span class="n">m</span> <span class="o">+</span> <span class="n">md4_pad</span><span class="p">(</span><span class="n">totallen</span><span class="p">)</span> <span class="o">+</span> <span class="s">b';admin=true'</span>
+    <span class="n">new_hmac</span> <span class="o">=</span> <span class="n">md</span><span class="p">.</span><span class="n">finish</span><span class="p">()</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">verify_hmac</span><span class="p">(</span><span class="n">new_message</span><span class="p">,</span> <span class="n">new_hmac</span><span class="p">)):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'success!'</span><span class="p">)</span>
+        <span class="nb">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div></div>
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

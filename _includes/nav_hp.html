@@ -1,0 +1,43 @@
+<nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  {% for item in site.data.nav_hp %}
+  <p><a href="{{ item.link }}" {% if page.url == item.link %}class="current-nav"{% endif %}>{{ item.name | upcase }}</a></p>
+  {% endfor %}
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="{{site.url}}{{site.base-url}}">TOP</a></p>
+
+	{% for sitePage in site.pages %}
+	{% if sitePage.layout == "homepage" %}
+	{% if sitePage.title %}
+	{% if sitePage.title == "reo" %}
+	{% else %}
+	<p><a {% if sitePage.title == page.title %} style="text-decoration:line-through; opacity:1" {% else%} href="/{{sitePage.title | downcase}}" {% endif %}>{{sitePage.title | upcase}}</a></p>
+	{% endif %}
+	{% endif %}
+	{% endif %}
+	{% endfor %}
+-->

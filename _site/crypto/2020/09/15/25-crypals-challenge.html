@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Cryptopals Challenge 25</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>In this challenge, we common cited and supposed benefit of AES CTR mode being that one can
+easily seek into the ciphertext and decrypt just the byte/block which is needed.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#random-access-decipher" id="markdown-toc-random-access-decipher">Random Access Decipher</a></li>
+  <li><a href="#recovering-the-plaintext" id="markdown-toc-recovering-the-plaintext">Recovering the Plaintext</a></li>
+  <li><a href="#verifying-our-solution" id="markdown-toc-verifying-our-solution">Verifying our Solution</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="random-access-decipher">Random Access Decipher</h2>
+
+<hr />
+
+<p>We simulate such a function by generating a random key which encrypts some ciphertext
+and leaving the ability to edit through an API which can be accessed by anyone.
+First, we have the edit function. Note that in the diagram, we can decipher any
+block without needing to decipher any of the previous blocks</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/CTR_decryption_2.svg" alt="CTRdiagram" class="svg invert-color" width="1200px" /></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><em>CTR mode decryption (courtesy of Wikipedia)</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pkcs7</span> <span class="kn">import</span> <span class="n">unpad</span><span class="p">,</span> <span class="n">AES_BLOCKSIZE</span>
+<span class="kn">from</span> <span class="nn">ecb</span> <span class="kn">import</span> <span class="n">ecb_dec</span>
+<span class="kn">from</span> <span class="nn">ctr</span> <span class="kn">import</span> <span class="n">ctr_enc</span><span class="p">,</span> <span class="n">ctr_dec</span>
+<span class="kn">from</span> <span class="nn">Crypto.Util.strxor</span> <span class="kn">import</span> <span class="n">strxor</span>
+
+<span class="n">GKEY</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">CTR_NONCE</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">newbyte</span><span class="p">):</span>
+    <span class="s">'''
+    offset is given in bytes
+    newbyte is the byte which will replace the one at offset
+    '''</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">offset</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ct</span><span class="p">)):</span>
+        <span class="c1"># or offset is negative
+</span>        <span class="k">print</span><span class="p">(</span><span class="s">'invalid offset'</span><span class="p">)</span>
+        <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">blck</span> <span class="o">=</span> <span class="n">offset</span><span class="o">//</span><span class="n">AES_BLOCKSIZE</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">%</span> <span class="n">AES_BLOCKSIZE</span>
+    <span class="n">pt</span> <span class="o">=</span> <span class="n">ctr_dec</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">GKEY</span><span class="p">,</span> <span class="n">CTR_NONCE</span><span class="p">)</span>
+    <span class="n">pt</span> <span class="o">=</span> <span class="n">pt</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">offset</span><span class="p">]</span> <span class="o">+</span> <span class="n">newbyte</span> <span class="o">+</span> <span class="n">pt</span><span class="p">[</span><span class="n">offset</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">ctr_enc</span><span class="p">(</span><span class="n">pt</span><span class="p">,</span> <span class="n">GKEY</span><span class="p">,</span> <span class="n">CTR_NONCE</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>We then encrypt the file we are given under CTR</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">CipherFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">'25.txt'</span><span class="p">,</span><span class="s">'r'</span><span class="p">)</span>
+<span class="n">ct</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">CipherFile</span><span class="p">.</span><span class="n">read</span><span class="p">().</span><span class="n">replace</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">,</span><span class="s">''</span><span class="p">))</span>
+<span class="n">CipherFile</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">secret</span> <span class="o">=</span> <span class="n">unpad</span><span class="p">(</span><span class="n">ecb_dec</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="s">b'YELLOW SUBMARINE'</span><span class="p">))</span>
+
+<span class="n">newCt</span> <span class="o">=</span> <span class="n">ctr_enc</span><span class="p">(</span><span class="n">secret</span><span class="p">,</span> <span class="n">GKEY</span><span class="p">,</span> <span class="n">CTR_NONCE</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="recovering-the-plaintext">Recovering the Plaintext</h2>
+
+<hr />
+
+<p>Now, in order to break this system and recover the plaintext we will create a list
+of guesses for what any given byte can be</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">freqs</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s">b'e'</span><span class="p">,</span> <span class="s">b't'</span><span class="p">,</span> <span class="s">b'a'</span><span class="p">,</span> <span class="s">b'o'</span><span class="p">,</span> <span class="s">b'i'</span><span class="p">,</span> <span class="s">b'n'</span><span class="p">,</span> <span class="s">b's'</span><span class="p">,</span> <span class="s">b'h'</span><span class="p">,</span> <span class="s">b'r'</span><span class="p">,</span> <span class="s">b'd'</span><span class="p">,</span> <span class="s">b'l'</span><span class="p">,</span> <span class="s">b' '</span><span class="p">,</span> <span class="s">b'c'</span><span class="p">,</span> <span class="s">b'u'</span><span class="p">,</span> <span class="s">b'm'</span><span class="p">,</span> <span class="s">b'w'</span><span class="p">,</span> <span class="s">b'f'</span><span class="p">,</span> <span class="s">b'g'</span><span class="p">,</span> <span class="s">b'y'</span><span class="p">,</span> <span class="s">b'p'</span><span class="p">,</span> <span class="s">b'b'</span><span class="p">,</span> <span class="s">b'</span><span class="se">\'</span><span class="s">'</span><span class="p">,</span> <span class="s">b'v'</span><span class="p">,</span> <span class="s">b'k'</span><span class="p">,</span> <span class="s">b'j'</span><span class="p">,</span> <span class="s">b'x'</span><span class="p">,</span> <span class="s">b'q'</span><span class="p">,</span> <span class="s">b'z'</span><span class="p">,</span>
+    <span class="s">B'E'</span><span class="p">,</span> <span class="s">B'T'</span><span class="p">,</span> <span class="s">B'A'</span><span class="p">,</span> <span class="s">B'O'</span><span class="p">,</span> <span class="s">B'I'</span><span class="p">,</span> <span class="s">B'N'</span><span class="p">,</span> <span class="s">B'S'</span><span class="p">,</span> <span class="s">B'H'</span><span class="p">,</span> <span class="s">B'R'</span><span class="p">,</span> <span class="s">B'D'</span><span class="p">,</span> <span class="s">B'L'</span><span class="p">,</span> <span class="s">B'C'</span><span class="p">,</span> <span class="s">B'U'</span><span class="p">,</span> <span class="s">B'M'</span><span class="p">,</span> <span class="s">B'W'</span><span class="p">,</span> <span class="s">B'F'</span><span class="p">,</span> <span class="s">B'G'</span><span class="p">,</span> <span class="s">B'Y'</span><span class="p">,</span> <span class="s">B'P'</span><span class="p">,</span> <span class="s">B'B'</span><span class="p">,</span> <span class="s">B'V'</span><span class="p">,</span> <span class="s">B'K'</span><span class="p">,</span> <span class="s">B'J'</span><span class="p">,</span> <span class="s">B'X'</span><span class="p">,</span> <span class="s">B'Q'</span><span class="p">,</span> <span class="s">B'Z'</span><span class="p">,</span> <span class="s">b'</span><span class="se">\n</span><span class="s">'</span><span class="p">,</span> <span class="s">b'.'</span><span class="p">,</span>
+    <span class="s">b'-'</span><span class="p">,</span> <span class="s">b','</span><span class="p">,</span> <span class="s">b'"'</span><span class="p">,</span> <span class="s">b'9'</span><span class="p">,</span> <span class="s">b'8'</span><span class="p">,</span> <span class="s">b'1'</span><span class="p">,</span> <span class="s">b'2'</span><span class="p">,</span> <span class="s">b'3'</span><span class="p">,</span> <span class="s">b'4'</span><span class="p">,</span> <span class="s">b'5'</span><span class="p">,</span> <span class="s">b'6'</span><span class="p">,</span> <span class="s">b'7'</span><span class="p">,</span> <span class="s">b'0'</span><span class="p">,</span> <span class="s">b'/'</span><span class="p">,</span> <span class="s">b'?'</span><span class="p">,</span> <span class="s">b'!'</span><span class="p">,</span> <span class="s">b'</span><span class="se">\n</span><span class="s">'</span>
+<span class="p">]</span>
+</code></pre></div></div>
+
+<p>if we wanted to be more sophisticated we could use a better guessing strategy where
+we base our guesses on the state of the string decrypted so far similar to how a human would
+guess. This is related to the <a href="http://languagelog.ldc.upenn.edu/myl/Shannon1950.pdf">Entropy of Printed English</a>
+but for simplicity we will assume the characters are independent.</p>
+
+<p>Notice that if we use the edit function and get back the identical ciphertext, we can say with confidence that
+we have found the correct byte so we try all of the bytes from our list until the edit function returns
+with no changes to the ciphertext.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># this will store the characters we extract as we go along
+</span><span class="n">extracted</span> <span class="o">=</span> <span class="s">b''</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">newCt</span><span class="p">)):</span>
+    <span class="n">candidate</span> <span class="o">=</span> <span class="s">b''</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">candidate</span> <span class="o">!=</span> <span class="n">newCt</span><span class="p">):</span>
+        <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">candidate</span> <span class="o">=</span> <span class="n">edit</span><span class="p">(</span><span class="n">newCt</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">freqs</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+    <span class="n">extracted</span> <span class="o">+=</span> <span class="n">freqs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="verifying-our-solution">Verifying our Solution</h2>
+
+<hr />
+
+<p>we then check using</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">extracted</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>and as expected we get back the plaintext:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>b"I'm back and I'm ringin' the bell \nA rockin' on the mike while the fly girls yell \nIn ecstasy in the back of me \nWell that's my DJ Deshay cuttin' all them Z's \nHittin' hard and the girlies goin' crazy \nVanilla's on the mike, man I'm not lazy. \n\nI'm lettin' my drug kick in \nIt controls my mouth and I begin \nTo just let it flow, let my concepts go \nMy posse's to the side yellin', Go Vanilla Go! \n\nSmooth 'cause that's the way I will be \nAnd if you don't give a damn, then \nWhy you starin' at me \nSo get off 'cause I control the stage \nThere's no dissin' allowed \nI'm in my own phase \nThe girlies sa y they love me and that is ok \nAnd I can dance better than any kid n' play \n\nStage 2 -- Yea the one ya' wanna listen to \nIt's off my head so let the beat play through \nSo I can funk it up and make it sound good \n1-2-3 Yo -- Knock on some wood \nFor good luck, I like my rhymes atrocious \nSupercalafragilisticexpialidocious \nI'm an effect and that you can bet \nI can take a fly girl and make her wet. \n\nI'm like Samson -- Samson to Delilah \nThere's no denyin', You can try to hang \nBut you'll keep tryin' to get my style \nOver and over, practice makes perfect \nBut not if you're a loafer. \n\nYou'll get nowhere, no place, no time, no girls \nSoon -- Oh my God, homebody, you probably eat \nSpaghetti with a spoon! Come on and say it! \n\nVIP. Vanilla Ice yep, yep, I'm comin' hard like a rhino \nIntoxicating so you stagger like a wino \nSo punks stop trying and girl stop cryin' \nVanilla Ice is sellin' and you people are buyin' \n'Cause why the freaks are jockin' like Crazy Glue \nMovin' and groovin' trying to sing along \nAll through the ghetto groovin' this here song \nNow you're amazed by the VIP posse. \n\nSteppin' so hard like a German Nazi \nStartled by the bases hittin' ground \nThere's no trippin' on mine, I'm just gettin' down \nSparkamatic, I'm hangin' tight like a fanatic \nYou trapped me once and I thought that \nYou might have it \nSo step down and lend me your ear \n'89 in my time! You, '90 is my year. \n\nYou're weakenin' fast, YO! and I can tell it \nYour body's gettin' hot, so, so I can smell it \nSo don't be mad and don't be sad \n'Cause the lyrics belong to ICE, You can call me Dad \nYou're pitchin' a fit, so step back and endure \nLet the witch doctor, Ice, do the dance to cure \nSo come up close and don't be square \nYou wanna battle me -- Anytime, anywhere \n\nYou thought that I was weak, Boy, you're dead wrong \nSo come on, everybody and sing this song \n\nSay -- Play that funky music Say, go white boy, go white boy go \nplay that funky music Go white boy, go white boy, go \nLay down and boogie and play that funky music till you die. \n\nPlay that funky music Come on, Come on, let me hear \nPlay that funky music white boy you say it, say it \nPlay that funky music A little louder now \nPlay that funky music, white boy Come on, Come on, Come on \nPlay that funky music \n"
+</code></pre></div></div>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Cryptopals Challenge 11</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>In the 11th <a href="https://cryptopals.com/">cryptopals challenge</a>, our goal
+is to use an oracle which encrypts using AES ECB half the time and
+AES CBC the other half in order to tell which mode is being used reliably.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#chosen-plaintext" id="markdown-toc-chosen-plaintext">Chosen plaintext</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="intro">Intro</h2>
+
+<hr />
+
+<p>Similar to the <a href="/crypto/2020/07/23/08-crypals-challenge.html">previous challenge</a>, we will be
+taking advantage of the fact that AES ECB
+always encrypts to identical plaintext blocks to identical ciphertext blocks.</p>
+
+<p>First, we write the oracle which randomly encrypts either ECB or
+CBC:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">ecb</span> <span class="kn">import</span> <span class="n">ecb_enc</span><span class="p">,</span> <span class="n">ecb_dec</span>
+<span class="kn">from</span> <span class="nn">cbc</span> <span class="kn">import</span> <span class="n">cbc_enc</span><span class="p">,</span> <span class="n">cbc_dec</span>
+<span class="kn">from</span> <span class="nn">pkcs7</span> <span class="kn">import</span> <span class="n">pad</span><span class="p">,</span> <span class="n">AES_BLOCKSIZE</span>
+<span class="kn">from</span> <span class="nn">Crypto.Util.strxor</span> <span class="kn">import</span> <span class="n">strxor</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="k">def</span> <span class="nf">ecb_cbc_oracle</span><span class="p">(</span><span class="n">pt</span><span class="p">):</span>
+    <span class="s">'''
+    returns a bytestring of pt encrypted under
+    AES ECB half the time and CBC the other half
+    using a different key and, if necessary, iv
+    each time.
+    Additionally, between 5 and 10 random bytes are
+    prepended and appended to the plaintext at each
+    call.
+    '''</span>
+    <span class="n">prefixlen</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="n">prefixlen</span><span class="p">)</span>
+    <span class="n">suffixlen</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="n">suffixlen</span><span class="p">)</span>
+    <span class="n">pt</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">pt</span> <span class="o">+</span> <span class="n">suffix</span>
+
+    <span class="n">key</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">mode</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">pt</span> <span class="o">=</span> <span class="n">pad</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="n">ecb_enc</span><span class="p">(</span><span class="n">pt</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">iv</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="n">cbc_enc</span><span class="p">(</span><span class="n">pt</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">iv</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ct</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="chosen-plaintext">Chosen plaintext</h2>
+
+<hr />
+
+<p>To find out which was used, we simply pass in a chosen plaintext which
+takes up various blocks so regardless of any prefix or suffix we are guaranteed
+to have at least two blocks of plaintext which are identical.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="s">b'a'</span><span class="o">*</span><span class="mi">64</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="n">ecb_cbc_oracle</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ct</span><span class="p">[</span><span class="mi">16</span><span class="p">:</span><span class="mi">32</span><span class="p">]</span> <span class="o">==</span> <span class="n">ct</span><span class="p">[</span><span class="mi">32</span><span class="p">:</span><span class="mi">48</span><span class="p">]):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">'ecb'</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">'cbc'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Though 64 is overkill for this example it works for our blocksize of 16 bytes since
+we would need at least 32 for two blocks of identical input plus at least 22 more to
+fill the blocks with the added prefix and suffix.</p>
+
+<p>recall that CBC uses the prvious ciphertext so two consecutive blocks of <code class="language-plaintext highlighter-rouge">a</code>
+would encrypt to different ciphertext blocks while in ECB mode two consecutive blocks
+of <code class="language-plaintext highlighter-rouge">a</code> would encrypt to the same two blocks of ciphertext. That is what we’re checking
+for when determining what mode was used here.</p>
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

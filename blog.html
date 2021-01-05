@@ -1,0 +1,22 @@
+---
+layout: hp
+title: Blog
+mathjax: true
+---
+<h2>Ramblings on Security, (Cryptography, and Math).</h2>
+<br>
+<ul class="post-list">
+  {% for post in site.posts %}
+  <li class="post-list-item">
+  <div class="shared-post-header">
+    <h2>
+      <a class="shared-post-title" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+    </h2>
+    <span class="post-date">{{ post.date | date: "%B %-d, %Y" }}</span>
+  </div>
+  <div class="post-excerpt-main">
+    {{ post.excerpt }}
+  </div>
+  </li>
+  {% endfor %}
+</ul>

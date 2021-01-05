@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Intro Cryptography: RSA</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>As more and more of our lives become digital in one sense or another, questions about privacy and
+security arise naturally. This post works as a prelude to a deeper study in cryptography through
+the introduction of a brief history and a traditional example in the form of the <em>RSA</em> algorithm.</p>
+
+<h2 class="no_toc" id="topics">Topics</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#introduction" id="markdown-toc-introduction">Introduction</a></li>
+  <li><a href="#rsa-method" id="markdown-toc-rsa-method">RSA Method</a>    <ul>
+      <li><a href="#enciphering" id="markdown-toc-enciphering">Enciphering</a></li>
+      <li><a href="#deciphering" id="markdown-toc-deciphering">Deciphering</a></li>
+    </ul>
+  </li>
+  <li><a href="#conclusion" id="markdown-toc-conclusion">Conclusion</a></li>
+</ul>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Modern cryptography is a relatively new field when compared to most other foci of studies in
+mathematics. With the goal of sending secure messages over a network, early research was mostly
+done in organizations which would not release their work such as the NSA in the united States, it
+wasn’t until about 1970 two of the largest public advancements were made. The first one being the
+development of DES — a new standard for enciphering messages developed at IBM with the purpose of
+developing secure electronic communication between organizations which often handled sensitive data
+such as financial institutions.</p>
+
+<p>One of the largest shortcomings of cryptographic standards until this point is that in order to
+transmit messages, much like in legacy enciphering techniques used in the second world war, the code
+book to decipher them must first be passed along some secure channel. As expected, should this
+secure channel be compromised or at any point the codebook become available to a third party, the
+cipher can be broken quite easily and hence the initial secure communication would once again have
+to be established in order to keep the messages secret.</p>
+
+<p>The second one of these
+advancements addressed just that. Often referred to as Diffie-Hellman key exchange, it paved the way
+for asymmetric key encryption. Asymmetric key algorithms improved on their symmetric counterparts
+described above by having both the sender and recipient keep a key secret at all times and one
+agreed-upon key public. These keys are related (details on this relation depend on the implementation)
+but the secret key should not be easily deducible from the public one. This allowed for the
+creation of more efficient crypto systems including some which are widely used today such as AES.</p>
+
+<h2 id="rsa-method">RSA Method</h2>
+
+<p>Rivest–Shamir–Adleman (RSA), named after the authors who described the algorithm in 1977,
+is a form of public-key cryptography
+which involves private-public key pairs. It relies on the difficulty of factoring a number which
+is the product of two large primes, let’s call them \(p, q\) so that \(pq=n\). Now, in order to
+remain secure, these primes are often hundreds of digits long making their \(n\) quite large.
+The best way to illustrate this process is through an example, though these computations are
+tailored for a computer so we will be using much smaller primes.</p>
+
+<p>For this example, suppose we wish to send the message <em>HELLO</em> and use standard ASCII encoding
+to do so. This ascii table is courtesy of Wikipedia.</p>
+
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/ASCII-Table.svg/1000px-ASCII-Table.svg.png" alt="ASCII-table" class="svg invert-color" /></p>
+
+<p>We create our public-private key pairs as follows:</p>
+
+<p>choose two primes, \(p=23, q=31\) (in this example \(n=713\)) we also need a number \(e\) who is
+relatively prime to \(\phi(n) = (p-1)(q-1) = 22\cdot 30\) where \(\phi(n)\) is understood to be the
+Euler Phi function. Choose \(e=7\).</p>
+
+<p>The public key is then the numbers \(n\) and \(e\), while the numbers \(p\) and \(q\) are kept
+secret as our private key.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><img src="/assets/images/2019-02-13-KeyMessagePass.png" alt="message-passing-graphic" class="svg invert-color" /></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><em>high level overview of A sending a message to B</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="enciphering">Enciphering</h3>
+
+<p>We first encode the message, as a sequence of blocks who have fewer digits than \(n\).
+In our case, \(n\) has 3 digits which means we may simply use the ASCII encodings which for our purposes
+are at most two digits long. We obtain the following sequence as a result:</p>
+
+<div>
+$$
+    72 \quad 69 \quad 76 \quad 76 \quad 79
+$$
+</div>
+
+<p>At this stage, the message is in plaintext and can be decoded by anyone who intercepts it, so we label
+each block at this stage \(p_i\).
+The ciphertext blocks \(c_i\) can now be found by taking the \(p_i^e\)mod \(n\). For our example
+this yields</p>
+
+<div>
+$$
+    c_1 \equiv p_1^7 \equiv 72^7 \equiv 485 \: (\text{mod } 713)
+$$
+</div>
+
+<p>continuing in this fashion, we obtain the sequence which represents the ciphertext.</p>
+
+<div>
+$$
+    485 \quad 276 \quad 143 \quad 143 \quad 198
+$$
+</div>
+
+<h3 id="deciphering">Deciphering</h3>
+
+<p>We begin by defining \(b\) as the least common multiple between \(p-1\) and \(q-1\), and \(d\) as
+the least positive solution to</p>
+
+<div>
+$$
+    ex\equiv 1 \: (\text{mod} \: b)
+$$
+</div>
+
+<p>In our example, \(b=22\cdot 30/\text{gcd}(22, 30) = 660/2 = 330\) so to find \(d\) we solve</p>
+
+<div>
+$$
+    7x\equiv 1 \:(\text{mod} \: 330)
+$$
+</div>
+
+<p>We obtain \(d=x=283\)</p>
+
+<p>All that remains now to unscramble the text is to evaluate \(c_i^d\) mod \(n\). The modular
+exponentiation algorithm can be used here to evaluate the encodings for the plaintext. For
+\(i=1\) we have:</p>
+
+<div>$$
+    485^{283} \equiv 72 \: \text{mod} \: 713
+$$</div>
+
+<p>As expected, upon taking \(c_i^d\) mod \(n\) across the remaining \(i\) we get back our plaintext
+which can then be deciphered using
+our agreed upon encoding. In our case, this is (ASCII) and we are done.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>One of the key takeaways here is that someone who does not know the values for
+\(p\) and \(q\) would
+have a hard time trying to figure out the value of \(b\) and hence reversing the process to
+find the plaintext.</p>
+
+<p>As mentioned in the introduction, computers have only gotten faster and better at solving this
+sort of factoring problem. The response to keep communications secure has been mostly to increase key size.
+The problem is now becoming that key sizes are getting quite large and RSA itself is becoming
+more inefficient as time goes on.
+That said, there is hope. More sophisticated techniques which use smaller
+keys have been proposed and are beginning to become popular one of which is so-called elliptic
+curve cryptography.</p>
+
+<p>Sources:</p>
+
+<p>https://en.wikibooks.org/wiki/Cryptography/History</p>
+
+<p>definitions and RSA example:
+VandenEynden, Waveland press</p>
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

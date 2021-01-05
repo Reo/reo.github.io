@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Cryptopals Challenge 12</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>This next cryptopals challenge involves finding out information
+on the cipher used (in this case, blocksize and AES mode).
+Upon discovering ECB mode is being used, an attack is mounted where
+decryption can be done without knowledge of the key one byte at a time.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#discovering-the-blocksize" id="markdown-toc-discovering-the-blocksize">Discovering the Blocksize</a></li>
+  <li><a href="#discovering-the-mode-of-encryption" id="markdown-toc-discovering-the-mode-of-encryption">Discovering the Mode of Encryption</a></li>
+  <li><a href="#byte-at-a-time-cracking" id="markdown-toc-byte-at-a-time-cracking">Byte-at-a-Time Cracking</a></li>
+  <li><a href="#conclusion" id="markdown-toc-conclusion">Conclusion</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="discovering-the-blocksize">Discovering the Blocksize</h2>
+
+<hr />
+
+<p>The first step is to find out the block size of the cipher
+being used. This can be done by simply trying different size
+plaintext until the encryption needs to use a new block.
+The blocksize is then the difference in size between the previous and
+new ciphertext:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># length of the ciphertext before any appends
+</span><span class="n">ctLen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">concat_ecb</span><span class="p">(</span><span class="s">b''</span><span class="p">))</span>
+<span class="n">hiddenLen</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1"># length of hidden text
+</span><span class="n">blockLen</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># length of a block in this cipher
+</span><span class="n">diff</span> <span class="o">=</span> <span class="mi">0</span>       <span class="c1"># difference in length beween two ciphertexts
+</span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>          <span class="c1"># keep track of how many bytes needed to append
+</span><span class="k">while</span> <span class="p">(</span><span class="n">diff</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">concat_ecb</span><span class="p">(</span><span class="s">b'a'</span><span class="o">*</span><span class="n">i</span><span class="p">))</span> <span class="o">-</span> <span class="n">ctLen</span>
+    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="n">blockLen</span> <span class="o">=</span> <span class="n">diff</span>
+<span class="n">hiddenLen</span> <span class="o">=</span> <span class="n">ctLen</span> <span class="o">-</span> <span class="n">i</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="discovering-the-mode-of-encryption">Discovering the Mode of Encryption</h2>
+
+<hr />
+
+<p>Now that we have the blocksize, we check if ECB mode is being used.
+If this is not the case, this attack cannot be used so we exit.
+To check, we use the same strategy <a href="/crypto/2020/08/04/11-crypals-challenge.html">from last time</a>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># check if the function is using ECB.
+</span><span class="n">ct</span> <span class="o">=</span> <span class="n">concat_ecb</span><span class="p">(</span><span class="s">b'a'</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">blockLen</span><span class="p">))</span>
+<span class="k">if</span> <span class="p">(</span><span class="ow">not</span><span class="p">(</span><span class="n">ct</span><span class="p">[:</span><span class="n">blockLen</span><span class="p">]</span> <span class="o">==</span> <span class="n">ct</span><span class="p">[</span><span class="n">blockLen</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">blockLen</span><span class="p">])):</span>
+    <span class="c1"># Since the chosen plaintext is the prefix,
+</span>    <span class="c1"># the condition holds iff using ECB mode
+</span>    <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="byte-at-a-time-cracking">Byte-at-a-Time Cracking</h2>
+
+<hr />
+
+<p>Now that we know both the blocksize and that we’re using ECB mode,
+we can discover the hidden text one byte at a time as follows:</p>
+
+<ol>
+  <li>create a buffer which leaves only one byte of unknown hidden text at the end</li>
+  <li>find the ciphertext of that block and call it <code class="language-plaintext highlighter-rouge">blockA</code></li>
+  <li>try ASCII values (or more generally <code class="language-plaintext highlighter-rouge">0x00</code> to <code class="language-plaintext highlighter-rouge">0xff</code>) as the last byte call it <code class="language-plaintext highlighter-rouge">blockB</code></li>
+  <li>when <code class="language-plaintext highlighter-rouge">blockA == blockB</code> we have found the last byte</li>
+  <li>repeat this for every byte of the hidden text</li>
+</ol>
+
+<p>we implement this with a nested loop which iterates over every byte of
+the hidden text which we found the length of above and called <code class="language-plaintext highlighter-rouge">hiddenLen</code>.
+The inner loop is the one which guesses every possible byte until a match is found;
+it makes sense to make this a helper.</p>
+
+<p>The main loop then looks like</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">hiddenLen</span><span class="p">):</span>
+    <span class="n">blockIdx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">/</span><span class="n">blocksize</span><span class="p">)</span>
+    <span class="n">bufflen</span> <span class="o">=</span> <span class="p">(</span><span class="n">blocksize</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span> <span class="o">%</span> <span class="n">blocksize</span>
+    <span class="n">buff</span> <span class="o">=</span> <span class="s">b'x'</span><span class="o">*</span><span class="n">bufflen</span>
+    <span class="n">hiddenGuess</span> <span class="o">+=</span> <span class="n">find_byte_from_block</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="n">blockIdx</span><span class="p">,</span> <span class="n">blocksize</span><span class="p">,</span> <span class="n">hiddenGuess</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>while <code class="language-plaintext highlighter-rouge">find_byte_from_block()</code> is implemented as follows:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">find_byte_from_block</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="n">blockIdx</span><span class="p">,</span> <span class="n">blocksize</span><span class="p">,</span> <span class="n">reconstructed</span><span class="p">):</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">blocksize</span><span class="o">*</span><span class="n">blockIdx</span>     <span class="c1"># lower index
+</span>    <span class="n">u</span> <span class="o">=</span> <span class="n">blocksize</span><span class="o">*</span><span class="p">(</span><span class="n">blockIdx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># upper index
+</span>    <span class="n">blockA</span> <span class="o">=</span> <span class="n">concat_ecb</span><span class="p">(</span><span class="n">buff</span><span class="p">)[</span><span class="n">l</span><span class="p">:</span><span class="n">u</span><span class="p">]</span>
+    <span class="c1"># guess every possible byte
+</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">256</span><span class="p">):</span>
+        <span class="n">blockB</span> <span class="o">=</span> <span class="n">concat_ecb</span><span class="p">(</span><span class="n">buff</span> <span class="o">+</span> <span class="n">reconstructed</span> <span class="o">+</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">i</span><span class="p">]))[</span><span class="n">l</span><span class="p">:</span><span class="n">u</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">blockA</span> <span class="o">==</span> <span class="n">blockB</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">i</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="conclusion">Conclusion</h2>
+
+<hr />
+
+<p>When the algorithm terminates, the hidden text is then stored in <code class="language-plaintext highlighter-rouge">hiddenGuess</code> and may be printed:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">hiddenGuess</span><span class="p">)</span>
+<span class="c1"># &gt; b"Rollin' in my 5.0\nWith my rag-top down so my hair can blow\nThe girlies on standby waving just to say hi\nDid you stop? No, I just drove by"
+</span></code></pre></div></div>
+
+<p>To complete the code, the imports we ended up needing were:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">ecb</span> <span class="kn">import</span> <span class="n">ecb_enc</span><span class="p">,</span> <span class="n">ecb_dec</span>
+<span class="kn">from</span> <span class="nn">pkcs7</span> <span class="kn">import</span> <span class="n">pad</span><span class="p">,</span> <span class="n">AES_BLOCKSIZE</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+</code></pre></div></div>
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

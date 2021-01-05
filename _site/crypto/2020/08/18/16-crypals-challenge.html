@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Cryptopals Challenge 16</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>The final challenge for set 2 of the <a href="https://cryptopals.com/">cryptopals challenges</a>.
+We completed challenge 15 <a href="/crypto/2020/08/13/14-crypals-challenge.html">in a previous post</a> so we continue with 16
+which asks us to implement a CBC bit flipping attack.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#system-set-up-and-implementation" id="markdown-toc-system-set-up-and-implementation">System Set Up and Implementation</a></li>
+  <li><a href="#strategic-bit-flips" id="markdown-toc-strategic-bit-flips">Strategic Bit Flips</a></li>
+  <li><a href="#implementing-the-attack" id="markdown-toc-implementing-the-attack">Implementing the Attack</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="system-set-up-and-implementation">System Set Up and Implementation</h2>
+
+<hr />
+
+<p>The system here is one which allows the user to choose some data to send to the server.
+It then prepends the data with the string <code class="language-plaintext highlighter-rouge">"comment1=cooking%20MCs;userdata="</code>
+and appends the string <code class="language-plaintext highlighter-rouge">";comment2=%20like%20a%20pound%20of%20bacon"</code>.</p>
+
+<p>Similar to the cut and paste attack
+we did earlier, when parsing it checks for and rejects any <code class="language-plaintext highlighter-rouge">userdata</code> which
+contains meta characters <code class="language-plaintext highlighter-rouge">;</code> or <code class="language-plaintext highlighter-rouge">=</code>.
+It then encrypts the result using AES CBC under a random key and iv.
+In python it could look something like this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">Crypto.Util.strxor</span> <span class="kn">import</span> <span class="n">strxor</span>
+<span class="kn">from</span> <span class="nn">cbc</span> <span class="kn">import</span> <span class="n">cbc_enc</span><span class="p">,</span> <span class="n">cbc_dec</span>
+<span class="kn">from</span> <span class="nn">pkcs7</span> <span class="kn">import</span> <span class="n">pad</span><span class="p">,</span> <span class="n">AES_BLOCKSIZE</span>
+
+<span class="n">GKEY</span><span class="o">=</span><span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">iv</span><span class="o">=</span><span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">oracle</span><span class="p">(</span><span class="n">userdata</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">((</span><span class="s">b';'</span> <span class="ow">in</span> <span class="n">userdata</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s">b'='</span> <span class="ow">in</span> <span class="n">userdata</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="s">''</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="s">b"comment1=cooking%20MCs;userdata="</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="s">b";comment2=%20like%20a%20pound%20of%20bacon"</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">userdata</span> <span class="o">+</span> <span class="n">suffix</span>
+    <span class="k">return</span> <span class="n">cbc_enc</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">GKEY</span><span class="p">,</span> <span class="n">iv</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The server then verifies whether a user is admin by taking back in the ciphertext
+and checking if <code class="language-plaintext highlighter-rouge">admin=true</code> is present between the <code class="language-plaintext highlighter-rouge">;</code>-separated string:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">decrypt_and_check_for_admin</span><span class="p">(</span><span class="n">ct</span><span class="p">):</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">cbc_dec</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">GKEY</span><span class="p">,</span> <span class="n">iv</span><span class="p">).</span><span class="n">split</span><span class="p">(</span><span class="s">b';'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s">b'admin=true'</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="bp">False</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="strategic-bit-flips">Strategic Bit Flips</h2>
+
+<hr />
+
+<p>In order to break this, we rely on the fact that due to the description of CBC mode,
+a 1-bit change in the ciphertext propagates and affects the upcoming blocks.
+In particular, the ciphertext from the previous block is xored against the upcoming block.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><img src="https://i.stack.imgur.com/bOu8Q.png" alt="cbc-flip-diagram" class="invert-color" width="1200px" /></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><em>Modifying the cyan bit allows us to xor the corresponding plaintext (courtesy of Wikipedia)</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The string <code class="language-plaintext highlighter-rouge">xxxxxxxxxxxxxxxxxxxxx9admin9true</code> has none of the meta charaters and will
+therefore be accepted. Our plaintext would be divided into the following blocks:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>||  comment1=cooking  ||
+||  %20MCs;userdata=  ||
+||  xxxxxxxxxxxxxxxx  ||
+||  xxxxx9admin9true  ||
+||  ;comment2=%20lik  ||
+||  e%20a%20pound%20  ||
+||  of%20bacon[pad-]  ||
+</code></pre></div></div>
+
+<p>notice that the xor of the numerical representation of <code class="language-plaintext highlighter-rouge">9</code> in ascii and <code class="language-plaintext highlighter-rouge">0x02</code> gives us <code class="language-plaintext highlighter-rouge">0x3b</code>
+which is the numerical representation of <code class="language-plaintext highlighter-rouge">;</code> character in ascii. Similarly, xor of <code class="language-plaintext highlighter-rouge">0x39</code>
+(numerical representation of <code class="language-plaintext highlighter-rouge">9</code> in ascii) with <code class="language-plaintext highlighter-rouge">0x04</code> gives <code class="language-plaintext highlighter-rouge">0x3d</code> which decodes to <code class="language-plaintext highlighter-rouge">=</code>.
+We can try to use the bit propagation property mentioned earlier to alter the ciphertext
+without knowing the key and have it decrypt to our target of <code class="language-plaintext highlighter-rouge">;admin=true</code>.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="implementing-the-attack">Implementing the Attack</h2>
+
+<hr />
+
+<p>First, we get the corresponding ciphertext</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userdata</span> <span class="o">=</span> <span class="s">b'x'</span><span class="o">*</span><span class="mi">21</span> <span class="o">+</span> <span class="s">b'9admin9true'</span>
+<span class="n">ct</span> <span class="o">=</span> <span class="n">oracle</span><span class="p">(</span><span class="n">userdata</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Next, we construct and apply the mask using the values discussed earlier:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mask</span> <span class="o">=</span> <span class="s">b'</span><span class="se">\x00</span><span class="s">'</span><span class="o">*</span><span class="mi">32</span> <span class="o">+</span> <span class="s">b'</span><span class="se">\x00</span><span class="s">'</span><span class="o">*</span><span class="mi">5</span> <span class="o">+</span> <span class="s">b'</span><span class="se">\x02</span><span class="s">'</span> <span class="o">+</span> <span class="s">b'</span><span class="se">\x00</span><span class="s">'</span><span class="o">*</span><span class="mi">5</span> <span class="o">+</span> <span class="s">b'</span><span class="se">\x04</span><span class="s">'</span> <span class="o">+</span> <span class="s">b'</span><span class="se">\x00</span><span class="s">'</span><span class="o">*</span><span class="mi">52</span> <span class="o">+</span> <span class="s">b'</span><span class="se">\x00</span><span class="s">'</span><span class="o">*</span><span class="mi">16</span>
+<span class="n">attack</span> <span class="o">=</span> <span class="n">strxor</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>and finally, we confirm this gives us our expected result</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">decrypt_and_check_for_admin</span><span class="p">(</span><span class="n">attack</span><span class="p">))</span>
+<span class="c1"># &gt; True
+</span></code></pre></div></div>
+
+<p>which means we have gotten admin priveleges as desired.</p>
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

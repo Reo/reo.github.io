@@ -1,170 +1,130 @@
 <!DOCTYPE html>
-<html>
-
+<html style="height: 100%;" lang="en">
   <head>
-  <meta charset="utf-8">
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
 
-  <title>API Authorization Technologies</title>
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
 
-  <meta name="description" content="This week, I go over the techonologies involved in an implementation of the project mentioned in thelast post. Recall we wish to make an application which, w...">
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
 
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
-  <meta name="twitter:site" content="@daniwell_aidn">
-
-  <meta property="og:locale" content="en_CA">
-  <meta property="og:type" content="website">
-  <meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
-  <meta property="og:title" content="Reon homepage">
-  <meta property="og:description" content="This week, I go over the techonologies involved in an implementation of the project mentioned in thelast post. Recall we wish to make an application which, w...">
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
 
 
-  <!-- <meta property="fb:app_id" content="260132667518211"> -->
-  <!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
-  <!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
-  <!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
 
 
-  <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
-
-  <meta name="theme-color" content="#000000">
-  
-  <link rel="stylesheet" href="/css/style.css">
-  
-  <link rel="canonical" href="http://localhost:4000/programming/2019/01/16/API-Authorization-Technologies.html">
-  <link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://localhost:4000/feed.xml">
-</head>
 
 
-  <body class=" light  ">
-
-    <div class="content">
-      
-    
-<div class="wrapper">
-  <center> <a href="/blog/index.html"><div class="blog-title">Music, Math, Code</div></a></center>
-</div>
-<div class="wrapper blog-description">
-<center> 毎週の歌曲、勉強など     |       Weekly Lied, Study etc. </center>
-</div>
-<div class="wrapper">
-  <div class="trigger site-navigation">
-    <a class="page-link" href="http://localhost:4000">HOMEPAGE</a>
-
-    
-    
-    
-    <!-- do not include -->
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <!-- do not include -->
-    
-    
-    
-    
-    
-    
-    
-    <span class="exclamationMark">/</span><a class="page-link" href="/blog/misc/">MISCELLAN</a>
-    
-    
-    
-    
-    
-    <span class="exclamationMark">/</span><a class="page-link" href="/blog/music/">MUSIC</a>
-    
-    
-    
-    
-    
-    <span class="exclamationMark">/</span><a class="page-link" href="/blog/nihongo/">日本語</a>
-    
-    
-    
-    
-    
-    <span class="exclamationMark">/</span><a class="page-link" href="/blog/programming/">PROGRAMMING</a>
-    
-    
-    
-    
-    
-    <!-- do not include -->
-    
-    
-    
-    
-    
-    <span class="exclamationMark">/</span><a class="page-link" href="/blog/research/">RESEARCH</a>
-    
-    
-    
-    
-    
-    <!-- do not include -->
-    
-    
-    
-    
-    
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
   </div>
-</div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
 
-    
-    <!-- Page content -->
-    <div class="page-content">
-      <div class="wrapper">
-        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
-  <header class="post-header">
-    <h1 class="post-title" itemprop="name headline"><a class="post-title-link"  href="/programming/2019/01/16/API-Authorization-Technologies.html">API Authorization Technologies</a></h1>
-  <center>  <p class="post-meta"><time datetime="2019-01-16T00:00:00-05:00" itemprop="datePublished">Jan 16, 2019</time></p>
-    
-     <div class="">
-       <center><p ><strong><span class="authorKeyword">Author</span><span class="small-site-title"> <h2 style="letter-spacing: 3px !important;
-       text-transform: uppercase !important;">Reo</h2></span></strong></p></center>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
 
-     </div>
-     
-   </center>
-  </header>
+    <div class="hp-contents">
+      <h2 class="title">API Authorization Technologies</h2>
+      <div class="blog-container">
+        <div class="blog-content focus-content">
 
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
   <div class="post-content" itemprop="articleBody">
-    <p>This week, I go over the techonologies involved in an implementation of the project mentioned in the
-last post. Recall we wish to make an application which, when prompted, will fetch new course content
+    <p>This week, I go over the technologies involved in an implementation of the API authorization project
+mentioned previously. This includes a discussion on how communication takes place on the internet
+and preliminaries on authentication.</p>
+
+<p>Recall we wish to make an application which, when prompted, will fetch new course content
 (eg. assignments) not already downloaded. For each item which is added, a task will be created in
-a todo list using the Wunderlist API.</p>
+a todo list using the WunderList API.</p>
 
 <p>Let’s begin with the actual fetching of the content from a given site. In other words, let’s be more
-precise about what it means to “download a1.pdf from http://www.school.math.ca/course/assignments/”.
-What is commonly reffered to as a URL (Uniform Resource Locator), is simply a string of characters
+precise about what it means to download a1.pdf from <code class="language-plaintext highlighter-rouge">http://www.school.math.ca/course/assignments/</code>.
+What is commonly referred to as a URL (Uniform Resource Locator), is simply a string of characters
 which uniquely identifies a resource. In this case, the resource is a file over the network, this
 file is often interpreted and handled accordingly by a browser (ie. an HTML file may be formatted
-appropriatelly and shown to the user as a webpage while a format which the browser does not support
+appropriately and shown to the user as a web page while a format which the browser does not support
 would often be downloaded for the user to choose how to open it). Also note that a URL is simply
 a specific type of URI (Uniform Resource Identifier). The URI generic syntax has five components of
 which only two are required:</p>
 
-<p><code class="highlighter-rouge">scheme:[//authority]path[?query][#fragment]</code></p>
+<p><code class="language-plaintext highlighter-rouge">scheme:[//authority]path[?query][#fragment]</code></p>
 
 <p>Further, the authority section consists of:</p>
 
-<p><code class="highlighter-rouge">[userinfo@]host[:port]</code></p>
+<p><code class="language-plaintext highlighter-rouge">[UserInfo@]host[:port]</code></p>
 
 <ul>
   <li>The <strong>scheme</strong> tells the browser how to interpret everything which follows the colon.</li>
-  <li><strong>Authority</strong> is optional and though the userinfo section will not be relevant for our discussion, we 
+  <li><strong>Authority</strong> is optional and though the UserInfo section will not be relevant for our discussion, we
 will be using the host and port sections which follow it.
     <ul>
       <li><strong>host</strong> consists either of a registered name or an ip address</li>
@@ -180,105 +140,45 @@ usually takes the form of “;” or “&amp;” characters.</li>
 </ul>
 
 <p>The <strong>scheme</strong> deserves special emphasis for this project. Possibilities include <em>file</em> which provides
-access to locally stored files and http which will be of particular interest for this this project.
-http is a protocol which allows requests to be sent for the serve to respond accordingly. These
-requests is how the server knows what to do with the data at the specified URI and include <code class="highlighter-rouge">GET</code>,
-<code class="highlighter-rouge">POST</code>, and <code class="highlighter-rouge">PATCH</code>. A file (eg. html file or “webpage”) being fetched by a browser, is an example
-of a <code class="highlighter-rouge">GET</code> request. The server can then send a code which represents the status of what has
-occurred. Some common codes include <code class="highlighter-rouge">404</code> and <code class="highlighter-rouge">200</code> which mean a resource was not found and
+access to locally stored files and <em>http</em> which will be of particular interest for this project.
+http is a protocol which allows requests to be sent for the server to respond accordingly. These
+requests is how the server knows what to do with the data at the specified URI and include <code class="language-plaintext highlighter-rouge">GET</code>,
+<code class="language-plaintext highlighter-rouge">POST</code>, and <code class="language-plaintext highlighter-rouge">PATCH</code>. A file (eg. HTML file or “web page”) being fetched by a browser, is an example
+of a <code class="language-plaintext highlighter-rouge">GET</code> request. The server can then send a code which represents the status of what has
+occurred. Some common codes include <code class="language-plaintext highlighter-rouge">404</code> and <code class="language-plaintext highlighter-rouge">200</code> which mean a resource was not found and
 a response went through well (or “OK”) respectively.</p>
 
-<p>Communicating with a server using only codes would obviously be incredibly restrictive so the <code class="highlighter-rouge">GET</code> and
-<code class="highlighter-rouge">POST</code> are frequently used to send data back and forth between the client and server in
+<p>Communicating with a server using only codes would obviously be incredibly restrictive so the <code class="language-plaintext highlighter-rouge">GET</code> and
+<code class="language-plaintext highlighter-rouge">POST</code> are frequently used to send data back and forth between the client and server in
 a standardized format. There a number of these standardized formats, the one relevant to this
-project being the JSON format which Wunderlist API uses to respond to requests. JSON objects consist
+project being the JSON format which WunderList API uses to respond to requests. JSON objects consist
 of key-value pairs like such:</p>
 
 <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">myObj</span> <span class="o">=</span> <span class="p">{</span>
-<span class="na">name</span><span class="p">:</span>    <span class="s2">"John Smith"</span>
-<span class="na">tel</span><span class="p">:</span>     <span class="s2">"+1-123-123-1234"</span>
-<span class="na">address</span><span class="p">:</span> <span class="s2">"38 example dr."</span>
+  <span class="na">name</span><span class="p">:</span>    <span class="dl">"</span><span class="s2">John Smith</span><span class="dl">"</span>
+  <span class="na">tel</span><span class="p">:</span>     <span class="dl">"</span><span class="s2">+1-123-123-1234</span><span class="dl">"</span>
+  <span class="na">address</span><span class="p">:</span> <span class="dl">"</span><span class="s2">38 example dr.</span><span class="dl">"</span>
 <span class="p">}</span>
 </code></pre></div></div>
 
 <p>As one can imagine, more care must be taken when the requests involve more delicate data such as
 user information. These sorts requests are usually dealt with using some sort of authentication so
 the information is only released by the server if the authentication has been done properly. This is
-relevant to our project since the Wunderlist API uses authentication to ensure users are not able to
-perform actions they would not be able to normally. For authentication, the Wunderlist API uses the
-“authorization code” flow for oAuth 2, in order to not overwhelm the amount of concepts introduced
-here we will first have to create a web app to obtain the access token then simply paste the aquired
+relevant to our project since the WunderList API uses authentication to ensure users are not able to
+perform actions they would not be able to normally. For authentication, the WunderList API uses the
+“authorization code” flow for oAuth 2 where we obtain the access token then simply paste the acquired
 access token in the application which uses a CLI.</p>
 
 <p>More specifics with regards to the authorization process will be presented in the next post
 where we go over an implementation using the flow described in the documentation for usage of
-Wunderlist’s API and oAuth2.</p>
-
+WunderList’s API and oAuth2.</p>
 
   </div>
-
-  <footer class="postNavigation">
-  
-    <a class="postPrev" href="/programming/2019/01/09/API-Authorization-Primer.html">
-        &laquo; API-Authorization-Project
-    </a>
-  
-  
-    <a class="postNext" href="/programming/2019/01/21/API-Authorization-Implementation.html">
-        API-Authorization-Implementation.md &raquo;
-    </a>
-  
-  </footer>
 </article>
 
+
+        </div>
       </div>
-    </div>
-
-    <footer class="site-footer">
-
-  <div class="wrapper">
-
-    <div class="footer-col-wrapper">
-      <div class="footer-col footer-col-1">
-        <ul class="contact-list footer-content">
-          <li>Theme based on <a href="http://github.com/hemangsk/Gravity">Gravity</a></li>
-          <li>Made with <i class="fa fa-heart"></i> on <a href="http://jekyllrb.com"><span>{ { Jekyll } }</a></span></li>
-
-
-        </ul>
-      </div>
-
-      <div class="footer-col footer-col-2 footer-content">
-        <ul class="social-media-list">
-          
-          <li>
-            <a href="https://github.com/Reo"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
-</span><span class="username">Reo</span></a>
-
-          </li>
-          
-
-          
-          <li>
-            <a href="https://twitter.com/ReoErizae"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
-</span><span class="username">ReoErizae</span></a>
-
-          </li>
-          
-        </ul>
-      </div>
-
-      <!-- <div class="footer-col footer-col-3 site-description"> -->
-      <!--   <p>Reo Erizae homepage</p> -->
-      <!-- </div> -->
-    </div>
-
-  </div>
-
-</footer>
-
-
     </div>
   </body>
-
 </html>

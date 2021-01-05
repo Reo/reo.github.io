@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Cryptopals Challenge 14</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>Continuing our cryptopals challenges,
+we now tackle another attack on AES ECB encryption similar
+to the one from <a href="/crypto/2020/08/06/12-crypals-challenge.html">challenge 12</a>.
+This time, a random prefix is present which complicates things
+a little.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#setting-up-the-oracle" id="markdown-toc-setting-up-the-oracle">Setting up the Oracle</a></li>
+  <li><a href="#discovering-the-start-of-our-chosen-plaintext" id="markdown-toc-discovering-the-start-of-our-chosen-plaintext">Discovering the Start of Our Chosen Plaintext</a></li>
+  <li><a href="#retrofitting-to-previous-solution" id="markdown-toc-retrofitting-to-previous-solution">Retrofitting to Previous Solution</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="setting-up-the-oracle">Setting up the Oracle</h2>
+
+<hr />
+
+<p>The first thing which is different this time around is the fact we need to find out where
+the random prefix ends in order to use the same strategy we did in challenge 12. The
+oracle now looks like:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">concat_ecb</span><span class="p">(</span><span class="n">pt</span><span class="p">):</span>
+    <span class="n">hidden</span> <span class="o">=</span> <span class="s">'Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkg'</span>
+    <span class="n">hidden</span> <span class="o">+=</span> <span class="s">'aGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBq'</span>
+    <span class="n">hidden</span> <span class="o">+=</span> <span class="s">'dXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK'</span>
+    <span class="n">hidden</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">hidden</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">pad</span><span class="p">(</span><span class="n">pt</span><span class="o">+</span><span class="n">hidden</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ecb_enc</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">GKEY</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="discovering-the-start-of-our-chosen-plaintext">Discovering the Start of Our Chosen Plaintext</h2>
+
+<hr />
+
+<p>AES ECB mode encryption means we can take advantage of a vulnerability we’ve used
+in previous challenges. We first find out what a block of all <code class="language-plaintext highlighter-rouge">'a'</code> looks like.
+We can do this by sending 3 blocks worth of <code class="language-plaintext highlighter-rouge">'a'</code> to the oracle so the ciphertext
+has at least two identical blocks which are the enciphered <code class="language-plaintext highlighter-rouge">'a'</code>-filled blocks.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">repIdx</span><span class="p">,</span> <span class="n">repBlock</span> <span class="o">=</span> <span class="n">find_block_pairs</span><span class="p">(</span><span class="n">concat_ecb</span><span class="p">(</span><span class="s">b'A'</span><span class="o">*</span><span class="p">(</span><span class="n">blockLen</span><span class="o">*</span><span class="mi">3</span><span class="p">)),</span> <span class="n">blockLen</span><span class="p">)</span>
+<span class="c1"># this means the random prefix ends exactly at, or before repIdx
+</span></code></pre></div></div>
+
+<p>This is implemented as</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">find_block_pairs</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">blocksize</span><span class="p">):</span>
+    <span class="n">numblocks</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">blocksize</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numblocks</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">blockA</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">blocksize</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">blocksize</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">numblocks</span><span class="p">):</span>
+            <span class="n">blockB</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">j</span><span class="o">*</span><span class="n">blocksize</span><span class="p">:(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">blocksize</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">blockA</span> <span class="o">==</span> <span class="n">blockB</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">blockA</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="retrofitting-to-previous-solution">Retrofitting to Previous Solution</h2>
+
+<hr />
+
+<p>With this information and the number of bytes we have appended, we can create a
+“prebuffer” which is just a prefix to the buffer we used in our solution to
+<a href="/crypto/2020/08/06/12-crypals-challenge.html">challenge 12</a>..</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">prebuff</span> <span class="o">=</span> <span class="s">b'A'</span><span class="o">*</span><span class="n">blockLen</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">concat_ecb</span><span class="p">(</span><span class="n">prebuff</span><span class="p">)[</span><span class="n">repIdx</span><span class="o">*</span><span class="n">blockLen</span><span class="p">:(</span><span class="n">repIdx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">blockLen</span><span class="p">]</span> <span class="o">!=</span> <span class="n">repBlock</span><span class="p">):</span>
+    <span class="n">prebuff</span> <span class="o">+=</span> <span class="s">b'A'</span>
+<span class="c1"># we no longer need the extra block full of 'A' so just leave what is needed
+# to make the prefix complete a block
+</span><span class="n">prebuff</span> <span class="o">=</span> <span class="n">prebuff</span><span class="p">[</span><span class="n">blockLen</span><span class="p">:]</span>
+
+<span class="c1"># compute the actual length of the plaintext
+</span><span class="n">hiddenLen</span> <span class="o">=</span> <span class="n">hiddenLen</span> <span class="o">-</span> <span class="p">(</span><span class="n">blockLen</span> <span class="o">*</span> <span class="n">repIdx</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">prebuff</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>from here on, it’s just a modified version of our previous solution</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># and find the plaintext one byte at a time
+</span><span class="n">hiddenGuess</span> <span class="o">=</span> <span class="s">b''</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">hiddenLen</span><span class="p">):</span>
+    <span class="n">currBlock</span> <span class="o">=</span> <span class="n">repIdx</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">/</span><span class="n">blockLen</span><span class="p">)</span>    <span class="c1"># start the block after the random and prebuff
+</span>    <span class="n">bufflen</span> <span class="o">=</span> <span class="p">(</span><span class="n">blockLen</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span> <span class="o">%</span> <span class="n">blockLen</span> <span class="c1"># length of the buffer according to the algorithm
+</span>    <span class="n">buff</span> <span class="o">=</span> <span class="n">prebuff</span> <span class="o">+</span> <span class="s">b'x'</span><span class="o">*</span><span class="n">bufflen</span>           <span class="c1"># construct the whole buffer required
+</span>    <span class="n">hiddenGuess</span> <span class="o">+=</span> <span class="n">find_byte_from_block</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="n">currBlock</span><span class="p">,</span> <span class="n">blockLen</span><span class="p">,</span> <span class="n">hiddenGuess</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>printing the output we get</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>b"Rollin' in my 5.0\nWith my rag-top down so my hair can blow\nThe girlies on standby waving just to say hi\nDid you stop? No, I just drove by\n"
+</code></pre></div></div>
+
+<p>which looks a whole lot like deciphered text.</p>
+
+<p>The imports we needed here were:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">ecb</span> <span class="kn">import</span> <span class="n">ecb_enc</span><span class="p">,</span> <span class="n">ecb_dec</span>
+<span class="kn">from</span> <span class="nn">pkcs7</span> <span class="kn">import</span> <span class="n">pad</span><span class="p">,</span> <span class="n">AES_BLOCKSIZE</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">random</span>
+</code></pre></div></div>
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

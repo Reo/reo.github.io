@@ -1,26 +1,19 @@
-# Welcome to Jekyll!
-#
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely need to edit after that.
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'jekyll serve'. If you change this file, please restart the server process.
-
 # Site settings
-title: "Reo homepage"
-email: 
-description: "Reo Erizae homepage"
+#email: 
+title: "reo homepage"
+description: "LeoP homepage"
 #baseurl: "" # the subpath of your site, e.g. /blog
 #url: "http://yourdomain.com" # the base hostname & protocol for your site
-twitter_username: ReoErizae
-github_username: Reo
-#paginate: 5
-theme-dark: false #Set to true to change to dark website theme
+twitter_username: reo_Leop
+#github_username: reo
 
-plugins: [kramdown]
+plugins:
+  - kramdown
+#, github-pages]
 
 # if pagination is desired, set up the following instead:
 # plugins: [jekyll-paginate, kramdown]
-# paginate: 20
+# paginate: 5
 # paginate_path: "/blog/page:num/"
 
 # Build settings

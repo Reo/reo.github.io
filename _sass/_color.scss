@@ -68,16 +68,16 @@ body.light {
       color: darken($l-link-color, 50%) !important;
 
       &:visited {
-          color: $l-crimson !important;
-          border-color: $l-crimson;
+          color: $l-text-color !important;
+          border-color: $l-text-color;
       }
     }
     &.post-title-link{
       color: darken($l-link-color, 50%) !important;
 
       &:visited {
-          color: $l-crimson !important;
-          border-color: $l-crimson;
+          color: $l-grey-color-dark !important;
+          border-color: $l-grey-color-dark;
       }
     }
   }

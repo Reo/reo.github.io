@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Invalid Curve Attacks on Elliptic Curve Diffie Hellman</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>Here we go over an intuitive idea for what an attack on ECDH which uses invalid curves would look like.
+Some of the details were simplified which make the system insecure beyond our attack but in a future post
+we go over a similar attack which was a real vulnerability in TLS libraries which implemented ECDH
+such as <a href="https://www.bouncycastle.org/">Bouncy Castle</a>.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#notation" id="markdown-toc-notation">Notation</a></li>
+  <li><a href="#attack" id="markdown-toc-attack">Attack</a>    <ul>
+      <li><a href="#offline-portion" id="markdown-toc-offline-portion">Offline Portion</a></li>
+      <li><a href="#online-portion" id="markdown-toc-online-portion">Online Portion</a></li>
+    </ul>
+  </li>
+  <li><a href="#example" id="markdown-toc-example">Example</a></li>
+  <li><a href="#preventing-the-attack" id="markdown-toc-preventing-the-attack">Preventing the attack</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="intro">Intro</h2>
+
+<hr />
+
+<p>As its name suggests, ECDH (Elliptic Curve Diffie Hellman) is a variation of the
+<a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange">Diffie-Hellman protocol</a>
+which uses Elliptic Curve Cryptography (ECC) to accomplish its goal of establishing a
+shared secret over an insecure channel. It forms a large part in the security of
+exchanging messages finding uses in TLS as well as messaging apps such as WhatsApp,
+Facebook Messenger, and LINE.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="notation">Notation</h2>
+
+<hr />
+
+<p>Since we’re using Elliptice Curves for our asymmetric encryption, Bob is using
+a set of standard domain parameters, perhaps a set recommended by NIST.
+For simplicity, suppose we are working with curves in standard Weierstrass form over the field
+\(\text{GF}(p)\) where \(p\) is prime.</p>
+
+\[E:= y^2\equiv x^3 +ax + b\pmod{p}\]
+
+<p>Denote the public and private keys of a user Bob as \(Q_B\) and \(d_B\) respectively.
+If Alice and Bob use Diffie Hellman, the shared secret is then taken to be the
+x coordinate of \(d_BQ_A = d_AQ_B\)</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="attack">Attack</h2>
+
+<hr />
+
+<p>We define \(E^*\) is an <em>invalid curve with respect to</em> \(E\) exactly when \(E\)
+and \(E^*\) differ only in their constant term \(b\).</p>
+
+<p>Let \(H(c)\) be a cryptographic hash function and for a point
+\(P=(P_x,P_y)\) define the function \(x(P) = P_x\).</p>
+
+<p>Say we have a system where if Alice wishes to
+connect with Bob, she sends her public key to Bob who responds with
+\(H(x(d_BQ_A))\). This way, Alice can verify that the secret was correctly
+established by verifying</p>
+
+\[H(x(d_AQ_B)) = H(x(d_BQ_A))\]
+
+<p>There are two parts to this attack, an offline part followed by an online part.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h3 id="offline-portion">Offline Portion</h3>
+
+<hr />
+
+<p>Mallory computes some values with knowledge of terms such as
+\(n=\) number of points on the subgroup Bob is using. This part of NIST’s
+publicly available Domain parameters for instance.</p>
+
+<p>let \(p_1,\ldots p_m\) be small primes with \(m\) chosen such that</p>
+
+\[\prod_{i=1}^m p_i = B &gt; n^2\]
+
+<p>for convenience we denote \(B_i = B/p_i\). Mallory computes \(m\) points on invalid curves
+with respect to the curve Bob is using such that the order of points
+\(R_1,\ldots, R_m\) correspond exactly with \(p_1,\ldots, p_m\). Note that
+we have</p>
+
+\[d^2_B &lt; n^2 &lt; B\]
+
+<!--comment-->
+
+<p><br /></p>
+
+<hr />
+
+<h3 id="online-portion">Online Portion</h3>
+
+<hr />
+
+<ol>
+  <li>Mallory sends Bob \(R_1\)</li>
+  <li>Bob responds with \(H(x(d_BR_1))\)</li>
+  <li>Mallory computes \(H(x(R_1)),\ldots\) until for some \(t_1\) she has
+\(H(x(t_1R_1)) = H(d_BR_1)\)</li>
+</ol>
+
+<p>Mallory now knows \(t_1\equiv \pm d_B\pmod{p_1}\) and further</p>
+
+\[r_1\equiv t_1^2\equiv d_B^2\pmod{p_1}\]
+
+<p>Repeating this for the remaining \(R_i\) we have a system of congruences where the
+Chinese Remainder Theorem may be used to solve for \(d^2_B\). Mallory then simply
+needs to compute the square root to find \(d_B\).</p>
+
+<p>Note that since the orders are chosen to be small primes, Mallory needs to compute
+at most \(p_i\) hashes in step 2. so the expected number of hash computations is
+\(p_i/2\).</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="example">Example</h2>
+
+<hr />
+
+<p>Suppose Bob uses \(p=31\) with a private key \(d_B=22\) and curve</p>
+
+\[E:= y^2\equiv x^3 + 10x + 26\pmod{31}\]
+
+<p>Per our algorithm, Mallory precomputes points on invalid curves with respect to \(E\):</p>
+
+\[E^*_1:= y^2\equiv x^3 + 10x + 4\pmod{31}\]
+
+<p>contains the point \(R_1=(23,30)\) with order 5 and \(R_2=(6,30)\) with order 7.</p>
+
+\[E^*_2:= y^2\equiv x^3 + 10x + 23\pmod{31}\]
+
+<p>contains \(R_3=(2,12)\) with order 11 and</p>
+
+\[E^*_3:= y^2\equiv x^3 + 10x + 7\pmod{31}\]
+
+<p>has the point \(R_4=(1,24)\) of order 13.
+Mallory then does the online portion of our attack</p>
+
+<ol>
+  <li>Mallory starts a connection with Bob posting \(R_1\) as her public key</li>
+  <li>Bob computes \(d_BR_1 = (18,23)\) and following protocol, sends Mallory \(H(x(18,23))=H(18)\)</li>
+  <li>Mallory computes \(H(x(R_1)), H(x(2R_1))\) finding that \(H(18)=H(x(2R_1))\)</li>
+  <li>Mallory now knows that \(d_B^2\equiv 2^2\equiv 5\equiv r_1\pmod{5}\)</li>
+  <li>Mallory repeats from step 1 using \(R_2,R_3,\) and \(R_4\)</li>
+</ol>
+
+<p>After these computations, Mallory has the following system of congruences:</p>
+
+\[\begin{align}
+d_B^2\equiv r_1 &amp;\equiv 4 \pmod{5}\\
+d_B^2\equiv r_2 &amp;\equiv 1 \pmod{7}\\
+d_B^2\equiv r_3 &amp;\equiv 0 \pmod{11}\\
+d_B^2\equiv r_4 &amp;\equiv 3 \pmod{13}\\
+\end{align}\]
+
+<p>In order to use CRT we let \(x_i\) be the solution to \(B_ix_i\equiv 1\pmod{p_i}\) and
+use it to compute the smallest positive solution which we are interested in.</p>
+
+\[d_B^2 = \sum_{i=1}^4 r_i x_i\pmod{B}\]
+
+<p>expanding we get \(d_B^2 = 484\) hence \(d_B=22\) as expected.
+Notice that in this example, \(B=5\times 7\times 11\times 13=5005\) so with these few steps
+we can find private keys for any curve with fewer than \(\sqrt{5005}\) points.
+In fact, if we had also included primes 2 and 3 we would be able to determine
+\(d_B\) for all \(n\) smaller than \(\sqrt{30030}\). This is significantly faster
+than a brute force approach.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="preventing-the-attack">Preventing the attack</h2>
+
+<hr />
+
+<p>This attack relies on the fact that Bob computes point addition of points which may not even lie
+on his curve. Since the algorithm for point addition in the group of points on Elliptic curves
+does not depend on the constant term, Bob unwittingly leaks information on his private key
+by correctly computing the result on small subgroups.</p>
+
+<p>The easiest way to prevent this type of attack is to verify that the points being given in
+fact lie on your curve. The recommended solution is to verify the point is a member of the
+subgroup you are using before doing any processing involving the private key.</p>
+
+<p>These posts are based on the works of Jager et. al and Antipa et. al:</p>
+
+<p>T.  Jager,  J.  Schwenk,  and  J.  Somorovsky,  “Practical  invalid  curve  attacks  on  tls-ecdh,”  inEuropean Symposium on research in computer security, pp. 407–425, Springer, 2015.</p>
+
+<p>A.  Antipa,  D.  Brown,  A.  Menezes,  R.  Struik,  and  S.  Vanstone,  “Validation  of  elliptic  curvepublic keys,”  inInternational Workshop on Public Key Cryptography,  pp. 211–223,  Springer,2003.</p>
+
+<p>and the NIST recommendations</p>
+
+<p>L. Chen, D. Moody, A. Regenscheid, and K. Randall, “Recommendations for discrete logarithm-based cryptography:  Elliptic curve domain parameters,” tech. rep., National Institute of Stan-dards and Technology, 2019.</p>
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

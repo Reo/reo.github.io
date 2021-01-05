@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">API-Authorization-Implementation</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>This post covers an implementation of the project we have been discussing for the last two posts.
+Recall that the goal was to create a simple program which would fetch assignments from a set of
+courses and add them as tasks to be done in a Wunderlist todo list using the API.</p>
+
+<p>For this project, we will be using the Python requests library which strikes a nice balance between
+concise and descriptive code for our purposes. Last time we went over details
+regarding URL and http requests both of which will apply heavily this post, though this post also
+includes the added aspect of authentication using oAuth2.</p>
+
+<p>Seeing as the focus is the requests I will very briefly go over the part of the script which does not
+deal with the topic at hand.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">requests_oauthlib</span> <span class="kn">import</span> <span class="n">OAuth2Session</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">string</span>
+
+<span class="n">courseCode</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">"enter the course code to be fetched: "</span><span class="p">)</span>
+<span class="n">assign_num</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">"enter assignment number to be fetched: "</span><span class="p">)</span>
+<span class="n">padded_assign_num</span> <span class="o">=</span> <span class="n">assign_num</span> <span class="k">if</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">assign_num</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">9</span><span class="p">)</span> <span class="k">else</span> <span class="s">"0"</span><span class="o">+</span><span class="n">assign_num</span>
+
+<span class="n">course_site</span> <span class="o">=</span> <span class="p">{</span><span class="s">'MAT101'</span><span class="p">:</span> <span class="s">'https://www.math.school.ca/course/Prob_Set_'</span><span class="o">+</span> <span class="n">padded_assign_num</span> <span class="o">+</span> <span class="s">'.pdf'</span><span class="p">}</span>
+
+<span class="c1"># error checking
+</span><span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">courseCode</span> <span class="ow">in</span> <span class="n">course_site</span><span class="p">.</span><span class="n">keys</span><span class="p">()):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"please enter a defined course or add one, defined courses:"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">course_site</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">course</span><span class="p">)</span>
+    <span class="n">quit</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">course_code</code> and <code class="language-plaintext highlighter-rouge">assign_num</code> are simply values from the user which are used to download the
+correct assignment and used as the title of the task (eg. a task may be “MAT101 assignment 1”).
+<code class="language-plaintext highlighter-rouge">padded_assign_num</code> is used for assignment URLs which pad single digit numbers with a 0.
+<code class="language-plaintext highlighter-rouge">course_site</code> simply maps course codes to the respective URL to fetch the assignments. And finally,
+the if statement is error checking to make sure that the course code is in fact a key in the
+dictionary.</p>
+
+<p>Now, a simple request to <code class="language-plaintext highlighter-rouge">GET</code> a file may be written as follows using the requests library:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># URL to which get request will be sent
+</span><span class="n">assign_url</span> <span class="o">=</span> <span class="n">course_site</span><span class="p">[</span><span class="n">course_code</span><span class="p">]</span>
+
+<span class="c1"># perform the GET request to assign_URL
+</span><span class="n">assign_request</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">assign_url</span><span class="p">,</span> <span class="n">allow_redirects</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># status code error checking
+</span><span class="k">if</span> <span class="p">(</span><span class="n">assign_request</span><span class="p">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">):</span>
+    <span class="nb">open</span><span class="p">(</span><span class="s">'q'</span><span class="o">+</span><span class="n">assign_num</span><span class="o">+</span><span class="s">".pdf"</span><span class="p">,</span> <span class="s">'wb'</span><span class="p">).</span><span class="n">write</span><span class="p">(</span><span class="n">assign_request</span><span class="p">.</span><span class="n">content</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"successfully downloaded!"</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"assignment %s does not exist"</span> <span class="o">%</span> <span class="n">assign_num</span><span class="p">)</span>
+    <span class="n">quit</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>Note the scheme specified in the URI, http(s), defines the <code class="language-plaintext highlighter-rouge">GET</code> operation
+<a href="/programming/2019/01/16/API-Authorization-Technologies.html" title="API authorization technologies">as we have gone over</a>.
+<code class="language-plaintext highlighter-rouge">assign_request</code> is an object which now holds the response from the server. We
+remember from the last post that
+a status code of <code class="language-plaintext highlighter-rouge">200</code> indicates “OK” so that is the response we are looking for from this request,
+anything else indicates something went wrong (presumably <code class="language-plaintext highlighter-rouge">404</code>, the assignment is not up yet). With
+the assignment downloaded, we now wish to get into the meat of the
+project, interacting with the WunderList API.</p>
+
+<p>The flow which WunderList specifies in its documentation is the “authorization code” flow,
+typically reserved for web apps on a server (for reasons we will go into in a bit). We will be
+following <a href="https://developer.wunderlist.com/documentation/concepts/authorization">WunderList’s developer
+documentation</a>.</p>
+
+<p>The steps for using “authorization code” flow would be as follows:</p>
+
+<ol>
+  <li>The user makes a request to log in</li>
+  <li>The application redirects the user to the Authorization server (<code class="language-plaintext highlighter-rouge">/authorize</code> endpoint)
+    <ul>
+      <li>note, the params required here may change depending on the API in question, in our case,
+  WunderList requests we send our <strong>client id</strong>, <strong>redirect uri</strong>, and an “unguessable”
+  <strong>state</strong> as parameters</li>
+    </ul>
+  </li>
+  <li>The aforementioned authorization server redirects the user to the login prompt</li>
+  <li>The user authenticates using one of the configured login options</li>
+  <li>WunderList’s authorization server redirects to a <strong>redirect uri</strong> with an authorization <strong>code</strong></li>
+  <li>The cryptographically random <strong>state</strong> generated locally is checked against the one the server sends
+back</li>
+  <li>The <strong>code</strong>, <strong>client id</strong>, and <strong>client secret</strong> are sent to the <code class="language-plaintext highlighter-rouge">/access_token</code> endpoint</li>
+  <li>The authentication server responds with an <strong>access token</strong></li>
+  <li>The application uses said <strong>access token</strong> to make requests “as” the user</li>
+  <li>The API responds with the requested information</li>
+</ol>
+
+<p>We begin with the <strong>client id</strong>, <strong>client secret</strong>, <strong>redirect uri</strong>, and <strong>state</strong> which are
+mentioned in the steps above. The first three are given upon <a href="https://developer.wunderlist.com/apps/new" title="create new app">completing an
+application</a>. <strong>redirect uri</strong> is
+chosen as a server which runs locally on the machine on an unused port and <strong>state</strong> is “<em>An
+unguessable random string</em>” which is used to protect against cross-site request forgery attacks.
+It would be a good idea to write a function to generate such strings.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">generateRandomString</span><span class="p">(</span><span class="n">string_length</span><span class="p">):</span>
+    <span class="s">"""Return a randomly generated alphanumeric string of string_length length
+
+    :string_length: length of the string to be created
+    :returns:       randomly generated alphanumeric string of string_length length
+
+    """</span>
+    <span class="c1"># This is simply a string composed of uppercase and lowercase letters as well as digits 0-9.
+</span>    <span class="n">alpha_numer</span><span class="o">=</span><span class="n">string</span><span class="p">.</span><span class="n">ascii_letters</span> <span class="o">+</span> <span class="n">string</span><span class="p">.</span><span class="n">digits</span>
+
+    <span class="c1"># concatenate string_length alphanumeric characters
+</span>    <span class="n">ret</span><span class="o">=</span><span class="s">''</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">random</span><span class="p">.</span><span class="n">SystemRandom</span><span class="p">().</span><span class="n">choice</span><span class="p">(</span><span class="n">alpha_numer</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">string_length</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ret</span>
+
+
+<span class="c1"># credentials
+</span><span class="n">client_id</span> <span class="o">=</span> <span class="s">'client id from application'</span>
+<span class="n">client_secret</span> <span class="o">=</span> <span class="s">'client secret from application'</span>
+<span class="n">redirect_uri</span> <span class="o">=</span> <span class="s">'http://localhost:8888/callback'</span>
+<span class="n">local_state</span> <span class="o">=</span> <span class="n">generateRandomString</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>We may now begin with the steps highlighted above.</p>
+
+<h2 id="step-1">Step 1</h2>
+
+<p>This is done implicitly in our case. For our purposes, the user opening up WunderFetch would imply
+they want to use the capabilities of the WunderList API (and hence log in).</p>
+
+<h2 id="step-2">Step 2</h2>
+
+<p>Here, we redirect the user to WunderList’s authorization server,
+<code class="language-plaintext highlighter-rouge">https://www.wunderlist.com/oauth/authorize</code>. Like was mentioned in the previous post, information
+may be sent as parameters in the query of a URL and as the steps above indicate, we send the <strong>client
+id</strong>, <strong>redirect uri</strong>, and <strong>state</strong>. The resulting URL to which the redirect takes place then
+looks like:</p>
+
+<p><code class="language-plaintext highlighter-rouge">https://www.wunderlist.com/oauth/authorize?client_id=&lt;client_id&gt;&amp;redirect_uri=&lt;redirect_uri&gt;&amp;state=&lt;state&gt;</code></p>
+
+<p>where <code class="language-plaintext highlighter-rouge">&lt;&gt;</code> indicates reference to the variables. The requests library does this in a pair of lines:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># oAuth2 session, the params are set here
+</span><span class="n">oauth</span> <span class="o">=</span> <span class="n">OAuth2Session</span><span class="p">(</span><span class="n">client_id</span><span class="o">=</span><span class="n">client_id</span><span class="p">,</span> <span class="n">redirect_uri</span><span class="o">=</span><span class="n">redirect_uri</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">local_state</span><span class="p">)</span>
+
+<span class="c1"># requests takes responsibility for construction of the query string.
+# authorization_url: the newly created URL
+# state            : the state which was sent off to the server
+</span><span class="n">authorization_url</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">oauth</span><span class="p">.</span><span class="n">authorization_url</span><span class="p">(</span><span class="s">'https://www.wunderlist.com/oauth/authorize'</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">'Please authorize access at: %s'</span> <span class="o">%</span> <span class="n">authorization_url</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="steps-3-5">Steps 3-5</h2>
+
+<p>The user pastes <strong>authorization_url</strong> in a browser which redirects to the login prompt. The user
+authenticates at the redirected URL and gets sent back to
+“<strong>redirect_uri</strong>?state=<em>state-from-server</em>&amp;code=<em>code-from-server</em>”</p>
+
+<h2 id="step-6">Step 6</h2>
+
+<p>The user pastes the values in the param of the final URL, the state sent from the server is then
+checked against the locally stored <strong>state</strong> to ensure the authenticity of the request.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">state</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">'Enter the state param from the callback URL'</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="p">(</span> <span class="n">state</span> <span class="o">!=</span> <span class="n">local_state</span> <span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"authorization error, state mismatch."</span><span class="p">)</span>
+    <span class="n">quit</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 id="step-7">Step 7</h2>
+
+<p>We first receive the <strong>code</strong> from the user (the second parameter in the URL they were redirected
+to) and then send this along with the <strong>client id</strong> and <strong>client secret</strong> to
+<code class="language-plaintext highlighter-rouge">https://www.wunderlist.com/oauth/access\_token</code>. The <a href="https://developer.wunderlist.com/documentation/concepts/authorization">WunderList
+documentation</a> specifies we
+send this as a <code class="language-plaintext highlighter-rouge">POST</code> request with the data sent in JSON format. The server then responds with
+a JSON object which contains the <strong>access token</strong> required to access the user’s data:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">code</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">'Enter the code param from the callback URL:'</span><span class="p">)</span>
+
+<span class="n">tok_data</span> <span class="o">=</span> <span class="p">{</span><span class="s">'client_id'</span><span class="p">:</span> <span class="n">client_id</span><span class="p">,</span> <span class="s">'client_secret'</span><span class="p">:</span> <span class="n">client_secret</span><span class="p">,</span> <span class="s">'code'</span><span class="p">:</span> <span class="n">code</span><span class="p">}</span>
+<span class="n">token</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s">'https://www.wunderlist.com/oauth/access_token'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">tok_data</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="step-8">Step 8</h2>
+
+<p>We store the access token which the server sent, the requests library may be used to parse the JSON
+response as a Python dictionary the key may then be used to grab the access token:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># retrieve access token from JSON format
+</span><span class="n">access_token</span> <span class="o">=</span> <span class="n">token</span><span class="p">.</span><span class="n">json</span><span class="p">()[</span><span class="s">'access_token'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<h2 id="step-9">Step 9</h2>
+
+<p>All that remains now is to make the requests using the newly acquired access token — WunderList’s
+API requires requests which involve user information are sent with a header with the following
+syntax:</p>
+
+<p><code class="language-plaintext highlighter-rouge">headers = {'X-Access-Token': access_token, 'X-Client-ID': client_id}</code></p>
+
+<p>In this case, we wish to add a new task. Referring again to
+<a href="https://developer.wunderlist.com/documentation/endpoints/task">the documentation</a>, we do a <code class="language-plaintext highlighter-rouge">POST</code>
+request with the required data. A response of <code class="language-plaintext highlighter-rouge">201</code> from the server then indicates everything went
+as desired:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># WunderList requires this for requests which require authentication
+</span><span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s">'X-Access-Token'</span><span class="p">:</span> <span class="n">access_token</span><span class="p">,</span> <span class="s">'X-Client-ID'</span><span class="p">:</span> <span class="n">client_id</span><span class="p">}</span>
+
+<span class="c1"># create a task
+</span><span class="n">list_id</span> <span class="o">=</span> <span class="mi">367927829</span>
+<span class="n">post_data</span> <span class="o">=</span> <span class="p">{</span><span class="s">"list_id"</span><span class="p">:</span> <span class="n">list_id</span><span class="p">,</span> <span class="s">"title"</span><span class="p">:</span> <span class="n">course_code</span> <span class="o">+</span> <span class="s">" assignment "</span> <span class="o">+</span> <span class="n">assign_num</span><span class="p">}</span>
+<span class="n">post_req</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s">'https://a.wunderlist.com/api/v1/tasks'</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">post_data</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">post_req</span><span class="p">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">201</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"successfully added task!"</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"problem creating task, code:"</span> <span class="o">+</span> <span class="n">post_req</span><span class="p">.</span><span class="n">status_code</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>An important note here is that since the course websites and the location of assignments within them
+can be vastly different or even randomly generated (for instance, some require padding while others don’t in
+this example) this demonstration has them hard-coded. There are
+numerous ways to improve our situation here, for instance, we can have the script look in a locally
+stored file which contains the key-value pairs of the courses and their respective websites.</p>
+
+<p>Thank you for reading, the full source code can be found on the <a href="https://github.com/Reo/FetchAndTodo">GitHub repository</a>.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

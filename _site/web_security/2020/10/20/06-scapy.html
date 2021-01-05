@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Basic Scapy Sniffing</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>Here we use the <a href="https://scapy.net/">scapy</a> Python library to sniff and save a target’s traffic
+on the same network.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#setup" id="markdown-toc-setup">Setup</a></li>
+  <li><a href="#sniffing-packets" id="markdown-toc-sniffing-packets">Sniffing Packets</a></li>
+  <li><a href="#processing-incoming-packets" id="markdown-toc-processing-incoming-packets">Processing Incoming Packets</a>    <ul>
+      <li><a href="#credits" id="markdown-toc-credits">Credits</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="setup">Setup</h2>
+
+<hr />
+
+<p>Our docker-compose we have this time looks like</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3'</span>
+
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">alice</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">alice</span>
+    <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">cap_add</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">NET_ADMIN</span>
+      <span class="pi">-</span> <span class="s">SYS_ADMIN</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="na">channel</span><span class="pi">:</span>
+        <span class="na">ipv4_address</span><span class="pi">:</span> <span class="s">10.0.0.2</span>
+
+  <span class="na">mallory</span><span class="pi">:</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
+      <span class="na">container_name</span><span class="pi">:</span> <span class="s">mallory</span>
+      <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+      <span class="na">cap_add</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">NET_ADMIN</span>
+        <span class="pi">-</span> <span class="s">SYS_ADMIN</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="s">.:/shared</span>
+      <span class="na">network_mode</span><span class="pi">:</span> <span class="s">service:alice</span>
+
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="na">channel</span><span class="pi">:</span>
+    <span class="na">driver</span><span class="pi">:</span> <span class="s">bridge</span>
+    <span class="na">ipam</span><span class="pi">:</span>
+      <span class="na">config</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">subnet</span><span class="pi">:</span> <span class="s">10.0.0.0/28</span>
+</code></pre></div></div>
+
+<p>We begin with the <a href="/crypto/2020/10/08/05-lab.html#setup">usual setup</a>
+of our labs involving Docker.
+Alice again uses nodejs and with <code class="language-plaintext highlighter-rouge">docker-compose up alice</code> runs</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">shell</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">shelljs</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">exec</span> <span class="o">=</span> <span class="nx">shell</span><span class="p">.</span><span class="nx">exec</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">commands</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="dl">'</span><span class="s1">ping -c 1 cms-weblab.utsc.utoronto.ca</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">nslookup utsc.utoronto.ca</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">nslookup stackoverflow.com</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">nslookup seclab.space</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">curl http://http-only.seclab.space</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">curl https://https-only.seclab.space</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">curl -L http://security.stackexchange.com/questions/165782/is-there-any-way-capture-https-request-with-python</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">curl https://scapy.net/</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">curl https://github.com/invernizzi/scapy-http</span><span class="dl">'</span><span class="p">,</span>
+<span class="p">];</span>
+
+<span class="kd">var</span> <span class="nx">cmds</span> <span class="o">=</span> <span class="p">[];</span>
+
+<span class="kd">var</span> <span class="nx">runCommand</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">cmd</span><span class="p">){</span>
+    <span class="nx">exec</span><span class="p">(</span><span class="nx">cmd</span><span class="p">,</span> <span class="p">{</span><span class="na">silent</span><span class="p">:</span><span class="kc">true</span><span class="p">})</span><span class="c1">//+ " &gt; /dev/null 2&gt;&amp;1");</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">do_request</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">cmds</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">cmds</span> <span class="o">=</span> <span class="nx">commands</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">cmd</span> <span class="o">=</span> <span class="nx">cmds</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span><span class="o">*</span><span class="nx">cmds</span><span class="p">.</span><span class="nx">length</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="nx">runCommand</span><span class="p">(</span><span class="nx">cmd</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="sniffing-packets">Sniffing Packets</h2>
+
+<hr />
+
+<p>The focus of this exercise is to spy on, and parse the packets she sends into a digestible format.
+How Mallory actually gets this traffic is not the focus but one example would be as a
+<a href="/crypto/2020/10/15/06-malgat.html">malicious gateway</a>.</p>
+
+<p>From the <a href="https://scapy.readthedocs.io/en/latest/api/scapy.sendrecv.html?highlight=sniff%28%29%23scapy.sendrecv.sniff">Scapy documentation</a>
+the arguments for <code class="language-plaintext highlighter-rouge">sniff()</code> which will be useful for us are <strong>iface</strong>, <strong>lfilter</strong>, <strong>prn</strong>, and <strong>count</strong>.
+We can then write our main driver:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+    <span class="n">sniff</span><span class="p">(</span><span class="n">iface</span><span class="o">=</span><span class="s">"eth0"</span><span class="p">,</span> <span class="n">lfilter</span><span class="o">=</span><span class="n">packet_filter</span><span class="p">,</span> <span class="n">prn</span><span class="o">=</span><span class="n">packet_process</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_stream</span><span class="p">:</span>
+        <span class="n">file_stream</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>For this example, sniff TCP packets heading to ports either 80 or 443
+but this can easily be altered. Here are some examples.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">isTCP</span><span class="p">(</span><span class="n">packet</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">packet</span><span class="p">.</span><span class="n">haslayer</span><span class="p">(</span><span class="n">TCP</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="n">packet</span><span class="p">[</span><span class="n">TCP</span><span class="p">].</span><span class="n">dport</span> <span class="o">==</span> <span class="mi">80</span> <span class="ow">and</span> <span class="p">(</span><span class="s">'Host'</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">packet</span><span class="p">)))</span>
+        <span class="ow">or</span> <span class="p">(</span><span class="n">packet</span><span class="p">[</span><span class="n">TCP</span><span class="p">].</span><span class="n">dport</span> <span class="o">==</span> <span class="mi">443</span> <span class="ow">and</span> <span class="p">(</span><span class="n">packet</span><span class="p">[</span><span class="n">TCP</span><span class="p">].</span><span class="n">haslayer</span><span class="p">(</span><span class="n">TLSClientHello</span><span class="p">)))))</span>
+
+<span class="k">def</span> <span class="nf">isDNS</span><span class="p">(</span><span class="n">packet</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">packet</span><span class="p">.</span><span class="n">haslayer</span><span class="p">(</span><span class="s">'DNS Question Record'</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">packet</span><span class="p">[</span><span class="n">UDP</span><span class="p">].</span><span class="n">dport</span> <span class="o">==</span> <span class="mi">53</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">packet_filter</span><span class="p">(</span><span class="n">packet</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">isTCP</span><span class="p">(</span><span class="n">packet</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="processing-incoming-packets">Processing Incoming Packets</h2>
+
+<hr />
+
+<p>We can now move on to the actual processing. These can again be found in the documentation.
+In the case of DNS, we want to spy on the source, destination, protocol, and qname.</p>
+
+<p>In the case of HTTP we want the source, destination, protocol, host, method, and path</p>
+
+<p>Finally, for HTTPS we want the source, destination, protocol, and servername</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">packet_process</span><span class="p">(</span><span class="n">packet</span><span class="p">):</span>
+    <span class="c1"># extract the source and destinations IP
+</span>    <span class="n">sip</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="n">IPv6</span><span class="p">].</span><span class="n">src</span> <span class="k">if</span> <span class="p">(</span><span class="n">IPv6</span> <span class="ow">in</span> <span class="n">packet</span><span class="p">)</span> <span class="k">else</span> <span class="n">packet</span><span class="p">[</span><span class="n">IP</span><span class="p">].</span><span class="n">src</span>
+    <span class="n">dip</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="n">IPv6</span><span class="p">].</span><span class="n">dst</span> <span class="k">if</span> <span class="p">(</span><span class="n">IPv6</span> <span class="ow">in</span> <span class="n">packet</span><span class="p">)</span> <span class="k">else</span> <span class="n">packet</span><span class="p">[</span><span class="n">IP</span><span class="p">].</span><span class="n">dst</span>
+
+    <span class="n">qname</span> <span class="o">=</span> <span class="s">""</span>
+    <span class="n">protocol</span> <span class="o">=</span> <span class="s">""</span>
+
+    <span class="k">if</span> <span class="n">isDNS</span><span class="p">(</span><span class="n">packet</span><span class="p">):</span>
+        <span class="n">qname</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="n">DNS</span><span class="p">].</span><span class="n">qd</span><span class="p">.</span><span class="n">qname</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+        <span class="n">protocol</span> <span class="o">=</span> <span class="s">'DNS'</span>
+        <span class="n">results</span><span class="p">.</span><span class="n">append</span><span class="p">({</span><span class="s">"src"</span><span class="p">:</span> <span class="n">sip</span><span class="p">,</span> <span class="s">"dst"</span><span class="p">:</span> <span class="n">dip</span><span class="p">,</span> <span class="s">"protocol"</span><span class="p">:</span> <span class="n">protocol</span><span class="p">,</span> <span class="s">"qname"</span><span class="p">:</span> <span class="n">qname</span><span class="p">})</span>
+
+    <span class="k">if</span> <span class="n">isTCP</span><span class="p">(</span><span class="n">packet</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">packet</span><span class="p">[</span><span class="n">TCP</span><span class="p">].</span><span class="n">dport</span> <span class="o">==</span> <span class="mi">80</span><span class="p">:</span> <span class="c1"># is HTTP
+</span>            <span class="n">protocol</span> <span class="o">=</span> <span class="s">'HTTP'</span>
+            <span class="n">method</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="n">HTTPRequest</span><span class="p">].</span><span class="n">Method</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="n">HTTPRequest</span><span class="p">].</span><span class="n">Host</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="n">HTTPRequest</span><span class="p">].</span><span class="n">Path</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+            <span class="n">results</span><span class="p">.</span><span class="n">append</span><span class="p">({</span><span class="s">"src"</span><span class="p">:</span> <span class="n">sip</span><span class="p">,</span> <span class="s">"dst"</span><span class="p">:</span> <span class="n">dip</span><span class="p">,</span> <span class="s">"protocol"</span><span class="p">:</span> <span class="n">protocol</span><span class="p">,</span> <span class="s">"host"</span><span class="p">:</span> <span class="n">host</span><span class="p">,</span> <span class="s">"method"</span><span class="p">:</span>
+                <span class="n">method</span><span class="p">,</span> <span class="s">"path"</span><span class="p">:</span> <span class="n">path</span><span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">protocol</span> <span class="o">=</span> <span class="s">'HTTPS'</span>
+            <span class="n">servername</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">packet</span><span class="p">[</span><span class="n">TLS</span><span class="p">].</span><span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">ext</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">servernames</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">results</span><span class="p">.</span><span class="n">append</span><span class="p">({</span><span class="s">"src"</span><span class="p">:</span> <span class="n">sip</span><span class="p">,</span> <span class="s">"dst"</span><span class="p">:</span> <span class="n">dip</span><span class="p">,</span> <span class="s">"protocol"</span><span class="p">:</span> <span class="n">protocol</span><span class="p">,</span> <span class="s">"servername"</span><span class="p">:</span> <span class="n">servername</span><span class="p">})</span>
+</code></pre></div></div>
+
+<p>With this, we can examine Alice’s traffic with</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker exec mallory python3 spy.py
+</code></pre></div></div>
+
+<p>and as expected, this prints out a json file
+with <strong>count</strong> packets collected.</p>
+
+<p>When you’re done, don’t forget to <a href="/crypto/2020/10/08/05-lab.html#docker-cleanup">clean up</a>
+after Docker.</p>
+
+<hr />
+
+<h3 id="credits">Credits</h3>
+
+<hr />
+
+<p>These labs and exercises were provided as a part of a course in Security
+taught in 2019 by
+<a href="https://thierrysans.me/">Thierry Sans</a>.
+Credit for creation of these exercises and
+Docker images/containers goes to their respective creators.</p>
+
+<p>Docker images, urls, etc. are kept private
+to prevent abuse but if interested please
+contact.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

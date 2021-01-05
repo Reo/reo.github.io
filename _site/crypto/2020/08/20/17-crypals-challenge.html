@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Cryptopals Challenge 17</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>For the 17th <a href="https://cryptopals.com/">Cryptopals challenge</a>,
+we implement the so-called best-known attack on modern block cipher cryptography.
+The CBC padding oracle.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#system-set-up-and-implementation" id="markdown-toc-system-set-up-and-implementation">System Set Up and Implementation</a></li>
+  <li><a href="#overview-of-attack" id="markdown-toc-overview-of-attack">Overview of Attack</a></li>
+  <li><a href="#byte-by-byte-cracking" id="markdown-toc-byte-by-byte-cracking">Byte-by-Byte Cracking</a></li>
+  <li><a href="#bringing-it-together" id="markdown-toc-bringing-it-together">Bringing it Together</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="system-set-up-and-implementation">System Set Up and Implementation</h2>
+
+<hr />
+
+<p>The required imports end up being</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">from</span> <span class="nn">cbc</span> <span class="kn">import</span> <span class="n">cbc_enc</span><span class="p">,</span> <span class="n">cbc_dec</span>
+<span class="kn">from</span> <span class="nn">pkcs7</span> <span class="kn">import</span> <span class="n">pad</span><span class="p">,</span> <span class="n">unpad</span><span class="p">,</span> <span class="n">AES_BLOCKSIZE</span>
+</code></pre></div></div>
+
+<p>The system in this example uses one random 16 byte AES key and encrypts one of 10 strings
+chosen randomly using AES CBC mode. It then provides the ciphertext and iv. This
+can be implemented as follows</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">GKEY</span><span class="o">=</span><span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">hiddenlist</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="s">'MDAwMDAwTm93IHRoYXQgdGhlIHBhcnR5IGlzIGp1bXBpbmc='</span><span class="p">),</span>
+        <span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="s">'MDAwMDAxV2l0aCB0aGUgYmFzcyBraWNrZWQgaW4gYW5kIHRoZSBWZWdhJ3MgYXJlIHB1bXBpbic='</span><span class="p">),</span>
+        <span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="s">'MDAwMDAyUXVpY2sgdG8gdGhlIHBvaW50LCB0byB0aGUgcG9pbnQsIG5vIGZha2luZw=='</span><span class="p">),</span>
+        <span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="s">'MDAwMDAzQ29va2luZyBNQydzIGxpa2UgYSBwb3VuZCBvZiBiYWNvbg=='</span><span class="p">),</span>
+        <span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="s">'MDAwMDA0QnVybmluZyAnZW0sIGlmIHlvdSBhaW4ndCBxdWljayBhbmQgbmltYmxl'</span><span class="p">),</span>
+        <span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="s">'MDAwMDA1SSBnbyBjcmF6eSB3aGVuIEkgaGVhciBhIGN5bWJhbA=='</span><span class="p">),</span>
+        <span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="s">'MDAwMDA2QW5kIGEgaGlnaCBoYXQgd2l0aCBhIHNvdXBlZCB1cCB0ZW1wbw=='</span><span class="p">),</span>
+        <span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="s">'MDAwMDA3SSdtIG9uIGEgcm9sbCwgaXQncyB0aW1lIHRvIGdvIHNvbG8='</span><span class="p">),</span>
+        <span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="s">'MDAwMDA4b2xsaW4nIGluIG15IGZpdmUgcG9pbnQgb2g='</span><span class="p">),</span>
+        <span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="s">'MDAwMDA5aXRoIG15IHJhZy10b3AgZG93biBzbyBteSBoYWlyIGNhbiBibG93'</span><span class="p">)</span>
+        <span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">encrypt_and_generate_iv</span><span class="p">():</span>
+    <span class="n">currhidden</span> <span class="o">=</span> <span class="n">hiddenlist</span><span class="p">[</span><span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">9</span><span class="p">)]</span>
+    <span class="n">iv</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="n">cbc_enc</span><span class="p">(</span><span class="n">currhidden</span><span class="p">,</span> <span class="n">GKEY</span><span class="p">,</span> <span class="n">iv</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ct</span><span class="p">,</span> <span class="n">iv</span>
+</code></pre></div></div>
+
+<p>The user is then supposed to send back the ciphertext and iv to an oracle which checks the padding
+upon decryption and returns true iff the padding is valid.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">check_pad</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="o">-</span><span class="n">r</span><span class="p">:]</span> <span class="o">==</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">r</span><span class="p">])</span><span class="o">*</span><span class="n">r</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">pad_oracle</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">iv</span><span class="p">):</span>
+    <span class="n">pt</span> <span class="o">=</span> <span class="n">cbc_dec</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">GKEY</span><span class="p">,</span> <span class="n">iv</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">check_pad</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>This simulates AES CBC as it’s implemented server-side in web applications.
+The second can be thought of as mocking an encrypted session token such as
+a cookie.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="overview-of-attack">Overview of Attack</h2>
+
+<hr />
+
+<p>We will be breaking this implementation using a side-channel attack, the oracle
+leaks more information than it should by revealing whether or not the pad is valid.
+The idea is as follows:</p>
+
+<p>First, obtain the ciphertext, iv pair.
+For each block, we corrupt its last byte until we have a valid padding. If it is
+modified and is valid, it is likely the case that \(m\oplus b=01_{16}\)
+where \(m\) is the modification made to the last byte \(b\) and subscript denotes
+the base, in this case hex.
+Now that we know the last byte we continue similarly for subsequent bytes.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ct</span><span class="p">,</span> <span class="n">iv</span> <span class="o">=</span> <span class="n">encrypt_and_generate_iv</span><span class="p">()</span>
+<span class="n">pt</span> <span class="o">=</span> <span class="s">b''</span>
+<span class="c1"># for each block
+</span><span class="k">for</span> <span class="n">blckIdx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span><span class="o">/</span><span class="n">AES_BLOCKSIZE</span><span class="p">)):</span>
+    <span class="n">ptblck</span> <span class="o">=</span> <span class="s">b''</span>
+    <span class="n">ctblck</span> <span class="o">=</span> <span class="n">ct</span><span class="p">[</span><span class="n">AES_BLOCKSIZE</span><span class="o">*</span><span class="n">blckIdx</span><span class="p">:</span><span class="n">AES_BLOCKSIZE</span><span class="o">*</span><span class="p">(</span><span class="n">blckIdx</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="n">prevctblck</span> <span class="o">=</span> <span class="n">iv</span> <span class="k">if</span> <span class="p">(</span><span class="n">blckIdx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="n">ct</span><span class="p">[</span><span class="n">AES_BLOCKSIZE</span><span class="o">*</span><span class="p">(</span><span class="n">blckIdx</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span><span class="n">AES_BLOCKSIZE</span><span class="o">*</span><span class="n">blckIdx</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>We initialize variables we will use to store the plaintext as well as the previous and
+current block we will crack. Notice that the first “previous” block is the iv
+since it serves the same purpose for the first block.</p>
+
+<p>We will need another loop inside which goes over every byte within the block which
+is where we will be corrupting the current ciphertext block.</p>
+
+<p>For the \(i\)th byte into the block
+we need to corrupt the ciphertext in a way which will allow us to use the oracle.
+We can traverse the block in reverse and corrupt the \(i-1\) bytes which follow
+(in the previous block) so that when xored, they have a value of \(i\) and
+the oracle tells us if the \(i\)th byte is also correct.</p>
+
+<p>This is an inductive argument and assumes we have found the \(i-1\) previous
+bytes. The initial byte can be found with an empty “fake” padding manipulating
+only the final byte of the previous block until it is accepted in which
+case we can say (with high probability) that we have found the desired byte.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="byte-by-byte-cracking">Byte-by-Byte Cracking</h2>
+
+<hr />
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">for</span> <span class="n">byteIdx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">AES_BLOCKSIZE</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">fauxpad</span> <span class="o">=</span> <span class="n">construct_fauxpad</span><span class="p">(</span><span class="n">byteIdx</span><span class="p">,</span> <span class="n">ptblck</span><span class="p">,</span> <span class="n">prevctblck</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>where <code class="language-plaintext highlighter-rouge">construct_fauxpad()</code> may be implemented as:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">construct_fauxpad</span><span class="p">(</span><span class="n">bIdx</span><span class="p">,</span> <span class="n">ptblck</span><span class="p">,</span> <span class="n">ctblck</span><span class="p">):</span>
+    <span class="s">'''
+    create an artificial pad using known bytes
+    '''</span>
+    <span class="n">fpad</span> <span class="o">=</span> <span class="s">b''</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">bIdx</span><span class="p">):</span>
+        <span class="n">fpad</span> <span class="o">+=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">ptblck</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">ctblck</span><span class="p">[</span><span class="n">AES_BLOCKSIZE</span><span class="o">-</span><span class="n">bIdx</span><span class="o">+</span><span class="n">i</span><span class="p">]</span> <span class="o">^</span> <span class="n">bIdx</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">fpad</span>
+</code></pre></div></div>
+
+<p>from here we want to find \(m\) from the previous section which we will call <code class="language-plaintext highlighter-rouge">delta</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="n">delta</span> <span class="o">=</span> <span class="n">find_delta</span><span class="p">(</span><span class="n">byteIdx</span><span class="p">,</span> <span class="n">ctblck</span><span class="p">,</span> <span class="n">fauxpad</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>an example implementation being</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">find_delta</span><span class="p">(</span><span class="n">bIdx</span><span class="p">,</span> <span class="n">ctblck</span><span class="p">,</span> <span class="n">fauxpad</span><span class="p">):</span>
+    <span class="s">'''
+    Find the character which results in the desired ciphertext
+    accepted by the oracle
+    '''</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">256</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">pad_oracle</span><span class="p">(</span><span class="n">ctblck</span><span class="p">,</span> <span class="s">b'</span><span class="se">\xff</span><span class="s">'</span><span class="o">*</span><span class="p">(</span><span class="n">AES_BLOCKSIZE</span><span class="o">-</span><span class="n">bIdx</span><span class="p">)</span> <span class="o">+</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="n">fauxpad</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">i</span>
+    <span class="k">return</span> <span class="mi">0</span>
+</code></pre></div></div>
+
+<p>Notice that we skip 0 initially since it would trivially satisfy the oracle
+(no modification). We also use the value <code class="language-plaintext highlighter-rouge">b'\xff'</code> so there are no clashes
+with pad values.</p>
+
+<p>We use the \(m\oplus b\) formula to recover an additional byte of paintext</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="n">delta</span> <span class="o">^=</span> <span class="n">byteIdx</span>
+        <span class="n">ptblck</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">delta</span> <span class="o">^</span> <span class="n">prevctblck</span><span class="p">[</span><span class="n">AES_BLOCKSIZE</span><span class="o">-</span><span class="n">byteIdx</span><span class="p">]])</span> <span class="o">+</span> <span class="n">ptblck</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="bringing-it-together">Bringing it Together</h2>
+
+<hr />
+
+<p>putting everything together, our main loop looks like</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">blckIdx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span><span class="o">/</span><span class="n">AES_BLOCKSIZE</span><span class="p">)):</span>
+    <span class="n">ptblck</span> <span class="o">=</span> <span class="s">b''</span>
+    <span class="n">ctblck</span> <span class="o">=</span> <span class="n">ct</span><span class="p">[</span><span class="n">AES_BLOCKSIZE</span><span class="o">*</span><span class="n">blckIdx</span><span class="p">:</span><span class="n">AES_BLOCKSIZE</span><span class="o">*</span><span class="p">(</span><span class="n">blckIdx</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="n">prevctblck</span> <span class="o">=</span> <span class="n">iv</span> <span class="k">if</span> <span class="p">(</span><span class="n">blckIdx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="n">ct</span><span class="p">[</span><span class="n">AES_BLOCKSIZE</span><span class="o">*</span><span class="p">(</span><span class="n">blckIdx</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span><span class="n">AES_BLOCKSIZE</span><span class="o">*</span><span class="n">blckIdx</span><span class="p">]</span>
+    <span class="c1"># for each byte within the block
+</span>    <span class="k">for</span> <span class="n">byteIdx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">AES_BLOCKSIZE</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">fauxpad</span> <span class="o">=</span> <span class="n">construct_fauxpad</span><span class="p">(</span><span class="n">byteIdx</span><span class="p">,</span> <span class="n">ptblck</span><span class="p">,</span> <span class="n">prevctblck</span><span class="p">)</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">find_delta</span><span class="p">(</span><span class="n">byteIdx</span><span class="p">,</span> <span class="n">ctblck</span><span class="p">,</span> <span class="n">fauxpad</span><span class="p">)</span>
+        <span class="n">delta</span> <span class="o">^=</span> <span class="n">byteIdx</span>
+        <span class="n">ptblck</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">delta</span> <span class="o">^</span> <span class="n">prevctblck</span><span class="p">[</span><span class="n">AES_BLOCKSIZE</span><span class="o">-</span><span class="n">byteIdx</span><span class="p">]])</span> <span class="o">+</span> <span class="n">ptblck</span>
+    <span class="n">pt</span> <span class="o">+=</span> <span class="n">ptblck</span>
+</code></pre></div></div>
+
+<p>We can verify this works with</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">unpad</span><span class="p">(</span><span class="n">pt</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>and we see the plaintext we expect.</p>
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

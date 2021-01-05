@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Cryptopals Challenge 27</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p><a href="https://cryptopals.com/">Cryptopals challenge</a> 27. We recover the key used in a system
+where the key and IV are the same value and used for AES CBC mode.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#system-setup" id="markdown-toc-system-setup">System Setup</a></li>
+  <li><a href="#attackers-approach" id="markdown-toc-attackers-approach">Attacker’s Approach</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="system-setup">System Setup</h2>
+
+<hr />
+
+<p>The system here is one where a pair of systems agree that they will communicate using AES CBC mode
+with IV being the same as their key. If an error ocurrs due to one of tha characters not being ascii,
+they raise an exception which includes the attempt at deciphering to plaintext. For this attack,
+we need the plaintext to be at least 3 blocks (48 bytes) in length.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">cbc</span> <span class="kn">import</span> <span class="n">cbc_enc</span><span class="p">,</span> <span class="n">cbc_dec</span>
+<span class="kn">from</span> <span class="nn">Crypto.Util.strxor</span> <span class="kn">import</span> <span class="n">strxor</span>
+
+<span class="n">GKEY</span><span class="o">=</span><span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">CBC_IV</span><span class="o">=</span><span class="n">GKEY</span>
+
+<span class="k">def</span> <span class="nf">dec_and_check</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">iv</span><span class="p">):</span>
+    <span class="n">pt</span> <span class="o">=</span> <span class="n">cbc_dec</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">GKEY</span><span class="p">,</span> <span class="n">CBC_IV</span><span class="p">)</span>
+    <span class="c1"># also takes care of depadding
+</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">pt</span><span class="p">.</span><span class="n">isascii</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">pt</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="s">b'value1=12345678&amp;value2=2&amp;value3=YELLOWxSUBMARINE'</span>
+
+<span class="c1"># simulate the attacker intercepting the sent the message
+</span><span class="n">ct</span> <span class="o">=</span> <span class="n">cbc_enc</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">GKEY</span><span class="p">,</span> <span class="n">CBC_IV</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="attackers-approach">Attacker’s Approach</h2>
+
+<hr />
+
+<p>From here, the attacker manipulates the ciphertext in a way that the
+plaintext it decrypts to leaks information, sends it to one of the
+systems and saves the response.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">attack</span> <span class="o">=</span> <span class="n">ct</span><span class="p">[:</span><span class="mi">16</span><span class="p">]</span> <span class="o">+</span> <span class="s">b'</span><span class="se">\x00</span><span class="s">'</span><span class="o">*</span><span class="mi">16</span> <span class="o">+</span> <span class="n">ct</span><span class="p">[:</span><span class="mi">16</span><span class="p">]</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">dec_and_check</span><span class="p">(</span><span class="n">attack</span><span class="p">,</span> <span class="n">GKEY</span><span class="p">,</span> <span class="n">CBC_IV</span><span class="p">)</span>
+</code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/CBC_decryption.svg" alt="CBC diagram" class="svg invert-color" width="1200px" /></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><em>CTR mode decryption (courtesy of Wikipedia)</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Label the original three ciphertext blocks \(C_1, C_2, C_3\) respectively.
+From the diagram we see the plaintext error response we are sent back is</p>
+
+\[D_{\text{GKEY}}(C_1)\oplus \text{CBC_IV} || C_1\oplus D_{\text{GKEY}}(0)||D_{\text{GKEY}}(C_1)\]
+
+<p>In particular, we know
+\(D_{\text{GKEY}}(C_1)\) and \(D_{\text{GKEY}}(C_1)\oplus \text{CBC_IV}\).</p>
+
+<p>Taking xor of both of these we get back <code class="language-plaintext highlighter-rouge">CBC_IV</code> which is what we want.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">leakedIV</span> <span class="o">=</span> <span class="n">strxor</span><span class="p">(</span><span class="n">response</span><span class="p">[:</span><span class="mi">16</span><span class="p">],</span> <span class="n">response</span><span class="p">[</span><span class="mi">32</span><span class="p">:])</span>
+</code></pre></div></div>
+
+<p>we can check this worked as follows:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="n">CBC_IV</span> <span class="o">==</span> <span class="n">leakedIV</span>
+</code></pre></div></div>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

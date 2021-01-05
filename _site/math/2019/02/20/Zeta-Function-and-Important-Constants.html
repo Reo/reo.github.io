@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Zeta Function and Important Constants</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>This post covers an interesting way to relate the famous Zeta function and constants \(i\), \(\pi\), and lesser-known
+\(\gamma\) being the Euler-Mascheroni Constant. In order that goal we discuss a convenient way to rewrite
+\(\zeta(s)\) as a sum with a holomorphic function.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#rewriting-zetas" id="markdown-toc-rewriting-zetas">Rewriting \(\zeta(s)\)</a></li>
+  <li><a href="#evaluating-the-curve-integral" id="markdown-toc-evaluating-the-curve-integral">Evaluating the Curve Integral</a></li>
+  <li><a href="#reduced-to-a-limit-problem" id="markdown-toc-reduced-to-a-limit-problem">Reduced to a Limit Problem</a></li>
+</ul>
+
+<p><br /></p>
+
+<p>The Zeta function mainly gets its fame from Number Theory but it is also interesting to study in the
+context of complex analysis.</p>
+
+<p>Our goal here will be to evaluate the integral over a ball centered at 1. For a complex variable \(z\)
+we denote the real part of \(z\) as \(\Re(z)\).</p>
+
+<hr />
+
+<h2 id="rewriting-zetas">Rewriting \(\zeta(s)\)</h2>
+
+<hr />
+
+<p>Since we will be computing a contour integral, it would be convenient to be
+able to write \(\zeta(s)\) as a sum involving a holomorphic function. To that end, we present
+the following Lemma and Proposition. For convenience, we let \(\sigma=\Re(s)\).</p>
+
+<p><strong>Lemma:</strong> \(\vert n^{-s}\vert = n^{-\sigma}\)</p>
+
+<p><em>proof</em>:</p>
+
+\[\vert n^{-s}\vert = \vert e^{-s\ln(n)} \vert = e^{-\sigma\ln(n)} = n^{-\sigma}\]
+
+<p><strong>Proposition:</strong> If \(\Re(s) &gt; 0\) then</p>
+
+\[\zeta(s) = \frac{1}{s-1} + H(s)\]
+
+<p>where \(H(s)\) is holomorphic in \(\Re(s)&gt;0\).</p>
+
+<p>The proof presented here is a detailed version of the one in Stein and Shakarchi’s Complex Analysis textbook:</p>
+
+<p><em>proof</em>: Let \(f(x) = x^{-s}\) and set</p>
+
+\[\delta_n(s) = \int_n^{n+1} f(n) - f(x)\:dx\]
+
+<p>consider \(x\in[n,n+1]\) real and \(n\ge 1\) an integer. When \(x=n\) we have</p>
+
+\[\vert n^{-s} - x^{-s} \vert = \vert n^{-s} - n^{-s} \vert = 0 \le\frac{\vert s \vert}{n^{\sigma+1}}\]
+
+<p>since \(\Re(s)&gt;0\) so the rightmost value is in fact strictly positive. Next, let \(x\in(n,n+1]\) be arbitrary,
+by mean value theorem we have that there exists some \(c\in (n,x)\) such that</p>
+
+\[f'(c) = \frac{f(x) - f(n)}{x - n}\]
+
+<p>taking magnitute and noticing that \(1 \le (x-n)^{-1}\) for every choice of \(x\in(n,n+1]\) we have</p>
+
+\[\vert f(x) - f(n) \vert = \vert f(n) - f(x) \vert \le \vert f'(c) \vert = \vert -sc^{-s-1}\vert \le \vert s\vert\vert n^{-s}\vert\vert n^{-1} \vert\]
+
+<p>We may now directly apply our lemma and we get</p>
+
+\[\vert \delta_n(s) \vert = \vert f(n) - f(x) \vert \le \frac{\vert s\vert}{n^{\sigma + 1}}\]
+
+<p>Now consider</p>
+
+\[H(s) = \sum_{n=1}^{\infty}\delta_n(s) = \sum_{n=1}^{\infty}n^{-s} - \int_1^\infty x^{-s}\:dx = \sum_{n=1}^{\infty}n^{-s} - \frac{1}{s-1}\]
+
+<p>\(\Re(s)&gt;0\) implies \(\sigma + 1 &gt; 1\) so by
+comparison test and the bound we found for \(\vert \delta_n(s)\vert\) we have that \(H(s)\) converges uniformly
+on \(\Re(s)&gt;0\) and is well defined.</p>
+
+<p>Recall that \(\zeta(s) = \sum_{n=1}^{\infty}n^{-s}\) for \(\Re(s) &gt; 1\) so we have \(H(s) = \zeta(s) + (s-1)^{-1}\) on this
+region but since \(\sum_n\delta_n(s)\) is holomorphic on \(\Re(s) &gt; 0\) it follows that \(\zeta(s)\) is extensible to that
+region as well and the identity continues to hold so we have</p>
+
+\[\zeta(s) = H(s) + \frac{1}{s-1}\]
+
+<p>for \(\Re(s) &gt; 0\) where \(H(s)\) is holomorphic everywhere as desired.</p>
+
+<hr />
+
+<h2 id="evaluating-the-curve-integral">Evaluating the Curve Integral</h2>
+
+<hr />
+
+<p>Now for the computation mentioned in the title,
+let \(S_{\epsilon}(1)\) denote a ball of radius \(\epsilon\) centered at \(1\) with, say, \(\epsilon=1/2\).</p>
+
+<div class="latex-align">
+$$
+\begin{align*}
+  \oint_{S_{\epsilon}(1)} \zeta^2(s)\: ds &amp;= \oint_{S_{\epsilon}(1)} \left( \frac{1}{s-1} + H(s) \right)^2\: ds\\
+  &amp;= \oint_{S_{\epsilon}(1)} (s-1)^{-2} + 2H(s)(s-1)^{-1} + H(s)^2 \: ds\\
+  &amp;= \oint_{S_{\epsilon}(1)} \frac{2H(s)}{s-1}\: ds &amp;&amp;\text{Cauchy's Theorem, Residue Theorem}\\
+  &amp;= 4 \pi i \text{Res}_{s=1}\left(\frac{H(s)}{s-1}\right) &amp;&amp; \text{Cauchy's Integral formula}\\
+  &amp;= 4 \pi i \lim_{s \to 1}H(s) &amp;&amp;\text{computing the residue}\\
+\end{align*}
+$$
+</div>
+
+<hr />
+
+<h2 id="reduced-to-a-limit-problem">Reduced to a Limit Problem</h2>
+
+<hr />
+
+<p>We now turn our attention to evaluating \(\lim_{s \to 1}H(s)\) but first we recall \(\int_1^\infty x^{-s}dx=1/(s-1)\):</p>
+<div class="latex-align">
+$$
+\begin{align*}
+  \lim_{s \to 1}H(s) &amp;= \lim_{s \to 1}\left(\zeta(s) - \frac{1}{s-1}\right) &amp;&amp; \text{definition of } H(s)\\
+  &amp;= \lim_{s\to 1}\left( \left( \sum_{n=1}^\infty \frac{1}{n^s} \right) - \int_1^{\infty}\frac{dx}{x^s} \right)\\
+  &amp;= \sum_{n=1}^\infty\left( \frac{1}{n} - \int_n^{n+1}\frac{dx}{x} \right) &amp;&amp;\text{evaluate at $s=1$}\\
+  &amp;= \sum_{n=1}^{\infty}\left( \frac{1}{n} - (\ln(n+1) - \ln(n)) \right) &amp;&amp;\text{Fundamental Theorem of Calculus}\\
+  &amp;= \lim_{N\to\infty}\sum_{n=1}^{N}\left( \frac{1}{n} - (\ln(n+1) - \ln(n)) \right)\\
+  &amp;= \lim_{N\to\infty}\sum_{n=1}^{N}\left( \frac{1}{n}\right) - \ln(N)&amp;&amp;\text{telescoping sum, $\ln(1)=0$}\\
+  &amp;= \gamma &amp;&amp;\text{definition of the Euler-Mascheroni Constant}
+\end{align*}
+$$
+</div>
+<p>Hence, we arrive at the final answer for the original question: \(\int_{S_{\epsilon}(1)} \zeta^2(s)\: ds = 4\pi i\gamma\).</p>
+
+<p>I would like to give credit to my Complex Analysis professor Giulio Tiozzo for these elegant solutions
+to interesting puzzles.</p>
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

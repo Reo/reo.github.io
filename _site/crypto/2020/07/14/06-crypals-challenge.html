@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Cryptopals Challenge 6</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>This cryptopals challenge involves significantly more code.
+In order to break repeating-key XOR we will also be moving away from our words file and turn to
+<a href="https://en.wikipedia.org/wiki/Frequency_analysis">frequency analysis</a>
+when cracking the key.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#setup" id="markdown-toc-setup">Setup</a></li>
+  <li><a href="#hamming-distance" id="markdown-toc-hamming-distance">Hamming Distance</a></li>
+  <li><a href="#crack-the-key-length" id="markdown-toc-crack-the-key-length">Crack the Key length</a></li>
+  <li><a href="#keys-given-key-length" id="markdown-toc-keys-given-key-length">Keys given Key Length</a></li>
+  <li><a href="#scoring-keys" id="markdown-toc-scoring-keys">Scoring Keys</a></li>
+  <li><a href="#complete-code" id="markdown-toc-complete-code">Complete Code</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="setup">Setup</h2>
+
+<hr />
+
+<p>At the head of our file are the imports we use</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">from</span> <span class="nn">Crypto.Util.strxor</span> <span class="kn">import</span> <span class="n">strxor</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+</code></pre></div></div>
+
+<p>we also want to import the text which we will use to attack the system (this is a known ciphertext attack)</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># grab text and remove newlines
+</span><span class="n">CipherFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">'6.txt'</span><span class="p">,</span> <span class="s">'r'</span><span class="p">)</span>
+<span class="n">cipherbytes</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">CipherFile</span><span class="p">.</span><span class="n">read</span><span class="p">().</span><span class="n">replace</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">,</span><span class="s">''</span><span class="p">))</span>
+<span class="n">textlen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cipherbytes</span><span class="p">)</span>
+<span class="n">CipherFile</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="hamming-distance">Hamming Distance</h2>
+
+<hr />
+
+<p>Some helper functions will be useful in finding candidates for the key size.
+Because the key repeats,
+eventually we would have same characters encrypting to the same byte hence the
+smaller the hamming distance between blocks of a guessed length, the more likely
+the guessed length is the correct one.</p>
+
+<p>We can write a method which computes the hamming distance
+between a pair of byte strings <code class="language-plaintext highlighter-rouge">b1</code> and <code class="language-plaintext highlighter-rouge">b2</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">hamming_dist</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">):</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">strxor</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span>
+    <span class="n">ham_dist</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># count the number of '1's resulting from their xor
+</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">diff</span><span class="p">)):</span>
+        <span class="n">ham_dist</span> <span class="o">+=</span> <span class="nb">bin</span><span class="p">(</span><span class="n">diff</span><span class="p">[</span><span class="n">i</span><span class="p">]).</span><span class="n">count</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ham_dist</span>
+</code></pre></div></div>
+
+<p>and more generally, we could use this to compute the average hamming distance between <code class="language-plaintext highlighter-rouge">n</code>
+byte strings:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">avg_hamming_dist</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">keylen</span><span class="p">):</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">div</span> <span class="o">=</span> <span class="n">n</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="c1"># number of comparisons is 1 + ... + n-1
+</span>    <span class="c1"># compute hamming distance between every pair and divide by total number of comparisons
+</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="n">hamming_dist</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">keylen</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">keylen</span><span class="p">],</span> <span class="n">b</span><span class="p">[</span><span class="n">j</span><span class="o">*</span><span class="n">keylen</span><span class="p">:(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">keylen</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">total</span><span class="o">/</span><span class="n">div</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="crack-the-key-length">Crack the Key length</h2>
+
+<hr />
+
+<p>We could then write code which creates a list of likely key lengths. We exclude the
+trivial length 1 keys since we have already broken that in a <a href="/crypto/2020/06/30/crypals-challenges.html#challenge-3">previous challenge</a>
+and guess that the key is no longer than 42 bytes but this can be adjusted to taste.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">keylen_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="c1"># our range of guesses for keylengths
+</span><span class="k">for</span> <span class="n">keylen</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">42</span><span class="p">):</span>
+    <span class="n">guess_dist</span> <span class="o">=</span> <span class="n">avg_hamming_dist</span><span class="p">(</span><span class="n">cipherbytes</span><span class="p">,</span> <span class="n">HAMMING_DIST_DEPTH</span><span class="p">,</span> <span class="n">keylen</span><span class="p">)</span><span class="o">/</span><span class="n">keylen</span>
+    <span class="n">keylen_list</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="n">keylen</span><span class="p">,</span> <span class="n">guess_dist</span><span class="p">))</span>
+<span class="n">keylen_candidates</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keylen_list</span><span class="p">,</span><span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>itemgetter here is used to sort the key lengths by how likely they are to appear (how small their
+average hamming distance is) <code class="language-plaintext highlighter-rouge">HAMMING_DIST_DEPTH</code> is the number of blocks to check,
+the more we check the slower the computation but the more accurate our average becomes.
+Perhaps we choose</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">HAMMING_DIST_DEPTH</span><span class="o">=</span><span class="mi">15</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="keys-given-key-length">Keys given Key Length</h2>
+
+<hr />
+
+<p>After finding the most likely key lengths, we fix a keylength guess and
+try to find the most likely keys given our fixed key length. We could do this
+for various key-length guesses, say we pick
+<code class="language-plaintext highlighter-rouge">KEYLEN_CANDIDATES_CHECKED=4</code> of them to check.</p>
+
+<p>In turn, for each one of these we check we apply the single-byte XOR crack and assign a score
+based on character frequencies. For example, if our key length guess is 8 we would
+join all bytes with position congruent 0 mod 8 into a chunk and assign that a score using
+single-byte XOR crack.
+We would do the same for those congruent 1 mod 8 and so on. This would give us
+a total score for the key in terms of letter frequencies.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># letter frequencies courtesy of Wikipedia, space ' ' was estimated
+</span><span class="n">freqs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">'e'</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span> <span class="s">'t'</span><span class="p">:</span> <span class="mf">9.1</span><span class="p">,</span> <span class="s">'a'</span><span class="p">:</span> <span class="mf">8.2</span><span class="p">,</span> <span class="s">'o'</span><span class="p">:</span> <span class="mf">7.5</span><span class="p">,</span> <span class="s">'i'</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s">'n'</span><span class="p">:</span> <span class="mf">6.7</span><span class="p">,</span> <span class="s">'s'</span><span class="p">:</span> <span class="mf">6.3</span><span class="p">,</span> <span class="s">'h'</span><span class="p">:</span> <span class="mf">6.1</span><span class="p">,</span>
+        <span class="s">'r'</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s">'d'</span><span class="p">:</span> <span class="mf">4.3</span><span class="p">,</span> <span class="s">'l'</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s">'c'</span><span class="p">:</span> <span class="mf">2.8</span><span class="p">,</span> <span class="s">'u'</span><span class="p">:</span> <span class="mf">2.8</span><span class="p">,</span> <span class="s">'m'</span><span class="p">:</span> <span class="mf">2.4</span><span class="p">,</span> <span class="s">'w'</span><span class="p">:</span> <span class="mf">2.4</span><span class="p">,</span> <span class="s">'f'</span><span class="p">:</span> <span class="mf">2.2</span><span class="p">,</span>
+        <span class="s">'g'</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">'y'</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">'p'</span><span class="p">:</span> <span class="mf">1.9</span><span class="p">,</span> <span class="s">'b'</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="s">'v'</span><span class="p">:</span> <span class="mf">0.98</span><span class="p">,</span> <span class="s">'k'</span><span class="p">:</span> <span class="mf">0.77</span><span class="p">,</span> <span class="s">'j'</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">,</span> <span class="s">'x'</span><span class="p">:</span><span class="mf">0.15</span><span class="p">,</span>
+        <span class="s">'q'</span><span class="p">:</span> <span class="mf">0.095</span><span class="p">,</span> <span class="s">'z'</span><span class="p">:</span> <span class="mf">0.074</span><span class="p">,</span> <span class="s">' '</span><span class="p">:</span> <span class="mi">7</span>
+        <span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># now try to determine the key statistically by scoring possible key fragments
+</span><span class="n">key_candidates</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">key_sums</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">KEYLEN_CANDIDATES_CHECKED</span><span class="p">):</span> <span class="c1"># over the KEYLEN_CANDIDATES_CHECKED most probable key lengths
+</span>    <span class="n">curr_len</span> <span class="o">=</span> <span class="n">keylen_candidates</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">keyCand</span> <span class="o">=</span> <span class="s">b''</span>
+    <span class="n">keySum</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># An accumulator to store the score given to the current key guess
+</span>    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">curr_len</span><span class="p">):</span> <span class="c1"># over each byte of the key
+</span>        <span class="n">chunk</span> <span class="o">=</span> <span class="s">b''</span>
+        <span class="c1"># combine these bytes as a chunk
+</span>        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">textlen</span><span class="p">,</span> <span class="n">curr_len</span><span class="p">):</span>
+            <span class="n">chunk</span> <span class="o">+=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">cipherbytes</span><span class="p">[</span><span class="n">k</span><span class="p">]])</span>
+        <span class="c1"># and create likely key fragments corresponding to each chunk
+</span>        <span class="n">keyFragment</span><span class="p">,</span> <span class="n">fragmentSum</span> <span class="o">=</span> <span class="n">key_byte</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+        <span class="n">keyCand</span> <span class="o">+=</span> <span class="n">keyFragment</span>
+        <span class="n">keySum</span> <span class="o">+=</span> <span class="n">fragmentSum</span>
+    <span class="n">key_candidates</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">keyCand</span><span class="p">)</span>
+    <span class="n">key_sums</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">keySum</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="scoring-keys">Scoring Keys</h2>
+
+<hr />
+
+<p>We still need to go over how <code class="language-plaintext highlighter-rouge">key_byte()</code> determines a byte which is most likely for a given <code class="language-plaintext highlighter-rouge">chunk</code>.
+As mentioned earlier, this is a scoring similar to what one would do for cracking single-byte
+XOR except since these are spread across the string we cannot simply check for the existence of
+a dictionary word.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">key_byte</span><span class="p">(</span><span class="n">chunk</span><span class="p">):</span>
+    <span class="n">keyCand</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1"># the byte most likely to be the key
+</span>    <span class="n">sumCand</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1"># the total score of the most likely key
+</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">256</span><span class="p">):</span> <span class="c1"># for every possible 1-byte key
+</span>        <span class="n">currSum</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">)):</span>
+            <span class="c1"># check what the current byte decrypts to and score appropriately
+</span>            <span class="n">char</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">k</span> <span class="o">^</span> <span class="n">chunk</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">char</span><span class="p">.</span><span class="n">isascii</span><span class="p">())</span> <span class="ow">and</span> <span class="p">(</span><span class="n">char</span><span class="p">.</span><span class="n">lower</span><span class="p">().</span><span class="n">decode</span><span class="p">()</span> <span class="ow">in</span> <span class="n">freqs</span><span class="p">)):</span>
+                <span class="n">currSum</span> <span class="o">+=</span> <span class="n">freqs</span><span class="p">[</span><span class="n">char</span><span class="p">.</span><span class="n">lower</span><span class="p">().</span><span class="n">decode</span><span class="p">()]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">currSum</span> <span class="o">&gt;</span> <span class="n">sumCand</span><span class="p">):</span>
+            <span class="n">sumCand</span> <span class="o">=</span> <span class="n">currSum</span>
+            <span class="n">keyCand</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">k</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">keyCand</span><span class="p">,</span> <span class="n">sumCand</span>
+</code></pre></div></div>
+
+<p>With this, we have a set of the most likely keys according to frequency analysis which we may present:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">'the '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">KEYLEN_CANDIDATES_CHECKED</span><span class="p">)</span> <span class="o">+</span> <span class="s">' most likely keys in order (in terms of keylength) are:'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">KEYLEN_CANDIDATES_CHECKED</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">key_candidates</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="complete-code">Complete Code</h2>
+
+<hr />
+
+<p>An example solution to the challenge may then be the following code:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.strxor</span> <span class="kn">import</span> <span class="n">strxor</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+
+<span class="c1"># letter frequencies courtesy of Wikipedia, space ' ' was estimated
+</span><span class="n">freqs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">'e'</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span> <span class="s">'t'</span><span class="p">:</span> <span class="mf">9.1</span><span class="p">,</span> <span class="s">'a'</span><span class="p">:</span> <span class="mf">8.2</span><span class="p">,</span> <span class="s">'o'</span><span class="p">:</span> <span class="mf">7.5</span><span class="p">,</span> <span class="s">'i'</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s">'n'</span><span class="p">:</span> <span class="mf">6.7</span><span class="p">,</span> <span class="s">'s'</span><span class="p">:</span> <span class="mf">6.3</span><span class="p">,</span> <span class="s">'h'</span><span class="p">:</span> <span class="mf">6.1</span><span class="p">,</span>
+        <span class="s">'r'</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s">'d'</span><span class="p">:</span> <span class="mf">4.3</span><span class="p">,</span> <span class="s">'l'</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s">'c'</span><span class="p">:</span> <span class="mf">2.8</span><span class="p">,</span> <span class="s">'u'</span><span class="p">:</span> <span class="mf">2.8</span><span class="p">,</span> <span class="s">'m'</span><span class="p">:</span> <span class="mf">2.4</span><span class="p">,</span> <span class="s">'w'</span><span class="p">:</span> <span class="mf">2.4</span><span class="p">,</span> <span class="s">'f'</span><span class="p">:</span> <span class="mf">2.2</span><span class="p">,</span>
+        <span class="s">'g'</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">'y'</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">'p'</span><span class="p">:</span> <span class="mf">1.9</span><span class="p">,</span> <span class="s">'b'</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="s">'v'</span><span class="p">:</span> <span class="mf">0.98</span><span class="p">,</span> <span class="s">'k'</span><span class="p">:</span> <span class="mf">0.77</span><span class="p">,</span> <span class="s">'j'</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">,</span> <span class="s">'x'</span><span class="p">:</span><span class="mf">0.15</span><span class="p">,</span>
+        <span class="s">'q'</span><span class="p">:</span> <span class="mf">0.095</span><span class="p">,</span> <span class="s">'z'</span><span class="p">:</span> <span class="mf">0.074</span><span class="p">,</span> <span class="s">' '</span><span class="p">:</span> <span class="mi">7</span>
+        <span class="p">}</span>
+<span class="n">HAMMING_DIST_DEPTH</span><span class="o">=</span><span class="mi">15</span>
+<span class="n">KEYLEN_CANDIDATES_CHECKED</span><span class="o">=</span><span class="mi">4</span>
+
+<span class="k">def</span> <span class="nf">hamming_dist</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">):</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">strxor</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span>
+    <span class="n">ham_dist</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># count the number of '1's resulting from their xor
+</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">diff</span><span class="p">)):</span>
+        <span class="n">ham_dist</span> <span class="o">+=</span> <span class="nb">bin</span><span class="p">(</span><span class="n">diff</span><span class="p">[</span><span class="n">i</span><span class="p">]).</span><span class="n">count</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ham_dist</span>
+
+<span class="k">def</span> <span class="nf">avg_hamming_dist</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">keylen</span><span class="p">):</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">div</span> <span class="o">=</span> <span class="n">n</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="c1"># number of comparisons is 1 + ... + n-1
+</span>    <span class="c1"># compute hamming distance between every pair and divide by total number of comparisons
+</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="n">hamming_dist</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">keylen</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">keylen</span><span class="p">],</span> <span class="n">b</span><span class="p">[</span><span class="n">j</span><span class="o">*</span><span class="n">keylen</span><span class="p">:(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">keylen</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">total</span><span class="o">/</span><span class="n">div</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">key_byte</span><span class="p">(</span><span class="n">chunk</span><span class="p">):</span>
+    <span class="n">keyCand</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1"># the byte most likelyl to be the key
+</span>    <span class="n">sumCand</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1"># the total score of the most likely key
+</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">256</span><span class="p">):</span> <span class="c1"># for every possible 1-byte key
+</span>        <span class="n">currSum</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">)):</span>
+            <span class="c1"># check what the current byte decrypts to and score appropriately
+</span>            <span class="n">char</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">k</span> <span class="o">^</span> <span class="n">chunk</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">char</span><span class="p">.</span><span class="n">isascii</span><span class="p">())</span> <span class="ow">and</span> <span class="p">(</span><span class="n">char</span><span class="p">.</span><span class="n">lower</span><span class="p">().</span><span class="n">decode</span><span class="p">()</span> <span class="ow">in</span> <span class="n">freqs</span><span class="p">)):</span>
+                <span class="n">currSum</span> <span class="o">+=</span> <span class="n">freqs</span><span class="p">[</span><span class="n">char</span><span class="p">.</span><span class="n">lower</span><span class="p">().</span><span class="n">decode</span><span class="p">()]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">currSum</span> <span class="o">&gt;</span> <span class="n">sumCand</span><span class="p">):</span>
+            <span class="n">sumCand</span> <span class="o">=</span> <span class="n">currSum</span>
+            <span class="n">keyCand</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">k</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">keyCand</span><span class="p">,</span> <span class="n">sumCand</span>
+
+<span class="c1"># grab text and remove newlines
+</span><span class="n">CipherFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">'6.txt'</span><span class="p">,</span> <span class="s">'r'</span><span class="p">)</span>
+<span class="n">cipherbytes</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">CipherFile</span><span class="p">.</span><span class="n">read</span><span class="p">().</span><span class="n">replace</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">,</span><span class="s">''</span><span class="p">))</span>
+<span class="n">textlen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cipherbytes</span><span class="p">)</span>
+<span class="n">CipherFile</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="n">keylen_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="c1"># our range of guesses for keylengths
+</span><span class="k">for</span> <span class="n">keylen</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">42</span><span class="p">):</span>
+    <span class="n">guess_dist</span> <span class="o">=</span> <span class="n">avg_hamming_dist</span><span class="p">(</span><span class="n">cipherbytes</span><span class="p">,</span> <span class="n">HAMMING_DIST_DEPTH</span><span class="p">,</span> <span class="n">keylen</span><span class="p">)</span><span class="o">/</span><span class="n">keylen</span>
+    <span class="n">keylen_list</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="n">keylen</span><span class="p">,</span> <span class="n">guess_dist</span><span class="p">))</span>
+<span class="n">keylen_candidates</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keylen_list</span><span class="p">,</span><span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># now try to determine the key statistically by scoring possible key fragments
+</span><span class="n">key_candidates</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">key_sums</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">KEYLEN_CANDIDATES_CHECKED</span><span class="p">):</span> <span class="c1"># over the KEYLEN_CANDIDATES_CHECKED most probable key lengths
+</span>    <span class="n">curr_len</span> <span class="o">=</span> <span class="n">keylen_candidates</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">keyCand</span> <span class="o">=</span> <span class="s">b''</span>
+    <span class="n">keySum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">curr_len</span><span class="p">):</span> <span class="c1"># over each byte of the key
+</span>        <span class="n">chunk</span> <span class="o">=</span> <span class="s">b''</span>
+        <span class="c1"># combine these bytes as a chunk
+</span>        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">textlen</span><span class="p">,</span> <span class="n">curr_len</span><span class="p">):</span>
+            <span class="n">chunk</span> <span class="o">+=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">cipherbytes</span><span class="p">[</span><span class="n">k</span><span class="p">]])</span>
+        <span class="c1"># and create likely key fragments corresponding to each chunk
+</span>        <span class="n">keyFragment</span><span class="p">,</span> <span class="n">fragmentSum</span> <span class="o">=</span> <span class="n">key_byte</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+        <span class="n">keyCand</span> <span class="o">+=</span> <span class="n">keyFragment</span>
+        <span class="n">keySum</span> <span class="o">+=</span> <span class="n">fragmentSum</span>
+    <span class="n">key_candidates</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">keyCand</span><span class="p">)</span>
+    <span class="n">key_sums</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">keySum</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">'the '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">KEYLEN_CANDIDATES_CHECKED</span><span class="p">)</span> <span class="o">+</span> <span class="s">' most likely keys in order (in terms of keylength) are:'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">KEYLEN_CANDIDATES_CHECKED</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">key_candidates</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</code></pre></div></div>
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

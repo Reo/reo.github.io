@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Cryptopals Challenge 13</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>This Cut and Paste attack is a continuation of the <a href="https://cryptopals.com/">cryptopals challenges</a>
+we have been solving and are now halfway into the second set. We manipulate the ciphertext
+to send the server a query string which would not be allowed under normal circumstances.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#system-set-up" id="markdown-toc-system-set-up">System Set Up</a></li>
+  <li><a href="#system-implementation" id="markdown-toc-system-implementation">System Implementation</a></li>
+  <li><a href="#manipulating-the-ciphertext" id="markdown-toc-manipulating-the-ciphertext">Manipulating the Ciphertext</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="system-set-up">System Set Up</h2>
+
+<hr />
+
+<p>In order to make a valid response, we need to implement the reverse operation
+to our padding in <code class="language-plaintext highlighter-rouge">pkcs7.py</code> which we wrote in a <a href="/crypto/2020/07/28/09-crypals-challenge.html">previous post</a></p>
+
+<p>The pad we created intentionally to make unpadding easy, we simply
+remove the last <code class="language-plaintext highlighter-rouge">k</code> bytes where <code class="language-plaintext highlighter-rouge">k</code> is the numerical value of the final byte.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">unpad</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">blocksize</span><span class="o">=</span><span class="n">AES_BLOCKSIZE</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">b</span><span class="p">[:</span><span class="o">-</span><span class="n">r</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>Assume we have a system where a user can make an account with their email using a function
+that encodes a the profile in a query-string-format. For instance, given
+a string <code class="language-plaintext highlighter-rouge">name@mail.com</code> it produces</p>
+
+<p><code class="language-plaintext highlighter-rouge">email=name@mail.com&amp;uid=10&amp;role=user</code></p>
+
+<p>This function refuses to encode anything with metacharacters <code class="language-plaintext highlighter-rouge">&amp;</code> or <code class="language-plaintext highlighter-rouge">=</code> so
+as to prevent attackers from sending a string like
+<code class="language-plaintext highlighter-rouge">mallory@hacker.com&amp;role=admin</code>.</p>
+
+<p>The system sends an ecb-encrypted version of the string it produces back to the user.</p>
+
+<p>To verify, the user would send the same ciphertext again which the server
+deciphers and creates a JSON object out of the deciphered string.
+Using our first example again, the server would create</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+  email: 'name@mail.com',
+  uid: 10,
+  role: 'user'
+}
+</code></pre></div></div>
+
+<p>and assign permissions etc. accordingly.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="system-implementation">System Implementation</h2>
+
+<hr />
+
+<p>We first implement this fictitious service starting with creating a
+profile given an email. For simplicity, we hard-code user id as 10.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">GKEY</span> <span class="o">=</span> <span class="n">urandom</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">profile_for</span><span class="p">(</span><span class="n">email</span><span class="p">):</span>
+    <span class="c1"># don't allow '&amp;' or '=' as part of an email
+</span>    <span class="k">if</span> <span class="p">((</span><span class="s">'&amp;'</span> <span class="ow">in</span> <span class="n">email</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s">'='</span> <span class="ow">in</span> <span class="n">email</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="s">'email='</span><span class="o">+</span><span class="n">email</span><span class="o">+</span><span class="s">'&amp;uid=10&amp;role=user'</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pad</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">encode</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">ecb_enc</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">GKEY</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Next, we need to be able to retrieve the profile from ciphertext
+and parse the query string:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">profile_from_ciphertext</span><span class="p">(</span><span class="n">encoded_ct</span><span class="p">):</span>
+    <span class="n">pt</span> <span class="o">=</span> <span class="n">unpad</span><span class="p">(</span><span class="n">ecb_dec</span><span class="p">(</span><span class="n">encoded_ct</span><span class="p">,</span><span class="n">GKEY</span><span class="p">)).</span><span class="n">decode</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">parse_q</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">parse_q()</code> simply parses the querystring and returns the object. Recall this
+would be done server-side:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">parse_q</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="n">q</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">'&amp;'</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+        <span class="n">keyval</span> <span class="o">=</span> <span class="n">pair</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">'='</span><span class="p">)</span>
+        <span class="n">ret</span><span class="p">[</span><span class="n">keyval</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">keyval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="manipulating-the-ciphertext">Manipulating the Ciphertext</h2>
+
+<hr />
+
+<p>Our goal is to take advantage of the fact that ECB mode does not
+rely on previous blocks to create a ciphertext which has us on an admin role
+despite creating an account as a regular user.</p>
+
+<p>The idea here is to ‘cut and paste’ blocks from the ciphertext changing only the order
+they appear when decrypted. This is facilitated by hte fact that we know how the
+<code class="language-plaintext highlighter-rouge">profile_for()</code> function manipulates its input.</p>
+
+<p>we could choose</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">malstr</span> <span class="o">=</span> <span class="s">'xyzw@mail.admin'</span> <span class="o">+</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">([</span><span class="mi">11</span><span class="p">])</span><span class="o">*</span><span class="mi">11</span><span class="p">).</span><span class="n">decode</span><span class="p">()</span> <span class="o">+</span> <span class="s">'com'</span>
+<span class="n">malct</span> <span class="o">=</span> <span class="n">profile_for</span><span class="p">(</span><span class="n">malstr</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The ciphertext in terms of blocks is now</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>email=xyzw@mail.  ||  admin&lt;0x0b*11&gt;  ||  com&amp;uid=10&amp;role=  ||  user&lt;padding&gt;
+</code></pre></div></div>
+
+<p>notice that manipulating these blocks by switching the second and third and omitting
+the last we get</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>email=xyzw@mail.  ||  com&amp;uid=10&amp;role=  ||  admin&lt;0x0b*11&gt;
+</code></pre></div></div>
+
+<p>so we add</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">malct</span> <span class="o">=</span> <span class="n">malct</span><span class="p">[:</span><span class="mi">16</span><span class="p">]</span> <span class="o">+</span> <span class="n">malct</span><span class="p">[</span><span class="mi">32</span><span class="p">:</span><span class="mi">48</span><span class="p">]</span> <span class="o">+</span> <span class="n">malct</span><span class="p">[</span><span class="mi">16</span><span class="p">:</span><span class="mi">32</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>this is exactly what we want and this can be verified by printing</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">profile_from_ciphertext</span><span class="p">(</span><span class="n">malct</span><span class="p">))</span>
+<span class="c1"># &gt; {'email': 'xyzw@mail.com', 'uid': '10', 'role': 'admin'}
+</span></code></pre></div></div>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

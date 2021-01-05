@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Tail Recursion and MIT Scheme</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>This post will serve to introduce the reader to basic syntax of MIT scheme and explain
+precisely what is meant by tail recursion. This will serve as preparation to the
+more famous topic in functional programming being lambda expressions.</p>
+
+<p>We discuss a few key points culminating in
+an example written in MIT Scheme. These are applicable not only in strictly functional
+languages but also multi-paradigm languages with functional capabilities such as Java.</p>
+
+<h2 class="no_toc" id="topics">Topics</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#overview" id="markdown-toc-overview">Overview</a></li>
+  <li><a href="#syntax" id="markdown-toc-syntax">Syntax</a></li>
+  <li><a href="#tail-recursion" id="markdown-toc-tail-recursion">Tail Recursion</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="overview">Overview</h2>
+
+<hr />
+
+<p>In order to introduce more focused topics in functional programming, it’s convenient to first
+mention the fundamentals. In our case, we will be working in MIT Scheme, a type of <a href="https://en.wikipedia.org/wiki/Lisp_(programming_language)">LISP</a>.
+This choice is made both because it continues to be developed but also since
+the presentation of concepts here will borrow closely from the seminal text <a href="Structure and Interpretation of Computer Programs">SICP</a>.</p>
+
+<p>Before diving into the syntax, recall that <strong>Polish Notation</strong> simply means that operators precede their
+operands so \(x+y\) becomes \(+ x y\). Notice that this removes ambiguity for more complex expressions
+and can more easily be parsed into a tree for computer evaluation.</p>
+
+<hr />
+
+<h2 id="syntax">Syntax</h2>
+
+<hr />
+
+<p>As when learning any new language, we briefly go over the syntax the interpreter/compiler expects.
+In our dialect of LISP, we may write functions as follows, noting that
+operations are written in Polish notation:</p>
+
+<div class="language-scheme highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">define</span> <span class="nv">x</span> <span class="mi">3</span><span class="p">)</span> <span class="c1">; x = 3</span>
+<span class="p">(</span><span class="k">define</span> <span class="nv">y</span> <span class="mi">9</span><span class="p">)</span> <span class="c1">; y = 9</span>
+<span class="p">(</span><span class="k">define</span> <span class="p">(</span><span class="nf">z</span> <span class="nv">w</span><span class="p">)</span> <span class="p">(</span><span class="nb">+</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">x</span> <span class="nv">y</span><span class="p">)</span> <span class="nv">w</span><span class="p">))</span>  <span class="c1">;z = ((x + y) + w)</span>
+<span class="p">(</span><span class="nb">display</span> <span class="nv">x</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">display</span> <span class="nv">y</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">display</span> <span class="p">(</span><span class="nf">z</span> <span class="mi">2</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>This will display the numbers <code class="language-plaintext highlighter-rouge">3</code>, <code class="language-plaintext highlighter-rouge">9</code>, and <code class="language-plaintext highlighter-rouge">14</code>. An important distinction to be made here
+from traditional programming languages is that <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">y</code> are functions just like <code class="language-plaintext highlighter-rouge">z</code>
+they just happen to return a constant value. This is in contrast to them being “variables”
+which store a value such as an integer. Note also how the argument passed to z needs no additional parentheses.</p>
+
+<p>We can now begin our discussion of tail recursion in this syntax</p>
+
+<hr />
+
+<h2 id="tail-recursion">Tail Recursion</h2>
+
+<hr />
+
+<p>Tail Recursion is simply when the implementation of a procedure is recursive however when
+evaluated, only one call frame needs to be kept track of at any point in the evaluation.
+This is best illustrated with an example:</p>
+
+<div class="language-scheme highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">define</span> <span class="p">(</span><span class="nf">sumrec</span> <span class="nv">x</span><span class="p">)</span>
+  <span class="p">(</span> <span class="nv">if</span> <span class="p">(</span><span class="nb">=</span> <span class="nv">x</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="nv">x</span>
+  <span class="p">(</span><span class="nb">+</span> <span class="nv">x</span> <span class="p">(</span><span class="nf">sumrec</span> <span class="p">(</span><span class="nb">-</span> <span class="nv">x</span> <span class="mi">1</span><span class="p">)))</span>
+  <span class="p">))</span>
+
+<span class="p">(</span><span class="nb">display</span> <span class="nv">sumrec</span> <span class="mi">3</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>notice that the computations here are</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(sumrec 3)
+( + 3 (sumrec 2))
+( + 3 ( + 2 (sumrec 1)))
+(+ 3 ( + 2 ( + 1)))
+</code></pre></div></div>
+
+<p>so all previous states must be kept while in the next recursive imlementation</p>
+
+<div class="language-scheme highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">define</span> <span class="p">(</span><span class="nf">sumtailrec</span> <span class="nv">x</span> <span class="nv">r</span><span class="p">)</span>
+  <span class="p">(</span> <span class="nv">if</span> <span class="p">(</span><span class="nb">=</span> <span class="nv">x</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="nv">r</span>
+  <span class="p">(</span><span class="nf">sumtailrec</span> <span class="p">(</span><span class="nb">-</span> <span class="nv">x</span> <span class="mi">1</span><span class="p">)</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">x</span> <span class="nv">r</span><span class="p">))</span>
+  <span class="p">))</span>
+<span class="p">(</span><span class="nb">display</span> <span class="nv">sumtailrec</span> <span class="mi">3</span> <span class="mi">0</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>the computations are</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(sumtailrec 3 0)
+(sumtailrec 2 3)
+(sumtailrec 1 5)
+(sumtailrec 0 6)
+</code></pre></div></div>
+
+<p>So we don’t need the entire call stack but only the most recent one since in a sense the auxiliary
+variable <code class="language-plaintext highlighter-rouge">r</code> is keeping track of the information we needed. This is effectively an iterative
+process which has been implemented using recursive procedure.</p>
+
+<p>Modern compilers for languages such as C now support this sort of optimization but future discussions
+will include features which functional programming languages are known for such as the aforementioned
+lambda expressions.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

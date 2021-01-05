@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    {% include head_hp.html %}
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark {% if page.name %} {{page.name}} {% endif %}">
+    {% include nav_hp.html %}
+    <div class="hp-contents">
+      <h2 class="title">{{ page.title }}</h2>
+      <div class="{{page.section | downcase}}-container">
+        <div class="{{page.section | downcase}}-content focus-content">
+
+          {{content}}
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

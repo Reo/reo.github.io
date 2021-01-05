@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Cryptopals Challenge 24</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>This <a href="https://cryptopals.com/">cryptopals challenge</a>
+asks us break a cipher which uses MT19937 as a keystream with a known plaintext.
+The keysize here 2 bytes so there are only \(2^{16}=65536\) possible keys, this is small enough
+to be feasibly brute forced. We will use known plaintext here to confirm which of the guessed
+keys is the correct one.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#implementing-the-cipher" id="markdown-toc-implementing-the-cipher">Implementing the Cipher</a></li>
+  <li><a href="#breaking-the-cipher" id="markdown-toc-breaking-the-cipher">Breaking the Cipher</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="implementing-the-cipher">Implementing the Cipher</h2>
+
+<hr />
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">mt_encrypt</span><span class="p">(</span><span class="n">pt</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="s">b''</span>
+    <span class="n">seed_mt</span><span class="p">(</span><span class="nb">int</span><span class="p">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s">'little'</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pt</span><span class="p">)):</span>
+        <span class="n">curr</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">extract_number</span><span class="p">()</span><span class="o">&amp;</span><span class="mh">0xFF</span><span class="p">])</span>
+        <span class="n">ct</span> <span class="o">+=</span> <span class="n">strxor</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">curr</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">ct</span>
+
+<span class="k">def</span> <span class="nf">mt_decrypt</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">pt</span> <span class="o">=</span> <span class="s">b''</span>
+    <span class="n">seed_mt</span><span class="p">(</span><span class="nb">int</span><span class="p">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s">'little'</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ct</span><span class="p">)):</span>
+        <span class="n">curr</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">extract_number</span><span class="p">()</span><span class="o">&amp;</span><span class="mh">0xFF</span><span class="p">])</span>
+        <span class="n">pt</span> <span class="o">+=</span> <span class="n">strxor</span><span class="p">(</span><span class="n">ct</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">curr</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">pt</span>
+</code></pre></div></div>
+
+<p>create a random plaintext with a known suffix and run it under the cipher</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">prefixLen</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">prefix</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="n">prefixLen</span><span class="p">)</span>
+<span class="n">pt</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s">b'A'</span><span class="o">*</span><span class="mi">14</span>
+<span class="c1"># next, run it under the created cipher
+</span><span class="n">ct</span> <span class="o">=</span> <span class="n">mt_encrypt</span><span class="p">(</span><span class="n">pt</span><span class="p">,</span> <span class="n">GKEY</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="breaking-the-cipher">Breaking the Cipher</h2>
+
+<hr />
+
+<p>And finally, we guess all possible keys looking for our stimulus of 14 consecutive <code class="language-plaintext highlighter-rouge">'A'</code> characters
+at the end.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">guesses</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">16</span><span class="p">):</span>
+    <span class="n">candidate</span> <span class="o">=</span> <span class="n">mt_decrypt</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">([(</span><span class="n">i</span><span class="o">&gt;&gt;</span><span class="mi">8</span><span class="p">),</span> <span class="n">i</span><span class="o">&amp;</span><span class="mh">0xFF</span><span class="p">]))</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">candidate</span><span class="p">[</span><span class="o">-</span><span class="mi">14</span><span class="p">:])</span> <span class="o">==</span> <span class="p">(</span><span class="s">b'A'</span><span class="o">*</span><span class="mi">14</span><span class="p">)):</span>
+        <span class="n">guesses</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="nb">bytes</span><span class="p">([(</span><span class="n">i</span><span class="o">&gt;&gt;</span><span class="mi">8</span><span class="p">),</span> <span class="n">i</span><span class="o">&amp;</span><span class="mh">0xFF</span><span class="p">]))</span>
+</code></pre></div></div>
+
+<p>We can verify this succeeded by checking the key against the
+set of guesses</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># use this to verify we guessed correctly
+</span><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">guesses</span><span class="p">)</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">GKEY</span> <span class="ow">in</span> <span class="n">guesses</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>and sure enough we have the size of guesses should be very small, often containing just the one element
+guaranteed to be present which is GKEY as desired.</p>
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

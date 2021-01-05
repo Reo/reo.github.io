@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Lambda Expressions in MIT Scheme</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>We briefly go over the history, and use of lambda expressions which appear in
+functional languages (and others which support this feature such as Java). We define
+first-class functions and proceed to an example in MIT Scheme.</p>
+
+<h2 class="no_toc" id="topics">Topics</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#introduction" id="markdown-toc-introduction">Introduction</a></li>
+  <li><a href="#setup" id="markdown-toc-setup">Setup</a></li>
+  <li><a href="#example" id="markdown-toc-example">Example</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="introduction">Introduction</h2>
+
+<hr />
+
+<p>Functional programming has its origins in academia where Alonzo Church developed a model of computation
+based on a simple rule — variable substitution. These are essentially modern-day
+procedures where one specifies in what manner a function manipulates its variables. Evaluation
+is as simple as “pluging in” values given as input by invoking the procedure.</p>
+
+<p>Notice that functions themselves may be given as input, this allows flexibility and modularity when writing programs
+in this paradigm since small functions can be composed and manipulated to form more complicated constructs.</p>
+
+<p>If you need a refresher on LISP syntax, you can check out <a href="">the first post</a>.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="setup">Setup</h2>
+
+<hr />
+
+<p>We set up a few simple procedures to begin with:</p>
+
+<div class="language-scheme highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">define</span> <span class="p">(</span><span class="nf">square</span> <span class="nv">x</span><span class="p">)</span>
+  <span class="p">(</span><span class="nb">*</span> <span class="nv">x</span> <span class="nv">x</span><span class="p">))</span>
+
+<span class="p">(</span><span class="k">define</span> <span class="p">(</span><span class="nf">double</span> <span class="nv">f</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nf">f</span> <span class="p">(</span><span class="nf">f</span> <span class="nv">x</span><span class="p">))))</span>
+
+<span class="p">(</span><span class="k">define</span> <span class="p">(</span><span class="nf">compose</span> <span class="nv">f</span> <span class="nv">g</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nf">f</span> <span class="p">(</span><span class="nf">g</span> <span class="nv">x</span><span class="p">))))</span>
+
+<span class="p">(</span><span class="k">define</span> <span class="p">(</span><span class="nf">repeated</span> <span class="nv">f</span> <span class="nv">n</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">=</span> <span class="nv">n</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nf">f</span> <span class="nv">x</span><span class="p">))</span>
+    <span class="p">(</span><span class="nf">repeated</span> <span class="p">(</span><span class="nf">compose</span> <span class="nv">f</span> <span class="nv">f</span><span class="p">)</span> <span class="p">(</span><span class="nb">-</span> <span class="nv">n</span> <span class="mi">1</span><span class="p">))))</span>
+</code></pre></div></div>
+
+<p>Here we see the <code class="language-plaintext highlighter-rouge">lambda</code> keyword a few times, let’s consider its first appearance <code class="language-plaintext highlighter-rouge">lambda (x) (f (f x))</code>.
+This expression simply returns a function which takes in one variable, <code class="language-plaintext highlighter-rouge">x</code> and itself returns <code class="language-plaintext highlighter-rouge">f (f x)</code>.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="example">Example</h2>
+
+<hr />
+
+<p>Consider</p>
+<div class="language-scheme highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">((</span><span class="nf">double</span> <span class="nv">square</span><span class="p">)</span> <span class="mi">2</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>you guessed it, this returns <code class="language-plaintext highlighter-rouge">(square (square (2)) = 16</code> which is the square function composed with itself applied to 2.
+Lambda expressions are not too scary when you think of them this way, here is a slightly more involved example with
+<code class="language-plaintext highlighter-rouge">repeated</code>:</p>
+
+<div class="language-scheme highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">display</span> <span class="p">((</span><span class="nf">repeated</span> <span class="nv">square</span> <span class="mi">3</span><span class="p">)</span> <span class="mi">2</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>This returns <code class="language-plaintext highlighter-rouge">2^16</code>! Notice that at each iteration, we’re computing double of the original function. Applying this three
+times to <code class="language-plaintext highlighter-rouge">square</code> our exponent goes from 2 to 4 to 16.</p>
+
+<p>This is only a basic numerical example but when generalized to applying to lists of values, this becomes
+quite powerful and is in fact used in the industry.</p>
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
