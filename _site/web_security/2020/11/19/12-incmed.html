@@ -78,7 +78,7 @@
 	}
 </script>
 <!--
-	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+	<p><a href="http://:4000">TOP</a></p>
 
 	
 	
@@ -173,7 +173,9 @@ the attacker <strong>Mallory</strong></p>
 
 <p>We start the containers with <code class="language-plaintext highlighter-rouge">$ docker-compose up</code> and open a browser to <code class="language-plaintext highlighter-rouge">http://localhost:8080/</code>.</p>
 
-<p>Upon the webapp starting, Alice populates it with a post: <em>Mallory should not be trusted</em>.</p>
+<p>Upon the webapp starting, Alice populates it with a post: <em>Mallory should not be trusted!</em>.</p>
+
+<p style="text-indent: 0;"><img src="/assets/images/incmed1.png" alt="webapp initial state" /></p>
 
 <p><br /></p>
 
@@ -183,11 +185,12 @@ the attacker <strong>Mallory</strong></p>
 
 <hr />
 
-<p>We can use Wireshark or simply the developer’s console in our browser to see the messages being sent.</p>
+<p>We can use Wireshark or simply the developer’s console in our browser to see the requests being sent,
+for instance logging in as Mallory we see.</p>
 
-<!--IMAGE OF DEV CONSOLE!-->
+<p style="text-indent: 0;"><img src="/assets/images/incmed4.png" alt="Firefox dev console" /></p>
 
-<p>The following table is how each operation is sent to the server</p>
+<p>With this, we create the following table detailing how each operation is sent to the server.</p>
 
 <div class="xscrollable">
 <table>

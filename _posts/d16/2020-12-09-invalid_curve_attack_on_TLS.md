@@ -128,7 +128,7 @@ Chinese Remainder Theorem may be used to solve for $$d^2_B$$. Mallory then simpl
 needs to compute the square root to find $$d_B$$.
 
 Note that since the orders are chosen to be small primes, Mallory needs to compute
-at most $$p_i$$ hashes in step 2. so the expected number of hash computations is
+at most $$p_i$$ hashes in step 2 so the expected number of hash computations per step is
 $$p_i/2$$.
 
 <br>

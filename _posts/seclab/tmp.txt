@@ -1,0 +1,8 @@
+
+strlen("aaaaaaaa")                                              = 8
+strcmp("aaaaaaaa", "dqw4w9wgxcq")                               = -3
+strcmp("WWWWWWWWWWWWWWWW", "Z(-.*/W++W/*.-(Z")                  = -3
+puts("Access Denied!"Access Denied!
+)                                          = 15
++++ exited (status 0) +++
+

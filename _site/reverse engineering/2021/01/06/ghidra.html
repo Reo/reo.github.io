@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Short Intro to using Ghidra</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>In this exercise, we find the password in a simple crackme
+using Ghidra.
+The purpose is to serve as an introduction
+to ghidra for reverse engineering projects.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#the-target-binary" id="markdown-toc-the-target-binary">The Target Binary</a></li>
+  <li><a href="#booting-up-ghidra" id="markdown-toc-booting-up-ghidra">Booting up Ghidra</a></li>
+  <li><a href="#opening-a-new-project" id="markdown-toc-opening-a-new-project">Opening a New Project</a></li>
+  <li><a href="#finding-main" id="markdown-toc-finding-main">Finding main()</a></li>
+  <li><a href="#cleaning-up-the-decompilation" id="markdown-toc-cleaning-up-the-decompilation">Cleaning up the Decompilation</a></li>
+  <li><a href="#an-occasionally-useful-shortcut" id="markdown-toc-an-occasionally-useful-shortcut">An (Occasionally) Useful Shortcut</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="the-target-binary">The Target Binary</h2>
+
+<hr />
+
+<p>For this example we will use a custom binary to crack. If you want to follow
+along, a simple crackme can be found at <a href="https://crackmes.one/crackme/5b8a37a433c5d45fc286ad83">this website</a>.
+The password required for extraction is <code class="language-plaintext highlighter-rouge">crackmes.one</code>.</p>
+
+<p>running the target binary, perhaps in a virtual machine we get</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ./reverse
+Enter an 8 character password as an argument
+</code></pre></div></div>
+
+<p>so it expects an 8-character string, giving it a valid argument we see</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ./reverse 12345678
+Access Denied!
+</code></pre></div></div>
+
+<p>we will use Ghidra to figure out the string our binary expects.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="booting-up-ghidra">Booting up Ghidra</h2>
+
+<hr />
+
+<p>Installing Ghidra is as simple as extracting the zip file found
+on <a href="https://ghidra-sre.org/">the homepage</a>.</p>
+
+<p>On Windows systems, you can double click on <code class="language-plaintext highlighter-rouge">ghidraRun.bat</code>.
+On Linux and MacOS, you can start Ghidra by opening a terminal window
+in the extracted directory and running</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ./ghidraRun
+</code></pre></div></div>
+
+<p>(if you get an error related to the Java runtime please see the <a href="https://ghidra-sre.org/InstallationGuide.html">Installation Guide</a>)</p>
+
+<p>You’ll be greeted with the user agreement.
+We hit “I agree” and continue to the Project Manager window seen below. We can close
+all the other windows we are not concerned about right now.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="opening-a-new-project">Opening a New Project</h2>
+
+<hr />
+
+<p>The remaining window should look something like</p>
+
+<p style="text-indent: 0;"><img src="/assets/images/ghidra3.png" alt="Opening a new project" /></p>
+
+<p>We create a new project navigating to <em>File &gt; New Project</em>, create a <em>Non Shared Project</em>,
+and select a project directory and project name. To import the binary, you can either use
+<em>File &gt; Import File</em> or drag and drop the binary to the window. For our purposes, Ghidra
+correctlyl detected the format and language so we simply click ok. You will see a summary
+which complains about unresolved symbols but we can ignore this warning and continue by
+clicking <em>OK</em>. The screen should now look as follows:</p>
+
+<p style="text-indent: 0;"><img src="/assets/images/ghidra6.png" alt="Opening the Code Browser" /></p>
+
+<p>We can now continue to the code browser by double clicking on the name of the binary. You
+will likely get a prompt asking if you would like Ghidra to analyze the file, click “Yes”.
+Most of the default options are fine as they are, though I recommend turning on the
+<em>Decompiler Parameter ID</em> since it often improves decompilation results and hit Analyze.</p>
+
+<p style="text-indent: 0;"><img src="/assets/images/ghidra7.png" alt="Decompiler Parameter ID" /></p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="finding-main">Finding main()</h2>
+
+<hr />
+
+<p>Now, we can begin by finding the entry point. On the left-hand side, under the label
+<em>Symbol Tree</em> we open the folder which says <em>Functions</em> and click the item which says
+<em>entry</em></p>
+
+<p style="text-indent: 0;"><img src="/assets/images/ghidra8.png" alt="entry point" /></p>
+
+<p>In the <strong>decompile</strong> window, we see
+<code class="language-plaintext highlighter-rouge">__libc_start_main()</code>.
+Finding <a href="https://refspecs.linuxbase.org/LSB_3.1.0/LSB-generic/LSB-generic/baselib---libc-start-main-.html">documentation</a>.
+for its signature, we see the first argument is a pointer to <code class="language-plaintext highlighter-rouge">main()</code>.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int __libc_start_main(int *(main) (int, char * *, char * *), int argc, char * * ubp_av, void (*init) (void), void (*fini) (void), void (*rtld_fini) (void), void (* stack_end))
+</code></pre></div></div>
+
+<p>so we double click that first function</p>
+
+<p style="text-indent: 0;"><img src="/assets/images/ghidra10.png" alt="main" /></p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="cleaning-up-the-decompilation">Cleaning up the Decompilation</h2>
+
+<hr />
+
+<p>Now, the signature to <code class="language-plaintext highlighter-rouge">main()</code> is well known so we can clean up the decompilation a little.
+Right click on the function name at the top, select Edit Function Signature, and paste the signature:</p>
+
+<p style="text-indent: 0;"><img src="/assets/images/ghidra11.png" alt="cleaning up" /></p>
+
+<p>From here, we can see that <code class="language-plaintext highlighter-rouge">iVar2</code> is being used to store the length of the string and
+<code class="language-plaintext highlighter-rouge">iVar1</code> to decide whether or not access is granted. We can rename those appropriately
+by right clicking and clicking <em>Rename Variable</em>.</p>
+
+<p>We can continue in this fashion peering through the function used to set <code class="language-plaintext highlighter-rouge">iVar1</code>’s value
+and so on until we figure out how to get our binary to output <code class="language-plaintext highlighter-rouge">Acess Granted</code>.</p>
+
+<p>As you keep experimenting, you may want to retype variables (done similarly to renaming)
+or peek into the assembly on the listing window.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="an-occasionally-useful-shortcut">An (Occasionally) Useful Shortcut</h2>
+
+<hr />
+
+<p>In this crackme, it all comes down to a string comparison.
+Running <a href="https://en.wikipedia.org/wiki/Ltrace">ltrace</a>
+we can see the calls to shared libraries</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ltrace ./reverse abcdefgh
+strlen("abcdefgh")                                                                                                                = 8
+strcmp("abcdefgh", "dqw4w9wgxcq")                                                                                                 = -3
+strcmp("^]\\[ZYXWWXYZ[\\]^", "Z(-.*/W++W/*.-(Z")                                                                                  = 4
+puts("Access Denied!"Access Denied!
+)                                                                                                            = 15
++++ exited (status 0) +++
+</code></pre></div></div>
+
+<p>First, notice that we again see the call to <code class="language-plaintext highlighter-rouge">strlen()</code> we caught in our decompilation with Ghidra.
+We also notice that the only comparison done with equal-length strings is the second instance of
+<code class="language-plaintext highlighter-rouge">strcmp()</code>
+though the string we sent has clearly been manipulated. To study the manipulation,
+we send a convenient string</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ltrace ./reverse aaaaaaaa
+strlen("aaaaaaaa")                                              = 8
+strcmp("aaaaaaaa", "dqw4w9wgxcq")                               = -3
+strcmp("WWWWWWWWWWWWWWWW", "Z(-.*/W++W/*.-(Z")                  = -3
+puts("Access Denied!"Access Denied!
+)                                          = 15
++++ exited (status 0) +++
+</code></pre></div></div>
+
+<p>from this, we can guess that the modification is simply a shift by 10 in the ascii value
+along with reversing and duplicating the string. It then suffices to find the ascii which correspond to
+adding 10 to the numerical values of <code class="language-plaintext highlighter-rouge">+W/*.-(Z</code>. (This is especially suspicious since the length of this
+string is exactly 8).</p>
+
+<p>We get <code class="language-plaintext highlighter-rouge">5a94872d</code>, trying this out</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ./reverse 5a94872d
+Access Granted!
+</code></pre></div></div>
+
+<p>as expected.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
