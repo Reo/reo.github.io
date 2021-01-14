@@ -1,9 +1,9 @@
 ---
 layout: post
 title: Invalid Curve Attacks on Elliptic Curve Diffie Hellman
-category: 
-author: 
-tags: 
+category: Crypto
+author: 'reo'
+tags: elliptic_curve attack crt ecdh
 mathjax: true
 ---
 

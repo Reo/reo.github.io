@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Post-Quantum Cryptography: NTRU</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>Along with discussions of large-scale quantum computers comes the often cited threats to
+cryptography currently in use. Though some may argue we are still a ways away from anything
+we should be concerned about, recent developments seem to indicate <a href="https://en.wikipedia.org/wiki/Shor%27s_algorithm">Shor’s Algorithm</a>
+is not too far off.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#definitions-and-review" id="markdown-toc-definitions-and-review">Definitions and Review</a></li>
+  <li><a href="#ntru-public-key-encryption-setup" id="markdown-toc-ntru-public-key-encryption-setup">NTRU (Public Key Encryption) Setup</a></li>
+  <li><a href="#ntru-asymmetric-encryptiondecryption" id="markdown-toc-ntru-asymmetric-encryptiondecryption">NTRU Asymmetric Encryption/Decryption</a></li>
+  <li><a href="#informal-proof" id="markdown-toc-informal-proof">Informal Proof</a></li>
+  <li><a href="#small-example" id="markdown-toc-small-example">Small Example</a></li>
+  <li><a href="#conclusion-and-notes" id="markdown-toc-conclusion-and-notes">Conclusion and Notes</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="intro">Intro</h2>
+
+<hr />
+
+<p>There are a number of practial factors currently delaying the development of a large-scale quantum computer
+but some experts believe it may not be too far off with Michele Mosca
+<a href="https://eprint.iacr.org/2015/1075">having written</a>.</p>
+
+<blockquote>
+  <p>I estimate a 1/7 chance of breaking RSA-2048 by 2026 and a 1/2 chance by 2031.</p>
+</blockquote>
+
+<p>and in October 2019 a milestone was achieved with an example of
+<a href="https://www.nature.com/articles/s41586-019-1666-5">Quantum Supremacy</a>.</p>
+
+<blockquote>
+  <p>Our Sycamore processor takes about 200 seconds to sample one instance of a
+quantum circuit a million times—our benchmarks currently indicate that the
+equivalent task for a state-of-the-art classical supercomputer would take
+approximately 10,000 years.</p>
+</blockquote>
+
+<p>Further, <a href="https://techcrunch.com/2020/09/15/ibm-publishes-its-quantum-roadmap-says-it-will-have-a-1000-qubit-machine-in-2023/">IBM claims</a></p>
+
+<blockquote>
+  <p>it is on its way to building a quantum processor with more than 1,000 qubits — and somewhere between 10 and 50 logical qubits — by the end of 2023.</p>
+</blockquote>
+
+<p>clearly quantum computation is scaling up and could be a threat to cryptographic standards if no change is made.
+For that purpose, NIST began a <a href="https://csrc.nist.gov/projects/post-quantum-cryptography">post-quantum crypto</a>
+project and a number of post-quantum cryptography algorithms have been proposed. One which particularly appears to have
+great promise is Lattice-based cryptography.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="definitions-and-review">Definitions and Review</h2>
+
+<hr />
+
+<p>Lattices are very similar to traditional vector spaces which are often taught in a first course of linear algebra.
+A lattice over linearly independent \(\pmb{v}_1,\ldots \pmb{v}_n\) can be defined as:</p>
+
+\[\left\{
+\sum_{i=1}^n\alpha_i\pmb{v}_i\:\Big|\: \alpha_i\in\mathbb{Z}
+\right\}\]
+
+<p>in essense, it’s the same as a real vector space with the exception that the scalars are taken to be integral.
+More precisely, these lattices are isomorphic to the group \(\mathbb{Z}^n\) with binary operation \(+\).</p>
+
+<p>There are interesting problems here such as the <em>Shortest Vector Problem</em> (SVP) which has been <a href="https://dl.acm.org/doi/10.1145/237814.237838">proven</a>
+to be NP hard in some cases and the <em>Closest Vector Problem</em> with <a href="https://www.sciencedirect.com/science/article/abs/pii/S0020019099000836?via%3Dihub">similar results</a>
+in terms of hardness.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><img src="https://upload.wikimedia.org/wikipedia/commons/3/32/SVP.svg" alt="SVP example" class="svg invert-color" /></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><em>A basic example of SVP, given b1, b2 find the vector in cyan (courtesy, Wikipedia)</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Though the problem seems quite easy in the diagram above, the difficulty in solving quickly ramps up as the number of
+dimensions increases.</p>
+
+<p>Recall that \(\mathbb{Z}[X]/(X^N-1)\) is the ring of polynomials with coefficients in \(\mathbb{Z}\) and powers of
+\(X\) strictly less than \(N\). We define multiplication of polynomials in this ring as follows</p>
+
+\[f * g = c_{N-1}X^{N-1} + \cdots + c_0\]
+
+<p>where if \(a_j\) denotes the \(j\)th coefficient of \(f\) and \(b_k\) the \(k\)th of \(g\) then</p>
+
+\[c_i = \sum_{j+k\equiv i}a_jb_k,\qquad\quad i\in\{0,\ldots N-1\}\]
+
+<p>the congruence taken mod \(N\) of course.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="ntru-public-key-encryption-setup">NTRU (Public Key Encryption) Setup</h2>
+
+<hr />
+
+<p>Here is only one variation on NTRU though many have been proposed.</p>
+
+<p>All parties agree on integers \(N,p,q\) such that gcd\((p,q)=1\) and \(p\ll q\).
+They also individually pick polynomials \(f,g\in\mathbb{Z}[X]/(x^N-1)\), say</p>
+
+\[f = a_{N-1}X^{N-1} +\cdots + a_0\qquad\text{and}\qquad g = b_{N-1}X^{N-1} +\cdots + b_0\:\:\text{.}\]
+
+<p>Let</p>
+
+\[h=f*g = c_{N-1}X^{N-1} + \cdot + c_0\]
+
+<p>Note that \(f\) must be invertible mod \(p\) and mod \(q\) ie. there exists \(F_p,F_q\in\mathbb{Z}[X]/(x^N-1)\)
+such that</p>
+
+\[F_p*f \equiv 1\pmod{p}\qquad\text{and}\qquad F_q*f\equiv 1\pmod{p}\]
+
+<p>the public key is then</p>
+
+\[(N,p,q,h)\]
+
+<p>and the private key is \((f,F_p)\). Note that \(g\equiv f*h\pmod{q}\) so nothing is lost by not storing it
+should it be needed.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="ntru-asymmetric-encryptiondecryption">NTRU Asymmetric Encryption/Decryption</h2>
+
+<hr />
+
+<p>Alice sends a message \(m\) to Bob as follows:</p>
+<ol>
+  <li>Encodes \(m\) as a polynomial in \(\mathbb{Z}[X]/(x^N-1)\) with coefficients no larger than \((p-1)/2\) in magnitude.</li>
+  <li>Choose a “small” polynomial \(\phi\) and compute \(c\equiv p\phi*h + m\pmod{q}\).</li>
+  <li>Send the ciphertext \(c\) to Bob</li>
+</ol>
+
+<p>Bob can then attempt to decrypt the message:</p>
+<ol>
+  <li>Compute \(a\equiv f*c\pmod{q}\) with all coefficients in \(a\) being at most \(q/2\) in magnitude</li>
+  <li>(Likely) recover the message with \(m \equiv F_p*a\pmod{p}\)</li>
+</ol>
+
+<p>There are parameters which have been shown to make failure extremely unlikely but we can examine why this
+usually works.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="informal-proof">Informal Proof</h2>
+
+<hr />
+
+<p>We want to show Bob receives the intended message from Alice. From the algorithm, we have</p>
+
+\[\begin{align}
+a &amp;\equiv f*c\pmod{q}\\
+  &amp;\equiv f*(p\phi * h + m)\pmod{q}\\
+  &amp;\equiv f*p\phi*F_q*g + f*m\pmod{q}\\
+  &amp;\equiv p\phi*g + f*m\pmod{q}
+\end{align}\]
+
+<p>Since \(\phi,g,f,m\) have small coefficients and \(q\) is much larger than \(p\) it is very likely that
+\(p\phi*h+f*m\) has coefficients with magnitude less than \(q/2\) (before taking mod \(q\)) in which case</p>
+
+\[a=p\phi*g+f*m\]
+
+<p>holds. Multiplying \(F_p\) we have</p>
+
+\[F_p*a = pF_p*\phi*g + F_p*f*m\equiv 0 + 1*m\equiv m\pmod{p}\]
+
+<p>as expected.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="small-example">Small Example</h2>
+
+<hr />
+
+<p>Suppose we have parameters \((N,p,q) = (5,3,16)\) and
+Bob chooses \(f=X^4+X-1\), \(g=X^3 -X\). We find</p>
+
+\[F_p= X^3+X^2-1,\quad F_q = X^3 + X^2 - 1,\quad h = -X^4-2X^3 + 2X + 1\]
+
+<p>Now, Alice computes the ciphertext to \(m=X^2-X+1\) with corresponding \(\phi=X-1\) as</p>
+
+\[c\equiv 3\phi*h+m\equiv -3X^4 + 6X^3 + 7X^2 - 4X - 5\pmod{16}\]
+
+<p>Bob receives \(c\) and decrypts:</p>
+
+\[a\equiv f*c\equiv 4X^4-2X^3-5X^2+6X-2\pmod{16}\]
+
+\[F_p*a\equiv X^2-X+1\equiv m\pmod{3}\]
+
+<p>so Bob has obtained the message as expected.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="conclusion-and-notes">Conclusion and Notes</h2>
+
+<hr />
+
+<p>This variation of NTRU is similar to the one presented in <a href="https://www.oreilly.com/library/view/introduction-to-cryptography/9780136758181/">Trappe and Washington</a></p>
+
+<p>Informally, the <em>SVP</em> harness assumption tells us that we can construct lattices
+such that it is “hard” to find the smallest vector on our lattice (think of these as having many
+more dimensions than the two in the figure above). There may be another article more precisely
+detailing the relation between lattices and NTRU in the future.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
