@@ -4,12 +4,13 @@ title: Invalid Curve Attacks on Elliptic Curve Diffie Hellman
 category: Crypto
 author: 'reo'
 tags: elliptic_curve attack crt ecdh
+featured: 1
 mathjax: true
 ---
 
 Here we go over an intuitive idea for what an attack on ECDH which uses invalid curves would look like.
 Some of the details were simplified which make the system insecure beyond our attack but in a future post
-we go over a similar attack which was a real vulnerability in TLS libraries which implemented ECDH
+we may go over a similar attack which was a real vulnerability in TLS libraries which implemented ECDH
 such as [Bouncy Castle](https://www.bouncycastle.org/).
 
 ## Contents

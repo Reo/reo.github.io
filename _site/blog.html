@@ -92,6 +92,8 @@
 	
 	
 	
+	
+	
 -->
 
     <div class="hp-contents">
@@ -99,41 +101,58 @@
       <div class="-container">
         <div class="-content focus-content">
 
-          <h2>Ramblings on Security, (Cryptography, and Math).</h2>
+          <h1 class="featured-blog-title" >Featured Posts</h1>
+<h2 class="blog-subtitle">Ramblings on Security, (Cryptography, and Math).</h2>
+<a class="archive-blog-link" href=/blog/archive>Archive</a>
 <br>
 <ul class="post-list">
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2021/01/13/Lattice-Based-Crypto.html">Post-Quantum Cryptography: NTRU</a>
-    </h2>
-    <span class="post-date">January 13, 2021</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>Along with discussions of large-scale quantum computers comes the often cited threats to
-cryptography currently in use. Though some may argue we are still a ways away from anything
-we should be concerned about, recent developments seem to indicate <a href="https://en.wikipedia.org/wiki/Shor%27s_algorithm">Shor’s Algorithm</a>
-is not too far off.</p>
-
-  </div>
-  </li>
+  
+  
+  
+  
   
   <li class="post-list-item">
   <div class="shared-post-header">
     <h2>
-      <a class="shared-post-title" href="/reverse%20engineering/2021/01/06/ghidra.html">Short Intro to using Ghidra</a>
+      <a class="shared-post-title" href="/crypto/2021/02/03/Learning-With-Rounding.html">Post-Quantum Cryptography: Learning with Rounding</a>
     </h2>
-    <span class="post-date">January 6, 2021</span>
+    <span class="post-date">February 3, 2021</span>
   </div>
   <div class="post-excerpt-main">
-    <p>In this exercise, we find the password in a simple crackme
-using Ghidra.
-The purpose is to serve as an introduction
-to ghidra for reverse engineering projects.</p>
+    <p>A brief introduction to Learning with Rounding (LWR) based on papers by
+Banerjee et al. and Alwen et al.</p>
 
   </div>
   </li>
+  
+  
+  
+  
+  
+  <li class="post-list-item">
+  <div class="shared-post-header">
+    <h2>
+      <a class="shared-post-title" href="/crypto/2021/01/18/Learning-With-Error.html">Post-Quantum Cryptography: Learning with Errors</a>
+    </h2>
+    <span class="post-date">January 18, 2021</span>
+  </div>
+  <div class="post-excerpt-main">
+    <p>Continuing our discussion of post-quantum crytpography,
+we study Learning with Error (LWE) problems. LWE is a simpler
+example which is handy to use when introducing Learning with Rounding in
+SABER which is one of the candidates which has made it into round 3 submissions for
+<a href="https://csrc.nist.gov/projects/post-quantum-cryptography">NIST post-quantum crypto</a>
+competition.</p>
+
+  </div>
+  </li>
+  
+  
+  
+  
+  
+  
   
   <li class="post-list-item">
   <div class="shared-post-header">
@@ -145,11 +164,13 @@ to ghidra for reverse engineering projects.</p>
   <div class="post-excerpt-main">
     <p>Here we go over an intuitive idea for what an attack on ECDH which uses invalid curves would look like.
 Some of the details were simplified which make the system insecure beyond our attack but in a future post
-we go over a similar attack which was a real vulnerability in TLS libraries which implemented ECDH
+we may go over a similar attack which was a real vulnerability in TLS libraries which implemented ECDH
 such as <a href="https://www.bouncycastle.org/">Bouncy Castle</a>.</p>
 
   </div>
   </li>
+  
+  
   
   <li class="post-list-item">
   <div class="shared-post-header">
@@ -170,89 +191,19 @@ We also demo the attack in action.</p>
   </div>
   </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/web_security/2020/12/01/13-xss.html">XSS</a>
-    </h2>
-    <span class="post-date">December 1, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>This last exercise features the mock webapp to demonstrate a cross-site scripting (XSS) attack.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/web_security/2020/11/26/13-csrf.html">CSRF</a>
-    </h2>
-    <span class="post-date">November 26, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>An example of a cross-site request forgery <a href="https://owasp.org/www-community/attacks/csrf">(CSRF)</a>
-attack on our artificial microblog webapp.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/web_security/2020/11/24/12-sqlinj.html">SQL Injection</a>
-    </h2>
-    <span class="post-date">November 24, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>An example of an SQL injection on an artificial microblog service.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/web_security/2020/11/19/12-incmed.html">Incomplete Mediation</a>
-    </h2>
-    <span class="post-date">November 19, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>This is an attack which is easily exploited
-if the backend does not properly check the authenticated user
-before performing an action.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/system_security/2020/11/17/11-maldeb.html">Malware Debian</a>
-    </h2>
-    <span class="post-date">November 17, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>Credits for this challenge go to KC Udonsi. We will use a malicious Debian package
-(a trojan)
-to install a RAT (Remote Admin Tool) into the target’s device.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/system_security/2020/11/12/11-fbshell.html">File-Based Shellcode</a>
-    </h2>
-    <span class="post-date">November 12, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>This last of a series of buffer overflow attacks will be from a file as opposed to from standard input.
-The goal is privelege escalation using a vulnerable binary with the setuid flag enabled.</p>
-
-  </div>
-  </li>
+  
+  
+  
+  
+  
+  
+  
+  
   
   <li class="post-list-item">
   <div class="shared-post-header">
@@ -269,35 +220,11 @@ a buffer-overflow on a program which uses <code class="language-plaintext highli
   </div>
   </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/system_security/2020/11/05/10-stack-shell.html">Stack Smash Shellcode</a>
-    </h2>
-    <span class="post-date">November 5, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>Continuing our <a href="/crypto/2020/11/03/10-stack-branch.html">last lab</a>
-we will use a buffer overflow to run an exploit which will
-allow for <a href="https://en.wikipedia.org/wiki/Privilege_escalation">privilege escalation</a>.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/system_security/2020/11/03/10-stack-branch.html">Stack Smash Branching</a>
-    </h2>
-    <span class="post-date">November 3, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>The goal of this exercise will be to introduce a series of attacks where the vulnerability
-is a seemingly innocuous buffer overflow. This Introductory exercise will allow us to branch
-to an unintended location of the program.</p>
-
-  </div>
-  </li>
+  
+  
+  
+  
   
   <li class="post-list-item">
   <div class="shared-post-header">
@@ -316,166 +243,29 @@ with both HTTP and HTTPS.</p>
   </div>
   </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/pen_testing/2020/10/27/09-penet-test.html">Elementary Penetration Testing</a>
-    </h2>
-    <span class="post-date">October 27, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>In this lab, we experiment with classical penetration testing techniques using tools
-such as nmap, OpenVas, and Metasploit.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/web_security/2020/10/22/08-http-sniffer.html">Scapy HTTP Dissection</a>
-    </h2>
-    <span class="post-date">October 22, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>Here we exploit one of many vulnerabilities of HTTP to create a sniffer
-which scrapes traffic sent by Alice over the network.
-Our goal is to steal the information including usernames, passwords,
-order numbers, etc. sent over the network. We again use the Sacpy library to
-acheive this.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/web_security/2020/10/20/06-scapy.html">Basic Scapy Sniffing</a>
-    </h2>
-    <span class="post-date">October 20, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>Here we use the <a href="https://scapy.net/">scapy</a> Python library to sniff and save a target’s traffic
-on the same network.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/web_security/2020/10/15/06-malgat.html">Malicious Gateway</a>
-    </h2>
-    <span class="post-date">October 15, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>This post describes how to exploit control of the gateway a target uses in order to monitor traffic.
-In this scenario, Mallory is the default gateway allowing the target Alice to connect to the external network.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/web_security/2020/10/08/05-lab.html">Intro to Wireshark</a>
-    </h2>
-    <span class="post-date">October 8, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>With this lab, we start experimenting with tools and exploits over a network. We
-use docker and docker-compose to simulate the different actors and networks.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/10/06/31-32-crypals-challenge.html">Cryptopals Challenges 31-32</a>
-    </h2>
-    <span class="post-date">October 6, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>The final challenge of this <a href="https://cryptopals.com/">cryptopals set</a>
-has us use a timing leak to attack HMAC SHA-1.
-Both challenges 31 and 32 are very similar so we go over both solutions here.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/10/01/04-lab.html">Hash Length Extension Module</a>
-    </h2>
-    <span class="post-date">October 1, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>In this lab, we implement a hash-length extension attack using a module created by
-<a href="https://github.com/stephenbradshaw/hlextend/blob/master/hlextend.py">Stefano Palazzo</a>.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/09/29/30-crypals-challenge.html">Cryptopals Challenge 30</a>
-    </h2>
-    <span class="post-date">September 29, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>This challenge is again similar to the last one. This hash length extension is on md4.
-The md4 implementation can be found <a href="https://gist.github.com/BenWiederhake/eb6dfc2c31d3dc8c34508f4fd091cea9">at this repo</a>.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/09/24/28-crypals-challenge.html">Cryptopals Challenges 28-29</a>
-    </h2>
-    <span class="post-date">September 24, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>We combine challenges 28 and 29 in this post which deals executing a hash-length extension attack
-on SHA-1. It is one example of various ways to do hash-length extension which is featured as a
-challenge on
-the <a href="https://cryptopals.com/">cryptopals website</a></p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/09/22/27-crypals-challenge.html">Cryptopals Challenge 27</a>
-    </h2>
-    <span class="post-date">September 22, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p><a href="https://cryptopals.com/">Cryptopals challenge</a> 27. We recover the key used in a system
-where the key and IV are the same value and used for AES CBC mode.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/09/17/26-crypals-challenge.html">Cryptopals Challenge 26</a>
-    </h2>
-    <span class="post-date">September 17, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>We take on challenge 26 from the set provided on the <a href="https://cryptopals.com/">cryptopals website</a>.
-This time we implement a bit flipping attack on AES CTR mode similar to the bitflipping attack
-we did in an <a href="/crypto/2020/08/18/16-crypals-challenge.html">earlier post</a> against AES CBC mode.</p>
-
-  </div>
-  </li>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   <li class="post-list-item">
   <div class="shared-post-header">
@@ -485,371 +275,77 @@ we did in an <a href="/crypto/2020/08/18/16-crypals-challenge.html">earlier post
     <span class="post-date">September 15, 2020</span>
   </div>
   <div class="post-excerpt-main">
-    <p>In this challenge, we common cited and supposed benefit of AES CTR mode being that one can
+    <p>In this challenge, we address the commonly cited and supposed benefit of AES CTR mode being that one can
 easily seek into the ciphertext and decrypt just the byte/block which is needed.</p>
 
   </div>
   </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/09/10/24-crypals-challenge.html">Cryptopals Challenge 24</a>
-    </h2>
-    <span class="post-date">September 10, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>This <a href="https://cryptopals.com/">cryptopals challenge</a>
-asks us break a cipher which uses MT19937 as a keystream with a known plaintext.
-The keysize here 2 bytes so there are only \(2^{16}=65536\) possible keys, this is small enough
-to be feasibly brute forced. We will use known plaintext here to confirm which of the guessed
-keys is the correct one.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/09/08/23-crypals-challenge.html">Cryptopals Challenge 23</a>
-    </h2>
-    <span class="post-date">September 8, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>The third challenge in the series of <a href="https://cryptopals.com/">cryptopals challenges</a>
-which asks us to use the MT19937 PRNG is one where we clone the state given only values
-it output. This is more powerful than the <a href="/crypto/2020/09/03/22-crypals-challenge.html">previous</a>
-attack since it does not rely on
-the PRNG being seeded in a predictable manner.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/09/03/22-crypals-challenge.html">Cryptopals Challenge 22</a>
-    </h2>
-    <span class="post-date">September 3, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>The 22nd <a href="https://cryptopals.com/">cryptopals challenge</a>
-asks us to crack an MT19937 seed given the output it gives.
-This is an example of why the distinction exists between cryptographically
-secure RNG and more general-purpose RNG such as this one which
-may be more efficient but is prone to this sort of attack.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/09/01/21-crypals-challenge.html">Cryptopals Challenge 21</a>
-    </h2>
-    <span class="post-date">September 1, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>The next cryptopals challenge asks us to implement MT19937 aka <a href="https://en.wikipedia.org/wiki/Mersenne_Twister">Mersenne Twister</a>,
-the most widely-used PRNG for general purposes but — as we will learn in the next few challenges,
-is not cryptographically secure.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/08/27/20-crypals-challenge.html">Cryptopals Challenges 19-20</a>
-    </h2>
-    <span class="post-date">August 27, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>We complete <a href="https://cryptopals.com/">cryptopals challenge</a>
-20 in this post which involves breaking CTR mode and is a more complete
-version of challenge 19.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/08/25/18-crypals-challenge.html">Cryptopals Challenge 18</a>
-    </h2>
-    <span class="post-date">August 25, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>We implement AES CTR mode as specified in cryptopals challenge 18.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/08/20/17-crypals-challenge.html">Cryptopals Challenge 17</a>
-    </h2>
-    <span class="post-date">August 20, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>For the 17th <a href="https://cryptopals.com/">Cryptopals challenge</a>,
-we implement the so-called best-known attack on modern block cipher cryptography.
-The CBC padding oracle.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/08/18/16-crypals-challenge.html">Cryptopals Challenge 16</a>
-    </h2>
-    <span class="post-date">August 18, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>The final challenge for set 2 of the <a href="https://cryptopals.com/">cryptopals challenges</a>.
-We completed challenge 15 <a href="/crypto/2020/08/13/14-crypals-challenge.html">in a previous post</a> so we continue with 16
-which asks us to implement a CBC bit flipping attack.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/08/13/14-crypals-challenge.html">Cryptopals Challenge 14</a>
-    </h2>
-    <span class="post-date">August 13, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>Continuing our cryptopals challenges,
-we now tackle another attack on AES ECB encryption similar
-to the one from <a href="/crypto/2020/08/06/12-crypals-challenge.html">challenge 12</a>.
-This time, a random prefix is present which complicates things
-a little.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/08/11/13-crypals-challenge.html">Cryptopals Challenge 13</a>
-    </h2>
-    <span class="post-date">August 11, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>This Cut and Paste attack is a continuation of the <a href="https://cryptopals.com/">cryptopals challenges</a>
-we have been solving and are now halfway into the second set. We manipulate the ciphertext
-to send the server a query string which would not be allowed under normal circumstances.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/08/06/12-crypals-challenge.html">Cryptopals Challenge 12</a>
-    </h2>
-    <span class="post-date">August 6, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>This next cryptopals challenge involves finding out information
-on the cipher used (in this case, blocksize and AES mode).
-Upon discovering ECB mode is being used, an attack is mounted where
-decryption can be done without knowledge of the key one byte at a time.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/08/04/11-crypals-challenge.html">Cryptopals Challenge 11</a>
-    </h2>
-    <span class="post-date">August 4, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>In the 11th <a href="https://cryptopals.com/">cryptopals challenge</a>, our goal
-is to use an oracle which encrypts using AES ECB half the time and
-AES CBC the other half in order to tell which mode is being used reliably.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/07/30/10-crypals-challenge.html">Cryptopals Challenge 10</a>
-    </h2>
-    <span class="post-date">July 30, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>The next <a href="https://cryptopals.com/">cryptopals challenge</a>, the tenth of the series is to implement AES CBC mode.
-It is convenient to use the code we wrote for AES ECB mode for the <a href="/crypto/2020/07/28/09-crypals-challenge.html">previous challenge</a>.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/07/28/09-crypals-challenge.html">Cryptopals Challenge 9</a>
-    </h2>
-    <span class="post-date">July 28, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>Challenge 9 is the first of the second set, it is relatively straight-forward involving only padding a string to
-ensure the length is a multiple of a given blocksize. We will implement PKCS#7 padding where a pad of length <code class="language-plaintext highlighter-rouge">k</code>
-is done by appending <code class="language-plaintext highlighter-rouge">k</code> bytes of that same value.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/07/23/08-crypals-challenge.html">Cryptopals Challenge 8</a>
-    </h2>
-    <span class="post-date">July 23, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>The goal of this challenge is to detect which of a list of ciphertexts used AES ECB mode.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/07/21/07-crypals-challenge.html">Cryptopals Challenge 7</a>
-    </h2>
-    <span class="post-date">July 21, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>Continuing the cryptopals challenges, challenge 7 has us get familiar with using AES ECB mode. We implement our solution in
-python as we have been for previous solutions. This may be a useful component so we call this <code class="language-plaintext highlighter-rouge">ecb.py</code> to make
-importing easier for future challenges.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/07/16/03-lab.html">Stream Cipher Salsa20</a>
-    </h2>
-    <span class="post-date">July 16, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>An example usage of stream cipher <a href="https://cr.yp.to/snuffle.html">Salsa20</a>
-to encrypt and decrypt audio data.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/07/14/06-crypals-challenge.html">Cryptopals Challenge 6</a>
-    </h2>
-    <span class="post-date">July 14, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>This cryptopals challenge involves significantly more code.
-In order to break repeating-key XOR we will also be moving away from our words file and turn to
-<a href="https://en.wikipedia.org/wiki/Frequency_analysis">frequency analysis</a>
-when cracking the key.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/07/09/05-crypals-challenge.html">Cryptopals Challenge 5</a>
-    </h2>
-    <span class="post-date">July 9, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>This <a href="https://cryptopals.com/">cryptopals challenge</a> asks us to implement a cipher similar to the <a href="https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher">Vignère cipher</a>,
-repeating key XOR.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/07/07/04-crypals-challenge.html">Cryptopals Challenge 4</a>
-    </h2>
-    <span class="post-date">July 7, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>In challenge 4 of the <a href="https://cryptopals.com/">cryptopals challenges</a>
-we detect and break single-byte XOR which has been used to encrypt a
-string. We do not know which.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/07/02/02-lab.html">Elementary Substitution Cipher</a>
-    </h2>
-    <span class="post-date">July 2, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>This series goes over labs completed in a security course.
-We first go over cryptography and will be implementing an elementary cipher to begin.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/crypto/2020/06/30/crypals-challenges.html">Cryptopals Challenges 1-3</a>
-    </h2>
-    <span class="post-date">June 30, 2020</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>Solving challenges 1, 2, and 3 of <a href="https://cryptopals.com/">the cryptopals challenges</a> using Python.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/programming/2019/04/24/Lambda-Expressions-in-MIT-Scheme.html">Lambda Expressions in MIT Scheme</a>
-    </h2>
-    <span class="post-date">April 24, 2019</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>We briefly go over the history, and use of lambda expressions which appear in
-functional languages (and others which support this feature such as Java). We define
-first-class functions and proceed to an example in MIT Scheme.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/programming/2019/03/27/Tail-Recursion-and-MIT-Scheme.html">Tail Recursion and MIT Scheme</a>
-    </h2>
-    <span class="post-date">March 27, 2019</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>This post will serve to introduce the reader to basic syntax of MIT scheme and explain
-precisely what is meant by tail recursion. This will serve as preparation to the
-more famous topic in functional programming being lambda expressions.</p>
-
-  </div>
-  </li>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   <li class="post-list-item">
   <div class="shared-post-header">
@@ -866,22 +362,9 @@ more famous topic in functional programming being lambda expressions.</p>
   </div>
   </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/programming/2019/02/13/Balanced-Tree-Amortized-Analysis.html">Balanced Tree Amortized Analysis</a>
-    </h2>
-    <span class="post-date">February 13, 2019</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>This is a simple exercise in amortized analysis which computer science
-students often encounter early in their careers. I use the potential method described
-in <a href="https://en.wikipedia.org/wiki/Introduction_to_Algorithms">CLRS</a> to show the amortized cost of <em>INSERT</em> and <em>EXTRACT</em> in
-an arbitrary (initially empty), balanced tree is \(\mathcal{O}(\log n)\) and \(\mathcal{O}(1)\)
-respectively.</p>
-
-  </div>
-  </li>
+  
+  
+  
   
   <li class="post-list-item">
   <div class="shared-post-header">
@@ -898,94 +381,16 @@ complex analysis.</p>
   </div>
   </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/math/2019/01/30/Intro-Cryptography.html">Intro Cryptography: RSA</a>
-    </h2>
-    <span class="post-date">January 30, 2019</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>As more and more of our lives become digital in one sense or another, questions about privacy and
-security arise naturally. This post works as a prelude to a deeper study in cryptography through
-the introduction of a brief history and a traditional example in the form of the <em>RSA</em> algorithm.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/programming/2019/01/23/API-Authorization-Implementation.html">API-Authorization-Implementation</a>
-    </h2>
-    <span class="post-date">January 23, 2019</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>This post covers an implementation of the project we have been discussing for the last two posts.
-Recall that the goal was to create a simple program which would fetch assignments from a set of
-courses and add them as tasks to be done in a Wunderlist todo list using the API.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/programming/2019/01/16/API-Authorization-Technologies.html">API Authorization Technologies</a>
-    </h2>
-    <span class="post-date">January 16, 2019</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>This week, I go over the technologies involved in an implementation of the API authorization project
-mentioned previously. This includes a discussion on how communication takes place on the internet
-and preliminaries on authentication.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/etc/2019/01/09/API-Authorization-Primer.html">API-Authorization-Primer</a>
-    </h2>
-    <span class="post-date">January 9, 2019</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>Here we create
-create a simple application to keep track of assignments in a todo list. We
-interface with the Wunderlist API to achieve this. This post goes over a motivation and some
-some specifications while future posts will cover more in detail.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/2019/01/02/Introductory-Post.html">Introduction Post</a>
-    </h2>
-    <span class="post-date">January 2, 2019</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>The purpose of this blog will be to serve as a personal journal. I plan on writing about
-interesting ideas I encounter mostly having to do with Mathematics, Crypto, and
-Music.</p>
-
-  </div>
-  </li>
   
-  <li class="post-list-item">
-  <div class="shared-post-header">
-    <h2>
-      <a class="shared-post-title" href="/%E6%97%A5%E6%9C%AC%E8%AA%9E/2018/12/29/%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E7%B7%B4%E7%BF%92-1.html">日本語の練習-1</a>
-    </h2>
-    <span class="post-date">December 29, 2018</span>
-  </div>
-  <div class="post-excerpt-main">
-    <p>「ブログの初めて作文」</p>
-
-  </div>
-  </li>
+  
+  
+  
+  
+  
   
 </ul>
 

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Timestamp Protocols</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>Some of the previous Protocols we’ve discussed mentioned using a
+timestamp in one way or another. It turns out having a reliable
+way to attach a timestamp is quite a complicated feat in and of
+itself.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#goals" id="markdown-toc-goals">Goals</a></li>
+  <li><a href="#first-attempt" id="markdown-toc-first-attempt">First Attempt</a></li>
+  <li><a href="#weakening-the-assumptions" id="markdown-toc-weakening-the-assumptions">Weakening the Assumptions</a></li>
+  <li><a href="#linking-protocol" id="markdown-toc-linking-protocol">Linking Protocol</a>    <ul>
+      <li><a href="#terms" id="markdown-toc-terms">Terms</a></li>
+      <li><a href="#the-protocol" id="markdown-toc-the-protocol">The Protocol</a></li>
+      <li><a href="#drawbacks" id="markdown-toc-drawbacks">Drawbacks</a></li>
+    </ul>
+  </li>
+  <li><a href="#recent-work" id="markdown-toc-recent-work">Recent Work</a></li>
+  <li><a href="#references" id="markdown-toc-references">References</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="goals">Goals</h2>
+
+<hr />
+
+<p>The aim of this article will be to explore options of timestamping
+protocols where</p>
+
+<ul>
+  <li>The data itself is timestamped, regardless of the medium (disk, tape, etc.)</li>
+  <li>It should be obvious if any change is made to the timestamped data</li>
+  <li>It should be obvious if any time different from the current one is used</li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="first-attempt">First Attempt</h2>
+
+<hr />
+
+<p>As usual, an approach where we can assume the existence of a trustworthy
+party “Trent” is more straightforward. The protocol may go as follows:</p>
+
+<ol>
+  <li>Alice sends a copy of the document to be timestamped to Trent</li>
+  <li>Trent records the date and time he received the document and keeps a copy</li>
+</ol>
+
+<p>if Bob wants to verify a timestamp, he simply asks trent to bring up the
+relevent document.</p>
+
+<p>Simple yet unrealistic.</p>
+
+<p>To list just a few of the issues, this relies on trent having enough
+storage and bandwidth, a secure database to store them, etc.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="weakening-the-assumptions">Weakening the Assumptions</h2>
+
+<hr />
+
+<p>We can improve the first approach using a hash function and
+digital signatures.</p>
+
+<ol>
+  <li>Alice sends Trent a hash of the document</li>
+  <li>Trent attaches the date and time to the hash he received and digitally signs it</li>
+  <li>Trent sends the signed hash with the timestamp back to Alice</li>
+</ol>
+
+<p>Bob can verify the timestamp is legitimate by checking Trent’s signature.</p>
+
+<p>Trent now doesn’t have to worry about needing an exorbitant amount of storage
+and bandwidth.
+He also isn’t responsible for keeping the sensitive data on the
+documents themselves.
+Another neat side effect is that Alice can verify herself that she received
+the expected timestamp and correct hash along with it taking necessary actions
+if there were any mistakes along the way.</p>
+
+<p>This works if Trent is completely reliable but unfortunately that’s not always
+realistic. Would it be possible to create a system which can defend even against
+Alice and Trent cooperating to fake a timestamp?</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="linking-protocol">Linking Protocol</h2>
+
+<hr />
+
+<p>Here’s an idea, what if Trent were to attach metadata to the timestamps linking
+them to each other. In essence causing timestamps to “sandwich” between to others.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h3 id="terms">Terms</h3>
+
+<hr />
+
+<p>We’ll need to define a few terms to get started, let</p>
+
+<ul>
+  <li>\(n\) be the current (ordered) timestamp number Trent is issuing</li>
+  <li>\(H_i\) be the hash of the \(i\)th document</li>
+  <li>\(t_i\) be the timestamp given to the \(i\)th document</li>
+  <li>\(I_i\) be the identity of the author of the \(i\)th timestamped document</li>
+  <li>\(L_i=(I_{i-1}, H_{i-1}, I_{i-1}, L_{i-1})\) where \(H\) is a hash function</li>
+  <li>\(S_k\) be Trent’s signature using his private key</li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h3 id="the-protocol">The Protocol</h3>
+
+<hr />
+
+<ol>
+  <li>Alice sends Trent \((H_n, A)\). Notice in particular \(I_n=A\)</li>
+  <li>Trent sends Alice \(T_n=S_k(n,A,H_n,t_n,I_{n-1},H_{n-1},t_{n-1}, L_n)\)</li>
+  <li>When Trent timestamps the next document, he sends Alice \(I_{n+1}\)</li>
+</ol>
+
+<p>The verification process is a little more involved this time. If Bob wants
+to verify the validity, she contacts \(I_{n-1}\) and \(I_{n+1}\) to see if
+the information matches up. Should that not be enough to convince him,
+Bob would go on to contact \(I_{n-2}\) and \(I_{n+2}\) and so on.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h3 id="drawbacks">Drawbacks</h3>
+
+<hr />
+
+<p>This protocol still uses a central authority in Trent and now requires
+more parties to cooperate in an attempt to keep Trent honest. It may not
+be entirely realistic to have this chain of cooperating participants
+especially when there is no incentive.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="recent-work">Recent Work</h2>
+
+<hr />
+
+<p>More recently, decentralized timestamping is using blockchain technology
+for a system which has no centralized authority and does not require
+explicit collaboration from other parties. There is an example of this
+in [1] which secures video integrity using this method of timestamping.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="references">References</h2>
+
+<hr />
+
+<p>Applied Crypto 4.1</p>
+
+<p>[1] https://www.gipp.com/wp-content/papercite-data/pdf/gipp2016a.pdf</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

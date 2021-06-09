@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Post-Quantum Cryptography: Learning with Rounding</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>A brief introduction to Learning with Rounding (LWR) based on papers by
+Banerjee et al. and Alwen et al.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#the-idea" id="markdown-toc-the-idea">The Idea</a></li>
+  <li><a href="#hardness-and-relation-to-lwe" id="markdown-toc-hardness-and-relation-to-lwe">Hardness and Relation to LWE</a></li>
+  <li><a href="#key-exchange" id="markdown-toc-key-exchange">Key Exchange</a></li>
+  <li><a href="#correctness" id="markdown-toc-correctness">Correctness</a>    <ul>
+      <li><a href="#asymmetric-encryption" id="markdown-toc-asymmetric-encryption">Asymmetric Encryption</a></li>
+    </ul>
+  </li>
+  <li><a href="#example" id="markdown-toc-example">Example</a>    <ul>
+      <li><a href="#example-1" id="markdown-toc-example-1">Example</a></li>
+    </ul>
+  </li>
+  <li><a href="#conclusion" id="markdown-toc-conclusion">Conclusion</a>    <ul>
+      <li><a href="#additional-resources" id="markdown-toc-additional-resources">Additional Resources:</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="the-idea">The Idea</h2>
+
+<hr />
+
+<p>In LWE, we sampled an error vector from a Gaussian distribution to fuzz the solution to a set of linear equations.
+This sampling may be a source of slowdown for the algorithm if, for instance, rejection sampling is used.</p>
+
+<p>In LWR, we generate the analog to errors deterministically by rounding an element in \(\mathbb{Z}_q\) to
+one in a more spare set such as \(\mathbb{Z}_p\) where \(p &lt; q\).
+<!---->
+We can then formalize our rounding procedure by defining
+\(\left\lfloor x\right \rceil_p = \left\lfloor \frac{p}{q}x\right \rceil \pmod{p}\)
+where \(\left\lfloor x\right \rceil\) denotes the nearest integer to \(x\).</p>
+
+<p>We can simplify this further by choosing \(q\) and \(p\) to be powers of \(2\), say,</p>
+
+\[q = 2^{\epsilon_q},\quad p = 2^{\epsilon_p}\]
+
+<p>where \(\epsilon_q, \epsilon_p\) are positive integers such that \(\epsilon_q &gt; \epsilon_p\).
+This simplifies our rounding operation since now \(p/q = 2^{\epsilon_p - \epsilon_q}\) which is equivalent to shifting
+\(\epsilon_q - \epsilon_p\) bits to the right; the mod \(p\) is implicit in this operation.</p>
+
+<p>The modulus operations are also more efficient to implement since taking mod \(q\) is equivalent to saying
+keep the \(q\) least significant bits (and similarly for mod \(p\)).</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="hardness-and-relation-to-lwe">Hardness and Relation to LWE</h2>
+
+<hr />
+
+<p>Notice that if \(s = \epsilon_q - \epsilon_p\) is small then the rounding operation is actually equivalent to
+adding a small error which makes the lower \(s\) bits \(0\). This similarity is convenient because it hints
+towards LWR being similar to LWE in terms of hardness, at least for certain parameters.</p>
+
+<p>One of the first results [<a href="https://eprint.iacr.org/2011/401.pdf">BPR12</a>] showed that LWR is as hard as LWE
+for parameters chosen so the modulus and modulus-to-error ratio are super-polynomial. This requirement was
+then improved in [<a href="https://eprint.iacr.org/2013/098.pdf">AKPW</a>] with a new reduction which proves hardness
+for a larger set of parameters including polynomial modulus and modulus-to-error ratio.</p>
+
+<p>This allows for an increase in security and efficiency which helped increase the popularity of this technique.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="key-exchange">Key Exchange</h2>
+
+<hr />
+
+<p>The basic algorithm for key exchange between Alice and Bob is similar to the one we saw in LWE.
+We denote a shift to the right by \(k\) bits as \(\gg k\) and \(msb(x)\) the most significant bit
+of \(x\) (with \(\epsilon_p\) bits). Our algorithm also introduces \(\epsilon_t\)
+which should be small relative to \(\epsilon_q\) and we have \(t=2^{\epsilon_t}\) respectively.</p>
+
+<ol>
+  <li>Alice generates \(A\in\mathbb{Z}_q^{l\times l}\) with coefficients chosen uniformly and \(s\in\mathbb{Z}_q^{l\times 1}\) Gaussian.</li>
+  <li>Alice computes and sends \(b=(As \bmod q) \gg (\epsilon_q - \epsilon_p)\in \mathbb{Z}_p^{l\times 1}\) to Bob.</li>
+</ol>
+
+<p>Notice that instead of adding an error, the public key \(b\) is determined by rounding.
+Up next, Bob does his part:</p>
+
+<ol>
+  <li>Bob generates \(s'\in\mathbb{Z}_q^{l\times 1}\) Gaussian</li>
+  <li>computes \(b' = (A^T s' \bmod q) \gg (\epsilon_q - \epsilon_p)\in \mathbb{Z}_p^{l\times 1}\)</li>
+  <li>computes \(v' = b^T(s'\bmod p)\in \mathbb{Z}_p\)</li>
+  <li>computes \(c  = ((v'\bmod p) \gg (\epsilon_p - \epsilon_t - 1)\bmod t)\in \mathbb{Z}_t\)</li>
+  <li>computes \(k' = msb(v')\)</li>
+  <li>finally, Bob sends \(b', c\) to Alice</li>
+</ol>
+
+<p>Alice completes the procedure again similarly to LWE. Another difference to notice is that the
+shared bit is encoded in the most significant bit.</p>
+
+<ol>
+  <li>Alice computes \(v = b'^T(s\bmod p)\in \mathbb{Z}_p\)</li>
+  <li>computes \(k = msb(v - 2^{\epsilon_p - \epsilon_t - 1}c)\)</li>
+</ol>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="correctness">Correctness</h2>
+
+<hr />
+
+<p>Similar to LWE, there is some probability that both parties will not agree on the same key but
+we’re happy as long as there’s a reasonable probability of success.</p>
+
+<p>From the algorithm, we want</p>
+
+\[k' = k\]
+
+<p>we see \(v\) and \(v'\) are close</p>
+
+\[v = b'^T(s\bmod p) = ((A^T s' \bmod q) \gg (\epsilon_q - \epsilon_p))^T(s\bmod p) \approx s'^TAs\]
+
+\[v' = b^T(s'\bmod p) = ((As \bmod q) \gg (\epsilon_q - \epsilon_p))^T(s'\bmod p) \approx s^TA^Ts' = s'^TAs\]
+
+<p>\(c\) can be though of as a correction which is used to make \(v\) closer to \(v'\) which used by Bob
+to find his side of the key.</p>
+
+<p>to see why the last equality holds we recall that the transpose of a \(1\times 1\) matrix is itself
+so \(s^TA^Ts' = (s^TA^Ts')^T = s'^TAs\). Since the shared secret will be the most significant bit
+of \(v\) and \(v'\) and we have that \(v\approx v'\) we have that with high probability, Alice and Bob
+agree on a secret.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h3 id="asymmetric-encryption">Asymmetric Encryption</h3>
+
+<hr />
+
+<p>Encrypting \(m\) is done similarly with the only difference being instead of computing \(c\),
+you compute \(c_m=(v' + 2^{\epsilon_p-1}m\bmod p)\gg (\epsilon_p - \epsilon_t - 1)\in\mathbb{Z}_{2t}\).</p>
+
+<p>To decrypt, Alice would compute \(msb(m')\) where \(m' = (v - 2^{\epsilon_p - \epsilon_t - 1}c_m)\).</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="example">Example</h2>
+
+<hr />
+
+<p>As for concrete numbers, we can use \(\epsilon_q = 13, \epsilon_p = 10, \epsilon_t = 3\) (so there is a corresponding \(t=2^{\epsilon_t}\))
+Choose \(l=3\)</p>
+
+<p>For high correctness, we choose a moderatiely small variance for our gaussian: \(\sigma = 2^6\) but higher security purposes may want to choose
+higher variance for more security. (the distribution is also truncated at \(\pm \sigma/2\))</p>
+
+<p>the numbers here were generated in python using <code class="language-plaintext highlighter-rouge">randint(0,q-1)</code> from the <code class="language-plaintext highlighter-rouge">random</code> package for uniform distributions and
+a rounded <code class="language-plaintext highlighter-rouge">truncnorm((lower - mu) / sigma, (upper - mu) / sigma, loc=mu, scale=sigma)</code> from <code class="language-plaintext highlighter-rouge">scipy.stats</code> package
+for the Gaussian distribution.</p>
+
+\[A=
+\begin{bmatrix}
+4768 &amp;
+7514 &amp;
+2031 \\
+331 &amp;
+6544 &amp;
+2947 \\
+7512 &amp;
+4568 &amp;
+4028
+\end{bmatrix}
+,\qquad
+\pmb{s} = 
+\begin{bmatrix}
+22\\
+-17\\
+10
+\end{bmatrix}\]
+
+<p>we get</p>
+
+\[As\bmod q =
+\begin{bmatrix}
+5660\\
+7424\\
+5008
+\end{bmatrix}\]
+
+<p>bit shifting right by \(\epsilon_q - \epsilon_p = 3\) we get</p>
+
+\[b=
+\begin{bmatrix}
+707\\
+928\\
+626
+\end{bmatrix}\]
+
+<p>Now it’s Bob’s turn:</p>
+
+\[\pmb{s}' = 
+\begin{bmatrix}
+-9\\
+16\\
+-27
+\end{bmatrix}\]
+
+<p>notice in our case \(s = s\bmod p\) and also \(s' = s'\bmod p\). This is convenient for computation.</p>
+
+\[A^Ts'\bmod q =
+\begin{bmatrix}
+5320\\
+3854\\
+2037
+\end{bmatrix}\]
+
+<p>bit shifting right by \(\epsilon_q - \epsilon_p = 3\) and \(\epsilon_p - \epsilon_t = 7\)
+respectively we get</p>
+
+\[b'=
+\begin{bmatrix}
+665\\
+481\\
+254
+\end{bmatrix}
+,\quad
+v' = -8417 \bmod p = 799
+,\quad
+c = 4
+,\quad
+k' = msb(799) = 1\]
+
+<p>Finally, Alice completes the process using \(r = 2^{\epsilon_p - \epsilon_t - 1}c = 64 * 4 = 256\)</p>
+
+\[v = 8993\bmod p = 801
+k = msb(v - r) = msb(801 - 256) = msb(545) = 1\]
+
+<p>as expected</p>
+
+<p><br /></p>
+
+<hr />
+<h3 id="example-1">Example</h3>
+<hr />
+
+<p>Using the same values from our earlier example and \(m = 1\) we have</p>
+
+\[c_m = (799 + 2^9\bmod p)\gg (10 - 3 - 1) = 287 \gg 6  = 4\]
+
+\[msb(m') = msb(801 - 2^{6}4) = msb(545) = 1\]
+
+<p>if instead \(m=0\) then \(c_m = 12\) and \(msb(m') = msb(801 - 2^6\cdot12) = msb(801-768) = msb(33) = 0\) as expected</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="conclusion">Conclusion</h2>
+
+<hr />
+
+<p>Though similar to LWE, LWR is becoming increasingly preffered due to the fact that it does not rely on
+needing to sample error terms (making it more efficient).
+There have also been developments which seem to indicate that <a href="https://eprint.iacr.org/2016/589">LWR can be just as “hard” to solve as LWE</a>.</p>
+
+<p>There is now only one more variant to talk about before we’re prepared to talk about one of the round 3 finalists
+for NIST post-quantum Key-Establishment algorithms. SABER. We will again be building on the theory covered so far
+so understanding LWR will be useful.</p>
+
+<p><br /></p>
+
+<hr />
+<h3 id="additional-resources">Additional Resources:</h3>
+<hr />
+
+<p><code class="language-plaintext highlighter-rouge">Banerjee, A., Peikert, C., &amp; Rosen, A. (2012, April). Pseudorandom functions and lattices. In Annual International Conference on the Theory and Applications of Cryptographic Techniques (pp. 719-737). Springer, Berlin, Heidelberg.</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">Alwen, J., Krenn, S., Pietrzak, K., &amp; Wichs, D. (2013, August). Learning with rounding, revisited. In Annual Cryptology Conference (pp. 57-74). Springer, Berlin, Heidelberg.</code></p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

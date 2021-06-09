@@ -1,0 +1,135 @@
+6a7
+> featured: 1
+10,12c11,13
+< A brief introduction to Learning with Rounding (LWR) based on papers by
+< Banerjee et al. and Alwen et al.
+< 
+---
+> The next step in our goal of understanding the NIST candidates for post-quantum cryptography will
+> be to look at Learning with Rounding (LWR). As you can probably guess, this is related to Learning with
+> Errors but it has a few key differences which makes it generally more efficient than LWE.
+29c30,31
+< This sampling may be a source of slowdown for the algorithm if, for instance, rejection sampling is used.
+---
+> There is a way to blur this information without needing to sample an error, and this is the
+> so-called "rounding".
+31c33
+< In LWR, we generate the analog to errors deterministically by rounding an element in $$\mathbb{Z}_q$$ to
+---
+> More precisely: in LWR, we generate the analog to errors deterministically by rounding an element in $$\mathbb{Z}_q$$ to
+46,66c48,49
+< The modulus operations are also more efficient to implement since taking mod $$q$$ is equivalent to saying
+< keep the $$q$$ least significant bits (and similarly for mod $$p$$).
+< 
+< <br>
+< 
+< ***
+< 
+< ## Hardness and Relation to LWE
+< 
+< ***
+< 
+< Notice that if $$s = \epsilon_q - \epsilon_p$$ is small then the rounding operation is actually equivalent to
+< adding a small error which makes the lower $$s$$ bits $$0$$. This similarity is convenient because it hints
+< towards LWR being similar to LWE in terms of hardness, at least for certain parameters.
+< 
+< One of the first results [[BPR12](https://eprint.iacr.org/2011/401.pdf)] showed that LWR is as hard as LWE
+< for parameters chosen so the modulus and modulus-to-error ratio are super-polynomial. This requirement was
+< then improved in [[AKPW](https://eprint.iacr.org/2013/098.pdf)] with a new reduction which proves hardness
+< for a larger set of parameters including polynomial modulus and modulus-to-error ratio.
+< 
+< This allows for an increase in security and efficiency which helped increase the popularity of this technique.
+---
+> The moduli are also easier to implement since taking mod $$q$$ is equivalent to saying keep the $$q$$ least significant bits
+> (and similarly for mod $$p$$).
+76,79c59,60
+< The basic algorithm for key exchange between Alice and Bob is similar to the one we saw in LWE.
+< We denote a shift to the right by $$k$$ bits as $$\gg k$$ and $$msb(x)$$ the most significant bit
+< of $$x$$ (with $$\epsilon_p$$ bits). Our algorithm also introduces $$\epsilon_t$$
+< which should be small relative to $$\epsilon_q$$ and we have $$t=2^{\epsilon_t}$$ respectively.
+---
+> 1. Alice generates $$A\in\mathbb{Z}_q^{l\times l}$$ Uniform and $$s\in\mathbb{Z}_q^{l\times 1}$$ Gaussian,
+> 2. computes sends $$b=(As \bmod q) \gg (\epsilon_q - \epsilon_p)\in \mathbb{Z}_p^{l\times 1}$$
+81,85c62
+< 1. Alice generates $$A\in\mathbb{Z}_q^{l\times l}$$ with coefficients chosen uniformly and $$s\in\mathbb{Z}_q^{l\times 1}$$ Gaussian.
+< 2. Alice computes and sends $$b=(As \bmod q) \gg (\epsilon_q - \epsilon_p)\in \mathbb{Z}_p^{l\times 1}$$ to Bob.
+< 
+< Notice that instead of adding an error, the public key $$b$$ is determined by rounding.
+< Up next, Bob does his part:
+---
+> ***
+92c69
+< 6. finally, Bob sends $$b', c$$ to Alice
+---
+> 6. sends $$b', c$$ to Alice
+94,95c71
+< Alice completes the procedure again similarly to LWE. Another difference to notice is that the
+< shared bit is encoded in the most significant bit.
+---
+> ***
+100,116d75
+< <br>
+< 
+< * * *
+< 
+< ## Correctness
+< 
+< * * *
+< 
+< Similar to LWE, there is some probability that both parties will not agree on the same key but
+< we're happy as long as there's a reasonable probability of success.
+< 
+< From the algorithm, we want
+< 
+< $$k' = k$$
+< 
+< we see $$v$$ and $$v'$$ are close
+< 
+121,123d79
+< $$c$$ can be though of as a correction which is used to make $$v$$ closer to $$v'$$ which used by Bob
+< to find his side of the key.
+< 
+133,145d88
+< ### Asymmetric Encryption
+< 
+< ***
+< 
+< Encrypting $$m$$ is done similarly with the only difference being instead of computing $$c$$,
+< you compute $$c_m=(v' + 2^{\epsilon_p-1}m\bmod p)\gg (\epsilon_p - \epsilon_t - 1)\in\mathbb{Z}_{2t}$$.
+< 
+< To decrypt, Alice would compute $$msb(m')$$ where $$m' = (v - 2^{\epsilon_p - \epsilon_t - 1}c_m)$$.
+< 
+< <br>
+< 
+< ***
+< 
+255a199,211
+> 
+> ## Asymmetric Encryption
+> 
+> ***
+> 
+> Encrypting $$m$$ is done similarly with the only difference being instead of computing $$c$$,
+> you compute $$c_m=(v' + 2^{\epsilon_p-1}m\bmod p)\gg (\epsilon_p - \epsilon_t - 1)\in\mathbb{Z}_{2t}$$.
+> 
+> To decrypt, Alice would compute $$msb(m')$$ where $$m' = (v - 2^{\epsilon_p - \epsilon_t - 1}c_m)$$.
+> 
+> <br>
+> 
+> ***
+275,281c231,232
+< Though similar to LWE, LWR is becoming increasingly preffered due to the fact that it does not rely on
+< needing to sample error terms (making it more efficient).
+< There have also been developments which seem to indicate that [LWR can be just as "hard" to solve as LWE](https://eprint.iacr.org/2016/589).
+< 
+< There is now only one more variant to talk about before we're prepared to talk about one of the round 3 finalists
+< for NIST post-quantum Key-Establishment algorithms. SABER. We will again be building on the theory covered so far
+< so understanding LWR will be useful.
+---
+> Though similar to 
+> 
+288,291d238
+< 
+< `Banerjee, A., Peikert, C., & Rosen, A. (2012, April). Pseudorandom functions and lattices. In Annual International Conference on the Theory and Applications of Cryptographic Techniques (pp. 719-737). Springer, Berlin, Heidelberg.`
+< 
+< `Alwen, J., Krenn, S., Pietrzak, K., & Wichs, D. (2013, August). Learning with rounding, revisited. In Annual Cryptology Conference (pp. 57-74). Springer, Berlin, Heidelberg.`

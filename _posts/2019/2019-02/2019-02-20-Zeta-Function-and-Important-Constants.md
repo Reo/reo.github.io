@@ -4,6 +4,7 @@ title: "Zeta Function and Important Constants"
 category: math
 author: "Reo"
 tags: complex_analysis
+featured: 1
 mathjax: true
 ---
 

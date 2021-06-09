@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Post-Quantum Cryptography: Learning with Errors</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>Continuing our discussion of post-quantum crytpography,
+we study Learning with Error (LWE) problems. LWE is a simpler
+example which is handy to use when introducing Learning with Rounding in
+SABER which is one of the candidates which has made it into round 3 submissions for
+<a href="https://csrc.nist.gov/projects/post-quantum-cryptography">NIST post-quantum crypto</a>
+competition.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#systems-of-linear-equations" id="markdown-toc-systems-of-linear-equations">Systems of Linear Equations</a></li>
+  <li><a href="#relation-to-lattice-problems" id="markdown-toc-relation-to-lattice-problems">Relation to Lattice Problems</a></li>
+  <li><a href="#public-key-system" id="markdown-toc-public-key-system">Public Key System</a>    <ul>
+      <li><a href="#key-generation" id="markdown-toc-key-generation">Key Generation</a></li>
+      <li><a href="#encryption" id="markdown-toc-encryption">Encryption</a></li>
+      <li><a href="#decryption" id="markdown-toc-decryption">Decryption</a></li>
+    </ul>
+  </li>
+  <li><a href="#conclusion" id="markdown-toc-conclusion">Conclusion</a>    <ul>
+      <li><a href="#additional-resources" id="markdown-toc-additional-resources">Additional Resources:</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="systems-of-linear-equations">Systems of Linear Equations</h2>
+
+<hr />
+
+<p>Before introducing LWE, we consider a related and more well known problem:</p>
+
+<p>Given matrices \(\color{Green}A\) and \(\pmb{\color{Green}b}\),
+can we find the value of \(\pmb{\color{Goldenrod}x}\) which satisfies the equation:</p>
+
+\[\color{Green}A\pmb{\color{Goldenrod}x} = \pmb{\color{Green}b}\]
+
+<p>if this is a difficult problem, we may be able to use it as a public-key system where
+\((A,\pmb{b})\) is a public key and \(\pmb{x}\) a secret key. Unfortunately, from
+our Linear Algebra courses we know this can be solved efficiently, say with Gaussian Elimination
+and hence is not fit for a crypto system.</p>
+
+<p>Modifying our system slightly, suppose we populate our matrices with elements from the field
+\(\mathbb{Z}_q\) and introduce a small error \(\pmb{e}\):</p>
+
+\[\color{Green}A\pmb{\color{Goldenrod}x} + \pmb{\color{Brown}e} = \pmb{\color{Green}b}\]
+
+<p>Finding the corresponding value for \(\pmb{x}\) is essentially the LWE problem and it turns out this is not only difficult,
+<a href="https://dl.acm.org/doi/10.1145/1060590.1060603">Regev showed</a>
+a reduction from worst-case lattice problems such as SVP (mentioned in the previous post)
+to LWE. In particular, LWE would be secure against quantum adversaries assuming quantum hardness
+of lattice problems such as SVP which have been studied <a href="https://staff.fnwi.uva.nl/p.vanemdeboas/vectors/mi8104c.html">more rigourously</a>.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="relation-to-lattice-problems">Relation to Lattice Problems</h2>
+
+<hr />
+
+<p>If we take the columns of \(A\) to be basis vectors in \(\mathbb{Z}^n_q\) and letting \(\pmb{s}\in\mathbb{Z}^n_q\) vary, we see
+\(A\pmb{s}\) is the set of points on a lattice. For example, if we have \(q=5\), \(A=
+\begin{bmatrix}
+1, 3\\
+2, 1
+\end{bmatrix}\), and \(\pmb{s} =
+\begin{bmatrix}
+0\\
+1
+\end{bmatrix}\)</p>
+
+<p>we get the point \([3,1]\) on the lattice. If we perturb this point with our error \(\pmb{e}\) we get \(\pmb{b}\) shown in pink
+in the graphic below. Notice since we are working in a finite field, we need only consider the points within
+\([0,5]\times[0,5]\) (since all others are equivalent mod \(q=5\))</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><img src="/assets/images/bdd.png" alt="BDD on a lattice" style="text-indent: 0;" class="invert-color" /></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><em>the lattice generated by \(A\)</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Knowing \(\pmb{b}\) is within the pink circle (knowing the nearest lattice point) is the fundamental statement of
+the “Bounded Distance Decoding” problem which LWE is based on.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="public-key-system">Public Key System</h2>
+
+<hr />
+
+<p>With the conjectured quantum-hardness of LWE it would be convenient to be able to create a public-key encryption
+system. We need to choose a modulus \(q\) and ensure all parties are working over the same field \(\mathbb{Z}_q\).
+For example, suppose we have \(q=17\).</p>
+
+<p>For simplicity, we will encrypting only a single bit but this process <a href="https://frodokem.org/">can be generalized</a>
+for sending larger chunks of data.</p>
+
+<p>Suppose we have a bit \(m\) we would like to encrypt. We can encode this for our system by computing</p>
+
+\[m' = \left\lfloor \frac{q}{2} \right\rfloor m = 8\times m\]
+
+<hr />
+
+<h3 id="key-generation">Key Generation</h3>
+
+<hr />
+
+<p>Key generation can done as follows:</p>
+<ol>
+  <li>Generate the matrix \(A\in\mathbb{Z}^{n\times n}\) with entries sampled uniformly from \([0,q-1]\)</li>
+  <li>Generate the secret \(\pmb{s}\in\mathbb{Z}^{n\times 1}\) with entries sampled uniformly from \([0,q-1]\)</li>
+  <li>Generate the error term \(\pmb{e}\in\mathbb{Z}^{n\times 1}\) with entries sampled from a discrete Gaussian Distribution (*)</li>
+  <li>Compute \(\pmb{b}=A\pmb{s} + \pmb{e}\)</li>
+</ol>
+
+<p>The public key is \((A, \pmb{b})\) and secret key is \(\pmb{s}\).</p>
+
+<p><br /></p>
+
+<hr />
+
+<h3 id="encryption">Encryption</h3>
+
+<hr />
+
+<p>Suppose Bob wants to encrypt the message \(\pmb{m}\) using Alice’s public key \((A, \pmb{b})\).
+In order to perform the encryption, he needs to:</p>
+
+<ol>
+  <li>Generate his own secret \(\pmb{s}'\in\mathbb{Z}^{1\times n}\) with entries sampled uniformly from \([0,q-1]\).</li>
+  <li>Compute \(\pmb{b}' = \pmb{s}'A + \pmb{e}'\)</li>
+  <li>Compute \(\pmb{v}' = \pmb{s}'\pmb{b}  + \pmb{e}''\)</li>
+  <li>Compute \(\pmb{c} = \pmb{v}' + \left\lfloor \frac{q}{2}\right\rfloor\pmb{m}\)</li>
+</ol>
+
+<p>Bob then sends \((\pmb{b}', \pmb{c})\) to Alice.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h3 id="decryption">Decryption</h3>
+
+<hr />
+
+<p>Decryption is done by computing a value close to \(\pmb{m}\) as follows</p>
+
+<ol>
+  <li>Compute \(\pmb{v} = \pmb{b}'\pmb{s}\)</li>
+  <li>Compute \(\pmb{m}' = \pmb{c} - \pmb{v}\approx \left\lfloor \frac{q}{2}\right\rfloor\pmb{m}\)</li>
+</ol>
+
+<p>\(\pmb{m}\) and \(\pmb{m}'\) are not identical but let’s examine their difference:</p>
+
+\[\begin{align*}
+\pmb{m}' - \pmb{m} &amp;= \pmb{c} - \pmb{v} - (\pmb{c} - \pmb{v}') \\
+&amp;= \pmb{c} - \pmb{c} + \pmb{v}' - \pmb{v}\\
+&amp;= \pmb{s}'\pmb{b}  + \pmb{e}'' - \pmb{b}'\pmb{s}\\
+&amp;= \pmb{s}'(A\pmb{s} + \pmb{e}) + \pmb{e}'' - (\pmb{s}'A + \pmb{e}')\pmb{s}\\
+&amp;= \pmb{s}'A\pmb{s} - \pmb{s}'A\pmb{s} + \pmb{s}'\pmb{e} - \pmb{e}'\pmb{s} + \pmb{e}''\\
+&amp;= \pmb{s}'\pmb{e} - \pmb{e}'\pmb{s} + \pmb{e}''\\
+\implies |\pmb{m}' - \pmb{m} |&amp;\lesssim q/4
+\end{align*}\]
+
+<p>Since the error was taken from a Gaussian distribution, we can say that with high probability
+it will be small. This is what justifies the magnitude of the difference being small in the last step
+so rounding to the nearest value most likely return the original message</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="conclusion">Conclusion</h2>
+
+<hr />
+
+<p>Lattice-based algorithms seem to be leading in popularity for post-quantum encryption so studying them continues to be
+important for anyone who uses crytography in their field.</p>
+
+<p>Note that worst-case hardness proofs also requires that the distribution used to
+sample the error should have a standard deviation \(\sigma\) such that
+\(\sigma\times q&gt;\sqrt{n}\).</p>
+
+<p><br /></p>
+
+<hr />
+<h3 id="additional-resources">Additional Resources:</h3>
+<hr />
+
+<p>https://simons.berkeley.edu/talks/lwe-worst-case-average-case-reductions-and-cryptomania
+http://www.tcs.tifr.res.in/~prahladh/mysore2013/slides/Rosen-LWR-Mysore.pdf</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

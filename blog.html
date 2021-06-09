@@ -3,10 +3,13 @@ layout: hp
 title: Blog
 mathjax: true
 ---
-<h2>Ramblings on Security, (Cryptography, and Math).</h2>
+<h1 class="featured-blog-title" >Featured Posts</h1>
+<h2 class="blog-subtitle">Ramblings on Security, (Cryptography, and Math).</h2>
+<a class="archive-blog-link" href=/blog/archive>Archive</a>
 <br>
 <ul class="post-list">
   {% for post in site.posts %}
+  {% if post.featured %}
   <li class="post-list-item">
   <div class="shared-post-header">
     <h2>
@@ -18,5 +21,6 @@ mathjax: true
     {{ post.excerpt }}
   </div>
   </li>
+  {% endif %}
   {% endfor %}
 </ul>

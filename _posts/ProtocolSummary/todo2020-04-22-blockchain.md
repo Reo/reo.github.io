@@ -1,0 +1,13 @@
+# Basic Blockchain
+
+## Goals
+
+## Assumptions
+
+## First Attempt
+
+## Weakening the Assumptions
+
+## Applications
+
+## Lessons Learned

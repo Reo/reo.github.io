@@ -4,6 +4,7 @@ title: "Growth of Fibonacci using Complex Analysis"
 category: math
 author: "Reo"
 tags: complex_analysis
+featured: 1
 mathjax: true
 ---
 

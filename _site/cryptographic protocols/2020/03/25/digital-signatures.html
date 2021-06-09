@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Summary of Digital Signature Schemes</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>With the increasingly widespread use of digital document
+formats, it quickly became obvious that physical signatures
+needed a digital, mathematically secure equivalent.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#goals" id="markdown-toc-goals">Goals</a></li>
+  <li><a href="#using-public-key-cryptography" id="markdown-toc-using-public-key-cryptography">Using Public-key Cryptography</a>    <ul>
+      <li><a href="#forgery" id="markdown-toc-forgery">Forgery</a></li>
+      <li><a href="#authentic" id="markdown-toc-authentic">Authentic</a></li>
+      <li><a href="#reusable" id="markdown-toc-reusable">Reusable</a></li>
+      <li><a href="#cannot-be-altered" id="markdown-toc-cannot-be-altered">Cannot be Altered</a></li>
+      <li><a href="#non-repudiation" id="markdown-toc-non-repudiation">Non-repudiation</a></li>
+    </ul>
+  </li>
+  <li><a href="#weakening-the-assumptions" id="markdown-toc-weakening-the-assumptions">Weakening the Assumptions</a></li>
+  <li><a href="#non-transferable-signatures" id="markdown-toc-non-transferable-signatures">Non-transferable Signatures</a>    <ul>
+      <li><a href="#example" id="markdown-toc-example">Example</a></li>
+    </ul>
+  </li>
+  <li><a href="#fail-stop-signatures" id="markdown-toc-fail-stop-signatures">Fail-Stop Signatures</a></li>
+  <li><a href="#references" id="markdown-toc-references">References</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="goals">Goals</h2>
+
+<hr />
+
+<p>There are a few requirements which we expect signatures to
+fulfil both in the traditional setting and digitally.</p>
+
+<ol>
+  <li>The signature cannot be forged</li>
+  <li>The signature must be authentic</li>
+  <li>The signature cannot be “moved” to a different document</li>
+  <li>The signed document cannot be altered</li>
+  <li>The signature cannot be repudiated</li>
+</ol>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="using-public-key-cryptography">Using Public-key Cryptography</h2>
+
+<hr />
+
+<p>Public-key cryptography (in particular RSA) gives a
+straight-forward solution with some limitations.
+The idea is that instead of “encrypting” with the
+recipient’s public key, Alice would encrypt with
+her own secret key. Let’s take a look at why this appears
+to work.</p>
+
+<p><br /></p>
+
+<h3 id="forgery">Forgery</h3>
+
+<p>This signature cannot be forged since the only person who
+could have encrypted the message which corresponds to Alice’s
+public key must have Alice’s secret key (which we assume is
+only Alice otherwise we have much larger issues).</p>
+
+<p><br /></p>
+
+<h3 id="authentic">Authentic</h3>
+
+<p>Bob can verify the signature is authentic using Alice’s
+public key.</p>
+
+<p><br /></p>
+
+<h3 id="reusable">Reusable</h3>
+
+<p>Bob cannot “move” the signature since that would require
+encrypting using Alice’s secret key which he doesn’t have.</p>
+
+<p><br /></p>
+
+<h3 id="cannot-be-altered">Cannot be Altered</h3>
+
+<p>Similar to moving the signature, altering the document would
+require Bob to know Alice’s secret key.</p>
+
+<p><br /></p>
+
+<h3 id="non-repudiation">Non-repudiation</h3>
+
+<p>Since we assume Alice is the only one in possession of her
+secret key, she cannot reasonably deny having signed the document.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="weakening-the-assumptions">Weakening the Assumptions</h2>
+
+<hr />
+
+<p>There is however one potentially fatal flaw to only using the
+public-key approach. Consider the situation where Alice signs
+a document where she authorizes Bob to perform something on
+her behalf, perhaps move money. Bob can present this digital
+signature as many times as he wants and as long as Alice has
+the same public-private key pair, continues to have these
+permissions.</p>
+
+<p>This can be somewhat solved using timestamps (a combined
+approach like this is similar to what Adobe uses for their
+signature scheme).</p>
+
+<p>Even with this proposed solution why stop there? We can have
+stronger (or strictly weaker) requirements we want from a
+digital signature.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="non-transferable-signatures">Non-transferable Signatures</h2>
+
+<hr />
+
+<p>In this case, Alice wants to sign a document so that
+the only way to verify its authenticity is to participate
+in an interactive protocol. This prevents Bob from obtaining
+a signed document from Alice and later use it to blackmail
+her since Alice can simply choose to not verify.</p>
+
+<p>Here is a basic protocol which can help get the idea across</p>
+
+<p><br /></p>
+
+<h3 id="example">Example</h3>
+
+<p>Suppose Alice has private key \(x\), public key \(g^x\pmod{p}\) and
+signs \(m\) which she sends to Bob as \(z=m^x\pmod{p}\). Bob can
+verify the signature as follows</p>
+
+<ol>
+  <li>Bob chooses \(a, b\) random integers less than \(p\) and sends Alice \(c=z^a(g^x)^b\pmod{p}\)</li>
+  <li>Alice computes \(t=x^{-1}\pmod{p-1}\) and sends Bob \(d=c^t\pmod{p}\)</li>
+  <li>Bob confirms \(d\equiv m^ag^b\pmod{p}\)</li>
+</ol>
+
+<p>Bob should be convinced that Alice has the corresponding private key
+but cannot convince a third party of the signature using only the
+transcript since there is no way to know if the numbers were actually
+random or if Bob just “worked backwards” from the \(d\) he was looking for.</p>
+
+<p>There are more sophisticated protocols which also allow Alice to
+explicitly disavow a false signature.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="fail-stop-signatures">Fail-Stop Signatures</h2>
+
+<hr />
+
+<p>In this scenario, Alice wants to protect herself in case a brute-force
+attack manages to steal her secret key and starts signing documents on
+her behalf.</p>
+
+<p>This can be done by generating many secret keys which correspond to the
+same public key. Here if Alice wants to dispute a signature, she would
+show that the document with the forged signature and one with her real
+signature are distinct and still correspond to the same public key.</p>
+
+<p>Alice would need to generate sufficient secret keys to make the probability
+of an attack finding the one she uses sufficiently small.
+This doesn’t have many practical uses but it is an interesting area of study.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="references">References</h2>
+
+<hr />
+
+<p>Applied Crypto 23.4</p>
+
+<p>[1] https://helpx.adobe.com/acrobat/using/certificate-based-signatures.html</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

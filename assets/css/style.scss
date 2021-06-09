@@ -108,7 +108,7 @@ figcaption {
 .post-content td {
   padding-top: 8px;
   padding-bottom: 8px;
-  background-color: #222;
+  background-color: #202020;
   border-left:solid #ccc 1px;
   border-right:solid #ccc 1px;
   border-bottom:solid #ccc 1px;
@@ -174,10 +174,13 @@ blockquote {
 /**
  * Special Selectors
  */
-.no-indent p{
+.no-indent p {
   text-indent: 0px;
 }
 
+.green-background td {
+  background-color: #2c6719 !important;
+}
 
 
 /**

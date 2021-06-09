@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Learning with Errors: Example</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>We go over an example of encryption and decryption presented in the last post as well as
+how to establish a shared securely similar to diffie-hellman.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#key-generation" id="markdown-toc-key-generation">Key Generation</a></li>
+  <li><a href="#encryption" id="markdown-toc-encryption">Encryption</a></li>
+  <li><a href="#decryption" id="markdown-toc-decryption">Decryption</a></li>
+  <li><a href="#shared-secret" id="markdown-toc-shared-secret">Shared Secret</a></li>
+  <li><a href="#conclusion" id="markdown-toc-conclusion">Conclusion</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="key-generation">Key Generation</h2>
+
+<hr />
+
+<p>We first need to agree on a modulus. For this small example, say we take \(q=7\).</p>
+
+<p>Next, we generate a matrix \(A\in\mathbb{Z}^{n\times n}\) which will be used by both parties with entries sampled uniformly.
+Suppose we choose \(n=3\), \(A\) could look something like</p>
+
+\[A=
+\begin{bmatrix}
+6 &amp; 4 &amp; 5\\
+3 &amp; 6 &amp; 3\\
+6 &amp; 1 &amp; 2
+\end{bmatrix}\]
+
+<p>we similarly sample \(\pmb{s}\):</p>
+
+\[\pmb{s} = 
+\begin{bmatrix}
+5\\
+2\\
+3
+\end{bmatrix}\]
+
+<p>and finally the error from a discrete distibution similar to Gaussian</p>
+
+\[\pmb{e} =
+\begin{bmatrix}
+1\\
+0\\
+1
+\end{bmatrix}\]
+
+<p>Computing \(\pmb{b} = A\pmb{s} + \pmb{e}\) we have</p>
+
+\[\pmb{b} =
+\begin{bmatrix}
+5\\
+1\\
+4
+\end{bmatrix}\]
+
+<p>Alice’s public key is then \((A, \pmb{b})\)</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="encryption">Encryption</h2>
+
+<hr />
+
+<p>Suppose Bob would like to send a message to Alice.
+For demonstration purposes, he will be sending a single bit, \(m\).</p>
+
+<p>Bob first generates his own secret and two error terms</p>
+
+\[\pmb{s}' = 
+\begin{bmatrix}
+1,
+5,
+2
+\end{bmatrix},\qquad
+
+\pmb{e}' = 
+\begin{bmatrix}
+0,
+-1,
+-1
+\end{bmatrix},\qquad
+
+\pmb{e}'' = -1\]
+
+<p>and computes the terms he will send</p>
+
+\[\pmb{b}' = \pmb{s}'A + \pmb{e}' =
+\begin{bmatrix}
+5, 0, 2
+\end{bmatrix},\qquad
+
+v' = \pmb{s}'\pmb{b} + \pmb{e}'' = 4 - 1 = 3,\qquad
+
+c = v' + \left\lfloor\frac{7}{2}\right\rfloor m = 3 + 3m\]
+
+<p>Bob finally sends \((\pmb{b}', c)\) to Alice.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="decryption">Decryption</h2>
+
+<hr />
+
+<p>Alice can decrypt the bit sent by Bob (with high probability) as follows:
+She first computes \(v = \pmb{b}'s = 3\) and uses it to compute something close to
+\(\left\lfloor\frac{7}{2}\right\rfloor m\):</p>
+
+\[m' = c - v = 3 + 3m - 3 = 3m\]
+
+<p>Decoding is done by setting the received message to \(0\) if
+\(m'\in[-\left\lfloor\frac{q}{4}\right\rfloor,\left\lfloor\frac{q}{4}\right\rfloor]\)
+and \(1\) otherwise.</p>
+
+<p>In our case, we would decode correctly either way as desired.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="shared-secret">Shared Secret</h2>
+
+<hr />
+
+<p>Taking a look at the values we computed, notice that \(v \approx \pmb{s}'A\pmb{s}\)
+and \(v' \approx \pmb{s}'A\pmb{s}\) so \(v\approx v'\). This can be used as a shared
+secret after rounding.</p>
+
+<p>In particular, notice this involves combining values chosen by both parties.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="conclusion">Conclusion</h2>
+
+<hr />
+
+<p>A real implementation which uses LWE can be seen in <a href="https://frodokem.org/">Frodo KEM</a>.
+Frodo includes a Key Encapsulation Mechanism (simplified key exchange) while
+minimizing error rate for LWE.</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

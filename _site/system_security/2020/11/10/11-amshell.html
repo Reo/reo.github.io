@@ -89,6 +89,8 @@
 	
 	
 	
+	
+	
 -->
 
     <div class="hp-contents">
@@ -258,7 +260,7 @@ the memory looks something like</p>
 </code></pre></div></div>
 
 <p>A small technical point is that pwnlib complains if we have null bytes in the argument.
-After some experimentin, we notice the first two bytes tend to be <code class="language-plaintext highlighter-rouge">0xff</code> and the next
+After some experimentation, we notice the first two bytes tend to be <code class="language-plaintext highlighter-rouge">0xff</code> and the next
 one quite large (around <code class="language-plaintext highlighter-rouge">0xc0</code>) so the problem one is the lowest which can be <code class="language-plaintext highlighter-rouge">0x00</code>.
 A simple solution is if we detect this, simply shift it so we land on our NOP sled</p>
 

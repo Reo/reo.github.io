@@ -264,9 +264,44 @@ a.shared-post-title {
   line-height: 80%;
 }
 
+.featured-blog-title {
+  font-family: Georgia, serif;
+  font-size: 45px;
+  letter-spacing: 2px;
+  word-spacing: 5px;
+  color: #4D57FF;
+  font-weight: 500;
+  text-decoration: none;
+  font-style: normal;
+  font-variant: normal;
+  text-transform: none;
+  padding: 20px 10px;
+}
+
+h2.blog-subtitle {
+  padding: 0px 0px 15px;
+}
+
+a.archive-blog-link {
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+  font-size: 20px;
+  letter-spacing: 2px;
+  word-spacing: 5px;
+  color: #D5D5D5;
+  background-color: #42425f;
+  font-weight: 500;
+  text-decoration: none;
+  font-style: normal;
+  font-variant: normal;
+  text-transform: none;
+  padding: 0px 8px;
+  border-radius: 6px;
+}
+
 .post-list {
   width: min(75vw, 940px);
   padding: 0;
+  padding-top: 15px;
   margin-left: 0;
 }
 

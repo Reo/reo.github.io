@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Steganography and Subliminal Channels</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>Defined as concealing a message within another (ie. in plain sight),
+steganography on its own is actually not considered to be a cipher.
+There are however techniques which should interest any security
+professional since it allows disclosure of information.
+We also go over a way to hide messages within signature schemes
+(specifically ElGamal signatures) which are properly encrypted.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#steganography" id="markdown-toc-steganography">Steganography</a></li>
+  <li><a href="#in-practice" id="markdown-toc-in-practice">In Practice</a></li>
+  <li><a href="#subliminal-channels" id="markdown-toc-subliminal-channels">Subliminal Channels</a>    <ul>
+      <li><a href="#hiding-messages-using-elgamal-signatures" id="markdown-toc-hiding-messages-using-elgamal-signatures">Hiding Messages using elGamal Signatures</a></li>
+      <li><a href="#the-algorithm" id="markdown-toc-the-algorithm">The Algorithm</a></li>
+      <li><a href="#example" id="markdown-toc-example">Example</a></li>
+    </ul>
+  </li>
+  <li><a href="#lessons-learned" id="markdown-toc-lessons-learned">Lessons Learned</a></li>
+  <li><a href="#references" id="markdown-toc-references">References</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="steganography">Steganography</h2>
+
+<hr />
+
+<p>An easy example of steganography would be if you were to grab
+a newspaper and puncture the space above the letters of a text
+you wanted to share. Another example would be adding an extra
+space in the beginning of words which have the desired letters.
+This works since the rendered HTML does not preserve these
+additional spaces but the intended recipient would know to check
+the source where they can then retrieve the message.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="in-practice">In Practice</h2>
+
+<hr />
+
+<p>One of the most popular software for steganography is
+<a href="http://quickcrypto.com/free-steganography-software.html">QuickStego</a>
+which hides text in image files by making very minute changes
+which are often undetectable to everyone except someone who knows
+to look for the message.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="subliminal-channels">Subliminal Channels</h2>
+
+<hr />
+
+<p>Suppose Alice and Bob live in a country where exchange of
+encrypted messages is outlawed. They cannot use traditional
+encryption techniques and Walter is in charge of monitoring
+their internet communications to ensure their messages
+are in fact in plaintext.</p>
+
+<p>It would be possible to use steganography such as the HTML
+example given above but if Walter is clever enough these can
+still be found out. Lucky for Alice and Bob however, signature
+schemes are still permitted. Here is how Alice and Bob can
+still privately exchange encrypted messages without Walter
+knowing.</p>
+
+<p><br /></p>
+
+<h3 id="hiding-messages-using-elgamal-signatures">Hiding Messages using elGamal Signatures</h3>
+
+<p>Suppose Alice
+and Bob meet up and exchange a symmetric key \(r\).</p>
+
+<p>Alice initializes the basic ElGamal signature scheme by
+choosing a prime \(p\), having \(g,r\) be random numbers
+both less than
+\(p\), and computing \(K=g^r\pmod{p}\).</p>
+
+<p>Alice’s public key is \((K,g,p)\).</p>
+
+<p>To send a subliminal message \(M\) using the inoffensive message
+\(M'\) we need \(M, M', p\) pairwise prime and \(M,(p-1)\) also
+relatively prime.</p>
+
+<p><br /></p>
+
+<h3 id="the-algorithm">The Algorithm</h3>
+
+<ol>
+  <li>Alice computes \(X = g^M mod p\) and solves for \(Y\) in \(M’ = rX + MY \pmod{p-1}\) [Extended Euclidean]</li>
+  <li>Alice attaches her signature \((X,Y)\) as specified in the basic ElGamal scheme</li>
+  <li>Walter can verify the signature is legitimate by confirming \(K^XX^Y = g^{M’} \pmod{p}\)</li>
+  <li>Bob verifies \((g^r)^XX^Y = g^{M’} \pmod{p}\) to ensure the message is genuine and \(r\) is valid</li>
+  <li>Bob recovers the hidden message by computing \(M = (Y^{-1}(M’-rX)) \pmod{p-1}\)</li>
+</ol>
+
+<p><br /></p>
+
+<h3 id="example">Example</h3>
+
+<p>This example is courtesy of Schneier’s Applied Cryptography:</p>
+
+<p>Let \(p=11,g=2,r=8\). This makes the publilc key (which Walter
+can verify himself) \(2^8\pmod{11} = 3\).</p>
+
+<p>To send \(M\) using innocent message \(M'=5\), Alice confirms that
+\(\{5, 9, 11\}\) are pairwise prime as well as \(\{9, 10\}\). Since
+they are, she may continue to solve for \(X=6\) and \(Y=3\).</p>
+
+<p>The signature is then the pair \((X,Y) = (6,3)\).
+Bob can verify \((2^8)^66^3\equiv 2^5\pmod{11}\) and recovers \(M\)</p>
+
+\[3^{-1}(5-8\times 6)\pmod{10} = 49\pmod{10} = 9 = M\]
+
+<p>as expected. From Walter’s point of view, Alice and Bob simply
+exchanged signatures.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="lessons-learned">Lessons Learned</h2>
+
+<hr />
+
+<p>This shows just how careful one must be if they plan on supervising
+communications, for instance in protecting intellectual property.
+Signature schemes which have protection against these subliminal
+channels have been proposed though it’s quite possible other
+protocols also include similar unconventional methods of communicating.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="references">References</h2>
+
+<hr />
+
+<p>applied crypto 4.2, 23.3</p>
+
+<p>https://link.springer.com/chapter/10.1007/978-3-642-21031-0_21</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

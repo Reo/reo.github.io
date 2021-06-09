@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Key Escrow</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>It’s no secret that government agencies around the world
+have attempted to, and in some cases succeeded, in passing
+legislation which give them “backdoor” access to
+cryptosystems. Often with the pretext that criminals may
+use these to communicate. Key Escrow is one proposed
+“solution” to this issue.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#goals" id="markdown-toc-goals">Goals</a></li>
+  <li><a href="#assumptions" id="markdown-toc-assumptions">Assumptions</a></li>
+  <li><a href="#first-attempt-fair-cryptosystems" id="markdown-toc-first-attempt-fair-cryptosystems">First Attempt (Fair Cryptosystems)</a>    <ul>
+      <li><a href="#cons-of-fair-cryptosystems" id="markdown-toc-cons-of-fair-cryptosystems">Cons of Fair Cryptosystems</a></li>
+    </ul>
+  </li>
+  <li><a href="#strengthening-the-goals" id="markdown-toc-strengthening-the-goals">Strengthening the Goals</a></li>
+  <li><a href="#failsafe-key-escrow" id="markdown-toc-failsafe-key-escrow">Failsafe Key Escrow</a></li>
+  <li><a href="#applications" id="markdown-toc-applications">Applications</a></li>
+  <li><a href="#references" id="markdown-toc-references">References</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="goals">Goals</h2>
+
+<hr />
+
+<p>The goal of Key Escrow is really straight-forward. Give
+someone (usually the authorities) a way to obtain the
+keys used for encrypted communication so that if messages
+are ever needed — say, for a criminal investigation —
+they can be easily decrypted by an authorized party.</p>
+
+<p>Ideally, the privacy of regular users should remain
+intact, nobody should be able to obscure messages from the
+authorities.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="assumptions">Assumptions</h2>
+
+<hr />
+
+<p>There’s a few (arguable lofty) assumptions being made here</p>
+
+<ol>
+  <li>There is a trusted KDC/authority</li>
+  <li>There is a sufficiently large set of (trusted) trustees</li>
+  <li>The trustees are available and cooperative</li>
+  <li>Alice and communicate securely with each of the trustees and KDC</li>
+  <li>The escrowed keys are the only ones valid for encryption</li>
+</ol>
+
+<p>Notice that we’ll use KDC instead of “authority” for brevity.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="first-attempt-fair-cryptosystems">First Attempt (Fair Cryptosystems)</h2>
+
+<hr />
+
+<p>One of the earliest implementations is as follows</p>
+
+<ol>
+  <li>Alice generates public/secret key pair \((p_k,s_k)\) and splits \(s_k\) into public and secret pieces</li>
+  <li>Alice sends a public and corresponding secret piece to each trustee and her public key to KDC</li>
+  <li>The trustees verify their public/secret pairs, store the secret part, and send KDC the public part</li>
+  <li>KDC verifies the public pieces against the public key, signs the public key, and sends it to Alice/posts it</li>
+</ol>
+
+<p>If Alice’s messages later need to be decrypted, the
+authorities simply tell the trustees to forfeit their
+secret pieces and reconstruct the secret.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h3 id="cons-of-fair-cryptosystems">Cons of Fair Cryptosystems</h3>
+
+<hr />
+
+<p>The fact that we need all trustees to cooperate could
+be an issue (may prefer to use a variation on secret
+sharing instead).</p>
+
+<p>We can establish some stronger and more concrete
+goals after this first attempt</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="strengthening-the-goals">Strengthening the Goals</h2>
+
+<hr />
+
+<ol>
+  <li>Users should have enough control over the keys to be sure they are secure</li>
+  <li>The authority should be guaranteed the secret keys are in fact random (no bad keys)</li>
+  <li>User should be guaranteed that their secret key is revealed iff enough trustees release their shares to the authority</li>
+  <li>The authority should be able to obtain the secret key for a target by collecting keys from a certain number of trustees</li>
+  <li>The system should not be able to allow obscured communication when the keys are revealed</li>
+</ol>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="failsafe-key-escrow">Failsafe Key Escrow</h2>
+
+<hr />
+
+<p>This scheme shares some similarities with traditional Diffie-Hellman exchange.</p>
+
+<p>Let \(p\) be prime and \(g\) a generator of \(\mathbb{Z}_p\)
+(both public parameters).</p>
+
+<ol>
+  <li>The KDC chooses \(y \in [0,p-2]\) randomly and commits \(y\) using a commitment scheme</li>
+  <li>\(A\) picks a random secret value \(x \in [0,p-2]\) and sends the KDC \(g^x \pmod{p}\)</li>
+  <li>\(A\) shares \(x\) with the trustees using a Verifiable Secret Sharing scheme</li>
+  <li>KDC reveals \(y\) to \(A\)</li>
+  <li>\(A\) verifies the commitment and sets her public key \(P_A = (G^x)G^y \pmod{p}\)</li>
+  <li>\(A\) sets her secret key to be \(S_A = x + y \pmod{p-1}\)</li>
+</ol>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="applications">Applications</h2>
+
+<hr />
+
+<p>This has applications in national security laws passed in nations such as
+the United Kingdom (see
+<a href="https://en.wikipedia.org/wiki/Regulation_of_Investigatory_Powers_Act_2000">RIPA 2000</a>).
+In these cases, government agencies want to be able to
+decrypt communication given sufficient clearance.</p>
+
+<p>Of course these don’t come without their own set of
+downsides, but there’s enough there for an entirely
+separate article.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="references">References</h2>
+
+<hr />
+
+<p>Applied Cryptography 4.14</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

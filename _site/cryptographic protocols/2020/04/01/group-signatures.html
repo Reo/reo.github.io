@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Group Signatures</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>Digital signatures can be extended to include protocols
+where we want to retain some level of anonymity while still
+needing to verify that a user is in fact a part of a
+privileged group.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#goals" id="markdown-toc-goals">Goals</a></li>
+  <li><a href="#first-attempt" id="markdown-toc-first-attempt">First Attempt</a>    <ul>
+      <li><a href="#problems" id="markdown-toc-problems">Problems</a></li>
+    </ul>
+  </li>
+  <li><a href="#ring-signatures" id="markdown-toc-ring-signatures">Ring Signatures</a>    <ul>
+      <li><a href="#generating-the-signature" id="markdown-toc-generating-the-signature">Generating the Signature</a></li>
+    </ul>
+  </li>
+  <li><a href="#references" id="markdown-toc-references">References</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="goals">Goals</h2>
+
+<hr />
+
+<p>The high-level goals here are</p>
+
+<ol>
+  <li>Only members of the group can sign messages</li>
+  <li>The receiver can verify that the signature is valid</li>
+  <li>The receiver cannot determine precisely who signed the document</li>
+</ol>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="first-attempt">First Attempt</h2>
+
+<hr />
+
+<p>A simple approach can involve a trusted third party we’ll call
+Trent and gives Trent the ability to “open” the identity of the
+signer should it be necessary.</p>
+
+<p>The protocol is as follows:</p>
+
+<ol>
+  <li>Trent generates many private-public key pairs and gives every member \(m\) unique private keys</li>
+  <li>The master list of all public keys is revealed with Trent keeping which corresponds to whom for himself</li>
+  <li>When a group member sign a document, they choose one of the $$m4$ keys at random</li>
+  <li>To verify the signature, the receiver matches it with one of the public keys on the master list</li>
+  <li>If there are any issues, Trent can identify which member the signature belongs to since he has the original list</li>
+</ol>
+
+<p><br /></p>
+
+<hr />
+
+<h3 id="problems">Problems</h3>
+
+<hr />
+
+<p>There are a few problems with this protocol which make it impractical.
+The first being that it can require a very large number of keys, and
+second, a trusted third party like Trent is hard to maintain and may
+not exist.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="ring-signatures">Ring Signatures</h2>
+
+<hr />
+
+<p>In this case, the assumtions are weakened so Trent is not needed while
+the assertions in our goals still hold. Precisely,</p>
+
+<ol>
+  <li>Only members of the group can sign messages</li>
+  <li>The receiver can verify that the signature is valid</li>
+  <li>The receiver cannot determine precisely who signed the document</li>
+</ol>
+
+<p>Note that since there is no trusted arbitrator, anonymity cannot be
+revoked in this case.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h3 id="generating-the-signature">Generating the Signature</h3>
+
+<hr />
+
+<p>To generate a signature, Alice does the following: (see [1] for details)</p>
+
+<ol>
+  <li>Computes a symmetric key as the hash of the message to be signed \(k=H(m)\)</li>
+  <li>Picks a random number \(v\) called “glue”</li>
+  <li>Picks random numbers \(x_i\) for every ring member except herself</li>
+  <li>Computes \(y_i=g(x_i)\) where \(g\) is a <a href="https://en.wikipedia.org/wiki/Trapdoor_function">trapdoor function</a></li>
+  <li>Plug \(y_i\) and \(v\) into the <em>ring equation</em> \(C_{k,v}(y_1,\ldots,y_r)\) solving for her corresponding \(y_s\) value</li>
+  <li>Use knowledge of the trapdoor to compute \(x_i = g_s^{-1}(y_s)\)</li>
+  <li>The signature is \((P_1,\ldots,P_r;v;x_1,\ldots,x_r)\) where \(P_i\) is the \(i\)th public key</li>
+</ol>
+
+<p>Verifying the signature is much simpler. Given \((P_1,\ldots,P_r;v;x_1,\ldots,x_r)\),
+and \(m\) Bob does the following:</p>
+
+<ol>
+  <li>Computes \(y_i=g_i(x_i)\) for \(i=1,\ldots, r\)</li>
+  <li>Computes \(k = H(m)\)</li>
+  <li>Verifies the ring equation \(C_{k,v}(y_1,\ldots,y_r)=v\)</li>
+</ol>
+
+<p>Note that this protocol has proven unconditional security for the signer
+and there are publicly available implementations.</p>
+
+<p>This has potential applications in identifying membership (eg. key cards)
+and cryptocurrency to obfuscate transaction details.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="references">References</h2>
+
+<hr />
+
+<p>Applied Crypto</p>
+
+<p>https://link.springer.com/content/pdf/10.1007%252F3-540-45682-1_32.pdf</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

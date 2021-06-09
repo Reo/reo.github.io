@@ -4,10 +4,11 @@ title: Cryptopals Challenge 25
 category: crypto
 author: 'reo'
 tags: python cryptopals
+featured: 1
 mathjax: 
 ---
 
-In this challenge, we common cited and supposed benefit of AES CTR mode being that one can
+In this challenge, we address the commonly cited and supposed benefit of AES CTR mode being that one can
 easily seek into the ciphertext and decrypt just the byte/block which is needed.
 
 ## Contents

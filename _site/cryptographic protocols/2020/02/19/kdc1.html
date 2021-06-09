@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Key Establishment with A Trusted Party</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>Why are Key Establishment protocols needed? How do they prevent attacks on
+Confidentiality?
+We answer these questions by building up to the Kerberos protocol
+from scratch. This discussion focuses on protocols using symmetric
+cryptography with a trusted party.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#assumptions" id="markdown-toc-assumptions">Assumptions</a></li>
+  <li><a href="#first-attempt" id="markdown-toc-first-attempt">First Attempt</a></li>
+  <li><a href="#wide-mouth-frog" id="markdown-toc-wide-mouth-frog">Wide Mouth Frog</a></li>
+  <li><a href="#needham-schroeder" id="markdown-toc-needham-schroeder">Needham-Schroeder</a></li>
+  <li><a href="#simplified-kerberos" id="markdown-toc-simplified-kerberos">Simplified Kerberos</a></li>
+  <li><a href="#kerberos-details" id="markdown-toc-kerberos-details">Kerberos Details</a></li>
+  <li><a href="#lessons-learned" id="markdown-toc-lessons-learned">Lessons Learned</a></li>
+  <li><a href="#references" id="markdown-toc-references">References</a></li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="assumptions">Assumptions</h2>
+
+<hr />
+
+<p>We assume Trent is a third party which can be trusted (ie. will not cheat)
+and Mallory an active attacker able to intercept and alter messages.
+We also assume Alice and Trent share a symmetric key \(K_{AT}\); similarly
+Bob and Trent share symmetric key \(K_{BT}\).</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="first-attempt">First Attempt</h2>
+
+<hr />
+
+<p>We could start with a technique we know guarantees Alice and Bob agree on
+a shared key.
+<a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange">Diffie-Hellman Key exchange</a>.</p>
+
+<p>Using this alone has one fatal flaw, nothing is stopping
+Mallory from intercepting the communication, sending her
+own public key under Alice’s name, and eavesdropping the commuunication
+between them that way</p>
+
+<p><strong>illustrate the attack</strong></p>
+
+<p>This is appropriately called a “man-in-the-middle” attack.
+Let’s try using our trusted friend Trent to solve this.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="wide-mouth-frog">Wide Mouth Frog</h2>
+
+<hr />
+
+<p>A good base would be simply to ask trent to send over a session key to Bob.
+The server needs to know which symmetric keys to use so Alice should also identify
+herself and the intended recipient.</p>
+
+\[\begin{align*}
+A\to T: A, \{B, K_{AB}\}_{K_{AT}}\\
+T\to B: \{A, K_{AB}\}_{K_{BT}}
+\end{align*}\]
+
+<p>This is similar to the <em>Wide Mouth Frog</em> protocol, let’s study its shortcomings.</p>
+
+<p>We first notice that though Mallory can’t execute the same man-in-the-middle
+attack, Alice is in charge of generating the keys which can be a problem
+if we don’t trust users to generate secure session keys. In particular,
+if Mallory is able to crack an old key, he can decipher any previously saved
+messages and resend Bob</p>
+
+\[M\to B: \{A, K_{AB}\}_{K_{BT}}\]
+
+<p>which featured the insecure key convinving Bob that he is speaking with
+Alice when it is in fact Mallory on the other end.</p>
+
+<p>This can be fixed by having Trent generate the keys and including a timestamp
+across messages to guarantee “freshness” so Trent and Bob don’t accept messages
+sent much later.</p>
+
+<p>There is also the issue that if Bob is offline, Trent is wasting resources
+trying to reach him while other users also need Trent’s services. This
+can be fixed by giving Alice the key and having her establish a connection
+with Bob.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="needham-schroeder">Needham-Schroeder</h2>
+
+<hr />
+
+<p>Our improved protocol now looks something like this:</p>
+
+\[\begin{align*}
+A\to T: &amp;A, B, N_A &amp;&amp;\text{Alice identifies herself and the intended recipient including a nonce}\\
+T\to A: &amp;\{ N_A, K_{AB}, B, \{ K_{AB}, A \}_{K_{BT}} \}_{K_{AT}}
+\end{align*}\]
+
+<p>The server generates a secure key packaging it in a message only Alice
+can see and a second to be read by Bob. Trent responds with the same nonce
+to ensure freshness.</p>
+
+\[\begin{align*}
+A\to B: &amp;\{ K_{AB},A \}_{K_{BT}}&amp;&amp;\text{Alice forwards Trent's message to Bob}\\
+B\to A: &amp;\{ N_B \}_{K_{AB}}&amp;&amp;\text{Bob sends a Nonce to confirm they agreed on a key}\\
+A\to B: &amp;\{ N_B-1 \}_{K_{AB}}&amp;&amp;\text{Alice performs a simple operation to confirm}
+\end{align*}\]
+
+<p>Finally, Bob check he received \(N_B-1\) meaning that the session key has been
+established and they may communicate.</p>
+
+<p>Unfortunately this still has one major oversight, though Alice no longer
+generates the session keys, a compromised session key is still much more dangerous
+than it needs to be.</p>
+
+<p>Suppose Mallory stores the message</p>
+
+\[\{ K_{AB},A \}_{K_{BT}}\\\]
+
+<p>and 6 months later, obtains the session key \(K_{AB}\) one way or another. Mallory
+can replay this message to Bob</p>
+
+\[M\to B: \{ K_{AB},A \}_{K_{BT}}\\\]
+
+<p>and Bob is convinced he is communicating with Alice despite Mallory being on the
+other end. There are a few ways to fix this, let’s consider a popular solution
+implemented in the
+<a href="https://en.wikipedia.org/wiki/Kerberos_(protocol)">Kerberos protocol</a>.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="simplified-kerberos">Simplified Kerberos</h2>
+
+<hr />
+
+<p>Using the same notation, we can describe a protocol which is similar to
+Kerberos though with some detail omitted.</p>
+
+\[\begin{align*}
+A\to T: &amp;A, B&amp;&amp;\text{Alice identifies herself and the intended recipient}\\
+T\to A: &amp;\{ T,L,K_{AB},B \}_{K_{AT}}\{ T,L,K_{AB},A \}_{K_{BT}}
+\end{align*}\]
+
+<p>Trent responds with Timestamp \(T\), lifetime \(L\) symmetric key,
+and who they will be communicating with.</p>
+
+\[A\to B: \{ A,T \}_{K_{AB}}\{ T,L,K_{AB},A \}_{K_{BT}}\]
+
+<p>Alice sends Bob the key information and timestamp to confirm proper receipt.</p>
+
+\[B\to A: \{ T+1 \}_{K_{AB}}\]
+
+<p>Bob confirms everything went through properly with an agreed-upon
+modification to the timestamp.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="kerberos-details">Kerberos Details</h2>
+
+<hr />
+
+<p>For a more detailed look into the Kerberos protocol, we set up a new scenario
+with different actors. In this case, we have a client \(C\) who wants to connect
+to a service \(S\). Key distribution is handled by an Authentication server \(A\)
+and a Ticket-granting Server \(T\) which are trusted.</p>
+
+<p>Additionally, \(T\) shares symmetric keys \(K_T\) with \(A\) and shares \(K_S\)
+with \(S\) while \(A\) and \(C\) both have \(K_C\) (usually some derived from a
+password \(C\) uses to log in).</p>
+
+<p>The remaining terms such as \(L\) for lifetime, \(T^*\) for timestamp, and
+\(K\) representing keys remains the same.</p>
+
+<p>The protocol is as follows:</p>
+
+\[\begin{align*}
+C\to A: &amp;A\\
+A\to C: &amp;\{ K_{CT} \}_{K_C}, \{ K_{CT}, A, L \}_{K_T}\\
+C\to T: &amp;\{ K_{CT}, A, L \}_{K_T}, \{ A, T \}_{K_{CT}}\\
+T\to C: &amp;\{ K_{CS} \}_{K_{CT}}, \{ K_{CS}, A, L \}_{K_S}\\
+C\to S: &amp;\{ K_{CS}, A, L \}_{K_S}, \{ A, T^* \}_{K_{CS}}\\
+S\to C: &amp;\{ T^* \}_{K_{CS}}
+\end{align*}\]
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="lessons-learned">Lessons Learned</h2>
+
+<hr />
+
+<p>Through this, we have learned just how careful one needs to be when desiging
+and choosing which protocol to use. The same advice of never rolling your
+own crypto especially applies here where there are so many avenues of attack.
+On top of that, this all relies on proper use and upkeep of the Trent server.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="references">References</h2>
+
+<hr />
+
+<p>Applied Cryptography 3.1-3.3, 24.5</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

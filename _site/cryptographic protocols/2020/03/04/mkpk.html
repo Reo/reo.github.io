@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:title" content="reo">
+<meta property="og:description" content="Leop homepage">
+
+<!-- <meta property="fb:app_id" content="260132667518211"> -->
+<!-- <link rel="apple-touch-icon" href="https://aidn.jp/apple-touch-icon.png"> -->
+<!-- <link rel="shortcut icon" href="https://aidn.jp/shared/icon/favicon.ico"> -->
+<!-- <link rel="alternate" media="handheld" href="https://aidn.jp/"> -->
+<!--
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aidn.jp/shared/img/og/aidn.png">
+<meta name="twitter:site" content="@daniwell_aidn">
+
+<meta property="og:image" content="https://aidn.jp/shared/img/og/aidn.png">
+
+
+<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="canonical" href="http://192.168.0.23:4000/">
+<link rel="alternate" type="application/rss+xml" title="Reo homepage" href="http://192.168.0.23:4000/feed.xml">
+-->
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+<meta property="og:locale" content="en_CA">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">Multiple Key Public Key (Secret Broadcasting)</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>Traditional public-key cryptography solves a problem with
+communication between two parties, this can be further generalized.
+Suppose you would like to broadcast a message so that only specific
+subsets of designated listeners can decipher, this is the idea
+behind Multiple-Key Public-Key cryptography. It turns out, this
+also has applications in DRM.</p>
+
+<h2 class="no_toc" id="contents">Contents</h2>
+
+<ul id="markdown-toc">
+  <li><a href="#goals" id="markdown-toc-goals">Goals</a></li>
+  <li><a href="#first-attempt" id="markdown-toc-first-attempt">First Attempt</a></li>
+  <li><a href="#boyds-protocol" id="markdown-toc-boyds-protocol">Boyd’s Protocol</a></li>
+  <li><a href="#weakening-the-assumptions" id="markdown-toc-weakening-the-assumptions">Weakening the Assumptions</a></li>
+  <li><a href="#conference-key-distribution" id="markdown-toc-conference-key-distribution">Conference Key Distribution</a></li>
+  <li><a href="#applications" id="markdown-toc-applications">Applications</a></li>
+  <li><a href="#references" id="markdown-toc-references">References</a>    <ul>
+      <li><a href="#applications-in-drm" id="markdown-toc-applications-in-drm">Applications in DRM</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="goals">Goals</h2>
+
+<hr />
+
+<p>The goal is simple, for a set of listeners \(L_1,\ldots, L_n\)
+we would like to be able to efficiently broadcast messages to
+arbitrary subsets.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="first-attempt">First Attempt</h2>
+
+<hr />
+
+<p>We can go the traditional route and exchange different keys with
+every listener encrypting the message differently for each listener.</p>
+
+<p>This results in encrypting the same message many times over and
+— if \(n\) is very large — becomes unnecessarily inefficient.</p>
+
+<p>Another idea may be to create keys which correspond to every possible
+and encrypt accordingly. This results in an exponential growth in
+keys not to mention the added burden of needing to secure and
+keep track of those keys. This is even less efficient.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="boyds-protocol">Boyd’s Protocol</h2>
+
+<hr />
+
+<p>Colin Boyd suggested a solution. At a high level, we generate
+\(n\) keys, encrypt the message with \(k &lt; n\) of those, and
+require the \(n-k\) unused keys to decrypt (similar to
+Secret Splitting).</p>
+
+<!--syntax hilight fix-->
+
+<p>This is best ilustrated with an
+example so suppose \(T\) wants to broadcast a message amongst
+listeners \(L_1, L_2, L_3\). The keys are fist distributed as
+follows:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Listener</th>
+      <th style="text-align: center">Keys given</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">\(L_1\)</td>
+      <td style="text-align: center">\(K_2, K_3\)</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">\(L_2\)</td>
+      <td style="text-align: center">\(K_1, K_3\)</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">\(L_3\)</td>
+      <td style="text-align: center">\(K_1, K_2\)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>with this, encrypting with \(K_1\) results in a message only
+\(L_1\) can read and encypting with both \(K_2, K_3\) will allow
+anyone with \(K_1\) to read the message. In this case,
+\(L_2\) and \(L_3\).</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="weakening-the-assumptions">Weakening the Assumptions</h2>
+
+<hr />
+
+<p>While this does work for most subsets, this actually doesn’t
+allow for a message which all listeners can decrypt.
+There also needs to be some way to communicate the intended
+listeners so they know which keys are needed to properly
+decrypt the message.</p>
+
+<p>More importantly, collusion of any two malicious actors
+can read any message sent by \(T\) since they would have
+the whole set of keys.</p>
+
+<p>Chiou and Chen suggest another solution</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="conference-key-distribution">Conference Key Distribution</h2>
+
+<hr />
+
+<p>In this example, \(T\) shares only one key
+\(K_1, K_2, K_3, K_4, K_5\)
+with each
+listener respectively such that the \(K_i\) are
+pairwise prime and larger than any message expected
+to be sent.</p>
+
+<p>To send \(m\) to be read only by \(L_3, L_4, L_5\),
+\(T\) first generates a
+random key \(K\) and computes a large \(R\) such that</p>
+
+\[\begin{align*}
+R&amp;\equiv 0\pmod{K_1}\\
+R&amp;\equiv 0\pmod{K_2}\\
+R&amp;\equiv K\pmod{K_3}\\
+R&amp;\equiv K\pmod{K_4}\\
+R&amp;\equiv K\pmod{K_5}\\
+\end{align*}\]
+
+<p>This is straightforward using CRT. Finally, \(T\) sends
+\(\{ m \}_K, R\)</p>
+
+<p>If the listener is the intended recipient, they get the
+key required to decrypt the message. Otherwise, they get
+0 and know they are not the intended recipient.</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="applications">Applications</h2>
+
+<hr />
+
+<p>Though the procedure is best illustrated as broadcasting
+messages to users, the most impactful applications are in
+protecting the rights of content owners aka DRM
+(see bibliography) and in multi-party signatures
+(to be covered).</p>
+
+<p><br /></p>
+
+<hr />
+
+<h2 id="references">References</h2>
+
+<hr />
+
+<p>Applied Cryptography 3.5, 22.7 + slides bibliography</p>
+
+<h3 id="applications-in-drm">Applications in DRM</h3>
+
+<p>Halevy, D., Shamir, A. The LSD Broadcast Encryption Scheme // Advances in Cryptology (Crypto 2002). Lecture Notes in Computer Science 2442. Springer-Verlag - 2002.</p>
+
+<p>https://www.site.uottawa.ca/~stan/csi5389/readings/ieeebroad.pdf</p>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
