@@ -189,7 +189,7 @@ a:hover {
 .title {
   position:relative;
   top:0px;
-  left:2vw;
+  left:2em;
   color:#a6a6a6;
   text-align:left;
   font-size: calc(1rem + 3vw);

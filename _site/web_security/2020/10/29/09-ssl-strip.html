@@ -171,7 +171,7 @@ address automatically. For instance,</p>
       <span class="pi">-</span> <span class="s2">"</span><span class="s">commerce.example.com:&lt;public</span><span class="nv"> </span><span class="s">IP&gt;"</span>
 
   <span class="na">mallory</span><span class="pi">:</span>
-    <span class="na">image</span><span class="pi">:</span> <span class="s">thierrysans/mallory:ssl-stripping</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
     <span class="na">container_name</span><span class="pi">:</span> <span class="s">mallory</span>
     <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
     <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
@@ -190,7 +190,7 @@ address automatically. For instance,</p>
       <span class="pi">-</span> <span class="s2">"</span><span class="s">commerce.example.com:&lt;public</span><span class="nv"> </span><span class="s">IP&gt;"</span>
   
   <span class="na">wireshark</span><span class="pi">:</span>
-    <span class="na">image</span><span class="pi">:</span> <span class="s">thierrysans/wireshark:malicious-gateway</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="c1"># private image</span>
     <span class="na">container_name</span><span class="pi">:</span> <span class="s">wireshark</span>
     <span class="na">tty</span><span class="pi">:</span> <span class="no">true</span>
     <span class="na">network_mode</span><span class="pi">:</span> <span class="s">service:alice</span>
