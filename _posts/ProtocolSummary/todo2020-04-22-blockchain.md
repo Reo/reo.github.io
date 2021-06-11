@@ -1,6 +1,6 @@
 # Basic Blockchain
 
-## Goals
+Basic ideas
 
 ## Assumptions
 

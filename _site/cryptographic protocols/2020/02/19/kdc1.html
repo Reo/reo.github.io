@@ -143,18 +143,26 @@ Bob and Trent share symmetric key \(K_{BT}\).</p>
 
 <hr />
 
-<p>We could start with a technique we know guarantees Alice and Bob agree on
+<p>We could start with a technique we’re familiar with so Alice and Bob agree on
 a shared key.
 <a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange">Diffie-Hellman Key exchange</a>.</p>
 
 <p>Using this alone has one fatal flaw, nothing is stopping
 Mallory from intercepting the communication, sending her
-own public key under Alice’s name, and eavesdropping the commuunication
+own public key under Bob’s name, and eavesdropping the commuunication
 between them that way</p>
 
-<p><strong>illustrate the attack</strong></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>             A           ||          M               ||            B
+--------------------------------------------------------------------------------
+"I want to speak to Bob" -&gt; "I want to speak to Bob" -&gt;
+                         &lt;- "Hi, I'm Bob"            &lt;- "Hi, I'm Bob"
+"Here's my Public Key" A -&gt; "Here's my Public Key" A -&gt;
+                         &lt;- "Here's my Public Key" M &lt;- "Here's my Public Key" B
+</code></pre></div></div>
 
-<p>This is appropriately called a “man-in-the-middle” attack.
+<p>Mallory can then proceed to forward Alice’s messages to Bob making
+it appear like a regular session while in fact Mallory is listening.
+This is appropriately called a “man-in-the-middle” attack.
 Let’s try using our trusted friend Trent to solve this.</p>
 
 <p><br /></p>
