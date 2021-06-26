@@ -195,6 +195,7 @@ a:hover {
   font-size: calc(1rem + 3vw);
   font-size: 3.2em;
   margin: 4vmin 4.4vmin;
+  width: 80%;
 }
 #menu {
   padding:4vmin 4.4vmin;
