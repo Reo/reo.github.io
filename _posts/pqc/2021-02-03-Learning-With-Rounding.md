@@ -30,7 +30,7 @@ In LWE, we sampled an error vector from a Gaussian distribution to fuzz the solu
 This sampling may be a source of slowdown for the algorithm if, for instance, rejection sampling is used.
 
 In LWR, we generate the analog to errors deterministically by rounding an element in $$\mathbb{Z}_q$$ to
-one in a more spare set such as $$\mathbb{Z}_p$$ where $$p < q$$.
+one in a more sparse set such as $$\mathbb{Z}_p$$ where $$p < q$$.
 <!---->
 We can then formalize our rounding procedure by defining
 $$\left\lfloor x\right \rceil_p = \left\lfloor \frac{p}{q}x\right \rceil \pmod{p}$$
